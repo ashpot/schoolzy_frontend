@@ -1,1 +1,80 @@
 @import "tailwindcss";
+
+@theme{
+  
+  --color-brand-primary: hsla(205, 83%, 45%, 1);
+  --color-brand-hover: hsla(205, 68%, 55%, 1);
+  --color-success: hsla(142, 71%, 45%, 1);
+  --color-warning: hsla(46, 92%, 50%, 1);
+  --color-danger: hsla(0, 84%, 60%, 1);
+
+  /* typography */
+  --color-text-primary: hsla(222, 47%, 11%, 1);
+  --color-text-secondary: hsla(215, 16%, 47%, 1);
+  --color-text-muted: hsla(220, 6%, 63%, 1);
+  --color-border-line01: hsla(214, 32%, 91%, 1);
+  --color-border-line02: hsla(240, 6%, 93%, 1);
+  --color-label: hsla(221, 16%, 27%, 1);
+  --color-bg-input: hsla(240, 11%, 98%, 1);
+
+
+  /* background */
+  --color-bg-main: hsla(0, 0%, 100%, 1);
+  --color-bg-soft: hsla(0, 0%, 94%, 0.8);
+
+  
+  /* fonts */
+  --font-lato: "Lato", sans-serif;
+  --font-jakarta: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", sans-serif;
+  --font-inter: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+@layer base {
+  * {
+    @apply box-border;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  html, body {
+    overflow-x: hidden;
+  }
+  body {
+    @apply transition-all duration-300 ease-in;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  ul{
+    @apply list-none;
+  }
+
+}
+@utility global-p{
+  @apply px-10 max-w-7xl mx-auto;
+}
+@utility dashboard-p{
+  @apply px-5 max-w-7xl mx-auto;
+}
+@utility admin-p{
+  @apply px-10 max-w-7xl mx-auto;
+}
+@utility card-shadow{
+  @apply shadow-[0_2px_12px_0_hsla(215,50%,23%,0.08)];
+}
+@utility flex-center{
+  @apply flex items-center justify-center;
+}
+@utility page-title{
+  @apply text-text-primary font-lato font-semibold text-[28px] leading-[10.5];
+}
+@utility section-title{
+  @apply text-text-primary font-lato font-semibold text-[20px] leading-[7.5];
+}
+@utility card-number{
+  @apply text-text-primary font-lato font-semibold text-[24px] leading-[9];
+}
+@utility text-body{
+  @apply text-text-primary font-lato font-normal text-base leading-[6];
+}
+@utility text-body-small{
+  @apply text-text-muted font-lato font-normal text-xs leading-[4.5];
+}

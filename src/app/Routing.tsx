@@ -1,26 +1,26 @@
-import { Route, Routes, useLocation } from "react-router-dom";
+import { LandingPage } from "@/features/landing";
 import { AnimatePresence } from "framer-motion";
+import { Route, Routes, useLocation } from "react-router";
+import { AuthLayout, PublicLayout } from "./layouts";
+import { SigninPage, SignupPage } from "@/features/auth";
 
-const Text = () => {
-  return (
-    <div>
-      Testing a text to see if everything works
-    </div>
-  )
-}
 
 const AppRouter = () => {
   const location = useLocation();
-  const getSubRouteKey = () => {
-    if (location.pathname.startsWith('/dashboard/settings')) {
-      return '/dashboard/settings'; 
-    }
-    return location.pathname;
-  };
+  
   return (
     <AnimatePresence mode="wait" initial={false}>
-    <Routes location={location} key={getSubRouteKey()}>
-        <Route index element={<Text/>} />
+      <Routes location={location} key={location.pathname}>
+        {/* public */}
+        <Route path="/" element={<PublicLayout />}>
+            <Route index element={<LandingPage/>}/>
+        </Route>
+
+      <Route element={<AuthLayout />}>
+          <Route path="signup" element={<SignupPage/>}/>
+          <Route path="signin" element={<SigninPage/>}/>
+      </Route>
+        
     </Routes>
     </AnimatePresence>
   )
