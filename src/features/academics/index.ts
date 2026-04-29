@@ -1,0 +1,10 @@
+export { default as SubjectsPage } from "./pages/SubjectsPage";
+export { default as SubjectTeachersPage } from "./pages/SubjectTeachersPage";
+export { default as AssessmentTypesPage } from "./pages/AssessmentTypesPage";
+export { default as GradePage } from "./pages/GradePage";
+export { default as PsychomotivePage } from "./pages/PsychomotivePage";
+export { default as ViewStudentResultPage } from "./pages/ViewStudentResultPage";
+export { default as ViewClassResultPage } from "./pages/ViewClassResultPage";
+export { default as PromoteStudentsPage } from "./pages/PromoteStudentsPage";
+export { default as ManageScoresPage } from "./pages/ManageScoresPage";
+export { default as AttendanceSummariesPage } from "./pages/AttendanceSummariesPage";
