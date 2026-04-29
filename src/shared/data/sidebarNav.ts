@@ -1,0 +1,146 @@
+import type { NavItem } from "@/shared/types/navigation";
+import {
+  DashboardIcon,
+  ProfileUsers,
+  AcademicsIcon,
+  LearningIcon,
+  TestsIcon,
+  ResultsIcon,
+  SectionsIcon,
+  FinancesIcon,
+  InventoryIcon,
+  SessionsIcon,
+  SettingsIcon,
+} from "@/shared/lib/SvgLib";
+
+
+export const sidebarNavItems: NavItem[] = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    path: "/dashboard",
+    icon: DashboardIcon,
+  },
+  {
+    id: "users",
+    label: "Users",
+    path: "/users",
+    icon: ProfileUsers,
+    children: [
+      { id: "students", label: "Students", path: "/users/students", icon: ProfileUsers },
+      { id: "teachers", label: "Teachers", path: "/users/teachers", icon: ProfileUsers },
+      { id: "admins", label: "Admins", path: "/users/admins", icon: ProfileUsers },
+      { id: "parents", label: "Parents", path: "/users/parents", icon: ProfileUsers },
+    ],
+  },
+  {
+    id: "academics",
+    label: "Academics",
+    path: "/academics",
+    icon: AcademicsIcon,
+    children: [
+      { id: "subjects", label: "Subjects", path: "/academics/subjects", icon: AcademicsIcon },
+      { id: "subject-teachers", label: "Subject Teachers", path: "/academics/subject-teachers", icon: AcademicsIcon },
+      { id: "assessment-types", label: "Assessment Types", path: "/academics/assessment-types", icon: AcademicsIcon },
+      { id: "grade", label: "Grade", path: "/academics/grade", icon: AcademicsIcon },
+      { id: "psychomotive", label: "Psychomotive Evaluations", path: "/academics/psychomotive", icon: AcademicsIcon },
+      { id: "view-student-result", label: "View Student Result", path: "/academics/view-student-result", icon: AcademicsIcon },
+      { id: "view-class-result", label: "View Class Result", path: "/academics/view-class-result", icon: AcademicsIcon },
+      { id: "promote-students", label: "Promote Students", path: "/academics/promote-students", icon: AcademicsIcon },
+      { id: "manage-scores", label: "Manage Scores", path: "/academics/manage-scores", icon: AcademicsIcon },
+      { id: "attendance-summaries", label: "Attendance Summaries", path: "/academics/attendance-summaries", icon: AcademicsIcon },
+    ],
+  },
+  {
+    id: "learning",
+    label: "Learning",
+    path: "/learning",
+    icon: LearningIcon,
+    children: [
+      { id: "lesson-notes", label: "Lesson Notes", path: "/learning/lesson-notes", icon: LearningIcon },
+      { id: "attendance", label: "Attendance", path: "/learning/attendance", icon: LearningIcon },
+    ],
+  },
+  {
+    id: "tests",
+    label: "Tests",
+    path: "/tests",
+    icon: TestsIcon,
+    children: [
+      { id: "questions", label: "Questions", path: "/tests/questions", icon: TestsIcon },
+      { id: "tests-list", label: "Tests", path: "/tests/list", icon: TestsIcon },
+      { id: "scheduled-tests", label: "Scheduled Tests", path: "/tests/scheduled", icon: TestsIcon },
+    ],
+  },
+  {
+    id: "results",
+    label: "Results",
+    path: "/results",
+    icon: ResultsIcon,
+    children: [
+      { id: "upload-assessment", label: "Upload Results (By Assessment Type)", path: "/results/upload-assessment", icon: ResultsIcon },
+      { id: "upload-omitted", label: "Upload Omitted", path: "/results/upload-omitted", icon: ResultsIcon },
+      { id: "upload-weekly", label: "Upload Weekly Assessment", path: "/results/upload-weekly", icon: ResultsIcon },
+      { id: "upload-results", label: "Upload Results", path: "/results/upload", icon: ResultsIcon },
+      { id: "view-scores", label: "View Uploaded Scores", path: "/results/view-scores", icon: ResultsIcon },
+    ],
+  },
+  {
+    id: "sections",
+    label: "Sections",
+    path: "/sections",
+    icon: SectionsIcon,
+    children: [
+      { id: "classes", label: "Classes", path: "/sections/classes", icon: SectionsIcon },
+      { id: "class-groups", label: "Class Groups", path: "/sections/class-groups", icon: SectionsIcon },
+      { id: "assign-class", label: "Assign Class Form Teacher", path: "/sections/assign-class", icon: SectionsIcon },
+      { id: "class-average", label: "Class Average Denominator", path: "/sections/class-average", icon: SectionsIcon },
+    ],
+  },
+  {
+    id: "finances",
+    label: "Finances",
+    path: "/finances",
+    icon: FinancesIcon,
+    children: [
+      { id: "fees", label: "Fees", path: "/finances/fees", icon: FinancesIcon },
+      { id: "fee-type", label: "Fee Type", path: "/finances/fee-type", icon: FinancesIcon },
+      { id: "assign-fees", label: "Assign Fees", path: "/finances/assign-fees", icon: FinancesIcon },
+      { id: "payments", label: "Payments", path: "/finances/payments", icon: FinancesIcon },
+      { id: "paid-lists", label: "Paid Lists", path: "/finances/paid-lists", icon: FinancesIcon },
+      { id: "expenses", label: "Expenses", path: "/finances/expenses", icon: FinancesIcon },
+    ],
+  },
+  {
+    id: "inventory",
+    label: "Inventory",
+    path: "/inventory",
+    icon: InventoryIcon,
+    children: [
+      { id: "items", label: "Items", path: "/inventory/items", icon: InventoryIcon },
+      { id: "item-type", label: "Item Type", path: "/inventory/item-type", icon: InventoryIcon },
+      { id: "record-sale", label: "Record Sale", path: "/inventory/record-sale", icon: InventoryIcon },
+      { id: "inventory-report", label: "Inventory Report", path: "/inventory/inventory-report", icon: InventoryIcon },
+    ],
+  },
+  {
+    id: "sessions",
+    label: "Sessions",
+    path: "/sessions",
+    icon: SessionsIcon,
+    children: [
+      { id: "terms", label: "Terms", path: "/sessions/terms", icon: SessionsIcon },
+    ],
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    path: "/settings",
+    icon: SettingsIcon,
+    children: [
+      { id: "school", label: "School", path: "/settings/school", icon: SettingsIcon },
+      { id: "testimonials", label: "Testimonials", path: "/settings/testimonials", icon: SettingsIcon },
+      { id: "news-events", label: "News & Events", path: "/settings/news-events", icon: SettingsIcon },
+    ],
+  },
+];

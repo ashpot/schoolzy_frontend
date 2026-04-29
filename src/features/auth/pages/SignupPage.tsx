@@ -61,9 +61,8 @@ const SignupPage = (): React.ReactElement => {
 
   return (
     <section className="relative min-h-screen">
-      {/* Background overlay handled by parent or here if needed */}
       <section className="relative z-10">
-        <AuthNav showBackButton backRoute="/login" />
+        <AuthNav showBackButton backRoute="/signin" />
       </section>
 
       {/* signup layout [form + image] */}
