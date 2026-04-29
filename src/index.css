@@ -12,8 +12,10 @@
   --color-text-primary: hsla(222, 47%, 11%, 1);
   --color-text-secondary: hsla(215, 16%, 47%, 1);
   --color-text-muted: hsla(220, 6%, 63%, 1);
+  --color-text-muted01: hsla(223, 13%, 32%, 1);
   --color-border-line01: hsla(214, 32%, 91%, 1);
   --color-border-line02: hsla(240, 6%, 93%, 1);
+  --color-border-line03: hsla(220, 5%, 88%, 1);
   --color-label: hsla(221, 16%, 27%, 1);
   --color-bg-input: hsla(240, 11%, 98%, 1);
 
@@ -64,17 +66,17 @@
   @apply flex items-center justify-center;
 }
 @utility page-title{
-  @apply text-text-primary font-lato font-semibold text-[28px] leading-[10.5];
+  @apply text-text-primary font-jakarta font-semibold text-[28px];
 }
 @utility section-title{
-  @apply text-text-primary font-lato font-semibold text-[20px] leading-[7.5];
+  @apply text-text-primary font-lato font-semibold text-[20px];
 }
 @utility card-number{
-  @apply text-text-primary font-lato font-semibold text-[24px] leading-[9];
+  @apply text-text-primary font-lato font-semibold text-[24px];
 }
 @utility text-body{
-  @apply text-text-primary font-lato font-normal text-base leading-[6];
+  @apply text-text-primary font-jakarta font-normal text-base;
 }
 @utility text-body-small{
-  @apply text-text-muted font-lato font-normal text-xs leading-[4.5];
+  @apply text-text-muted font-jakarta font-normal text-xs;
 }

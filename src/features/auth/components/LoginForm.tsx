@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import FormInput from '@/shared/ui/FormInput';
 import { BrandIcon, LoginIcon } from '@/shared/lib/SvgLib';
 import Button from '@/shared/ui/Button';
+import Sponsor from '@/shared/ui/Sponsor';
 
 interface LoginCredentials {
   username: string;
@@ -118,9 +119,7 @@ const LoginForm: React.FC = () => {
           </a>
         </p>
 
-        <p className="w-38 h-8 flex-center mx-auto rounded-full text-center text-text-muted font-lato font-normal text-xs border border-border-line02 bg-bg-input">
-          Powered by Schoolzy
-        </p>
+        <Sponsor />
       </div>
     </div>
   );
