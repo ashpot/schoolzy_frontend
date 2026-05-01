@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme{
-  
+
   --color-brand-primary: hsla(205, 83%, 45%, 1);
   --color-brand-hover: hsla(205, 68%, 55%, 1);
   --color-success: hsla(142, 71%, 45%, 1);
@@ -11,6 +11,7 @@
   /* typography */
   --color-text-primary: hsla(222, 47%, 11%, 1);
   --color-text-secondary: hsla(215, 16%, 47%, 1);
+  --color-text-nav: hsla(220, 23%, 21%, 1);
   --color-text-muted: hsla(220, 6%, 63%, 1);
   --color-text-muted01: hsla(223, 13%, 32%, 1);
   --color-border-line01: hsla(214, 32%, 91%, 1);
@@ -24,7 +25,7 @@
   --color-bg-main: hsla(0, 0%, 100%, 1);
   --color-bg-soft: hsla(0, 0%, 94%, 0.8);
 
-  
+
   /* fonts */
   --font-lato: "Lato", sans-serif;
   --font-jakarta: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", sans-serif;
@@ -44,7 +45,7 @@
     @apply transition-all duration-300 ease-in;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-  
+
   ul{
     @apply list-none;
   }
