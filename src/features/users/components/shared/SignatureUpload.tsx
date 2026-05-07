@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
-
+import { Pencil } from "lucide-react";
 
 interface SignatureUploadProps {
   onChange?: (file: File) => void;
