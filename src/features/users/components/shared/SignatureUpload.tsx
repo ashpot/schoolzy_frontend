@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { Pencil } from "lucide-react";
 
 interface SignatureUploadProps {
   onChange?: (file: File) => void;
@@ -18,7 +19,7 @@ const SignatureUpload: React.FC<SignatureUploadProps> = ({ onChange }) => {
 
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-xs font-semibold text-label leading-[18px] tracking-wide">
+      <label className="text-xs font-semibold text-label leading-4.5 tracking-wide">
         Signature
       </label>
       <motion.button

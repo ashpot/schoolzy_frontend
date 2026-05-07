@@ -10,8 +10,8 @@ const GenderBadge: React.FC<{ gender: "Male" | "Female" }> = ({ gender }) => (
     className={cn(
       "inline-flex px-2.5 py-0.5 rounded-full text-xs font-lato font-medium",
       gender === "Female"
-        ? "bg-pink-50 text-pink-500 border border-pink-100"
-        : "bg-sky-50 text-sky-500 border border-sky-100"
+        ? "bg-[#FDF2F8] text-female"
+        : "bg-[#E8F3FB] text-brand-primary",
     )}
   >
     {gender}

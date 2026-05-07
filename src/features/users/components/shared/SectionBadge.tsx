@@ -1,21 +1,17 @@
 import React from "react";
-import { motion } from "framer-motion";
 import { cn } from "@/shared/utils/cn";
 
 const SectionBadge: React.FC<{ section: string }> = ({ section }) => (
-  <motion.span
-    initial={{ opacity: 0, scale: 0.8 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ duration: 0.25, ease: "backOut" }}
+  <span
     className={cn(
-      "inline-flex px-2 py-0.5 rounded-md text-xs font-lato font-medium",
+      "inline-flex px-2 py-0.5 rounded-full text-xs font-lato font-medium transition-colors",
       section === "Jnr Sec"
-        ? "bg-success/10 text-success"
-        : "bg-warning/10 text-warning"
+        ? "bg-[#E9F9EF] text-success"
+        : "bg-[#FFF7ED] text-[#C2410C]"
     )}
   >
     {section}
-  </motion.span>
+  </span>
 );
 
 export default SectionBadge;

@@ -1,12 +1,15 @@
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
+import { adminSchema, type AdminFormValues } from "../../schemas";
 import { staggerContainer, fieldFadeUp } from "../../animations/variants";
-import PhotoUpload      from "../shared/PhotoUpload";
-import SignatureUpload  from "../shared/SignatureUpload";
-import SubmitButton     from "../shared/SubmitButton";
-import FormInput        from "@/shared/ui/FormInput";
-import FormSelect       from "@/shared/ui/FormSelect";
-import { useAddAdmin }  from "../../hooks/useAdmins";
+import { useAddAdmin } from "../../hooks/useAdmins";
+import PhotoUpload     from "../shared/PhotoUpload";
+import SignatureUpload from "../shared/SignatureUpload";
+import SubmitButton    from "../shared/SubmitButton";
+import FormInput from "@/shared/ui/FormInput";
+import FormSelect from "@/shared/ui/FormSelect";
 
 const SEX_OPTIONS = [
   { value: "Male", label: "Male" }, { value: "Female", label: "Female" },
@@ -14,59 +17,88 @@ const SEX_OPTIONS = [
 
 const AdminForm: React.FC = () => {
   const { mutate, isPending } = useAddAdmin();
-  const [form, setForm] = useState({
-    firstName: "", lastName: "", middleName: "", sex: "",
-    dob: "", phone: "", address: "", city: "", state: "", country: "", email: "",
+  // Signature is a File — not part of zod, managed separately
+  const [_signatureFile, setSignatureFile] = useState<File | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<AdminFormValues>({
+    resolver: zodResolver(adminSchema),
+    defaultValues: {
+      firstName: "", lastName: "", middleName: "", sex: undefined,
+      dob: "", phone: "", address: "", city: "", state: "", country: "", email: "",
+    },
   });
 
-  const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: wire to real API
+  const onSubmit = (values: AdminFormValues) => {
+    // TODO: include signatureFile in FormData when wiring to real API
     mutate({
-      ...form,
-      sex: form.sex as "Male" | "Female",
-      adminId: `ADM-${Date.now()}`,
-      username: `@${form.firstName.toLowerCase()}.${form.lastName.toLowerCase()}`,
-    });
+      ...values,
+      adminId:  `ADM-${Date.now()}`,
+      username: `@${values.firstName.toLowerCase()}.${values.lastName.toLowerCase()}`,
+    },
+    { onSuccess: () => { reset(); setSignatureFile(null); } });
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <PhotoUpload />
+
       <motion.div variants={staggerContainer} initial="hidden" animate="show" className="flex flex-col gap-3.5 mt-2">
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
-          <FormInput label="First Name" name="firstName" placeholder="First name" value={form.firstName} onChange={set("firstName")} isLoading={isPending} />
-          <FormInput label="Last Name"  name="lastName"  placeholder="Last name"  value={form.lastName}  onChange={set("lastName")}  isLoading={isPending} />
+          <FormInput label="First Name" placeholder="First name"
+            isLoading={isPending} error={errors.firstName?.message} {...register("firstName")} />
+          <FormInput label="Last Name"   placeholder="Last name"
+            isLoading={isPending} error={errors.lastName?.message}  {...register("lastName")} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Middle Name" name="middleName" placeholder="Middle name" value={form.middleName} onChange={set("middleName")} isLoading={isPending} />
+          <FormInput label="Middle Name" placeholder="Middle name"
+            isLoading={isPending} {...register("middleName")} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
-          <FormSelect label="Sex" name="sex" placeholder="Select..." options={SEX_OPTIONS} value={form.sex} onChange={set("sex")} isLoading={isPending} />
-          <FormInput  label="Date of Birth" name="dob" type="date" value={form.dob} onChange={set("dob")} isLoading={isPending} />
+          <FormSelect label="Sex" placeholder="Select..." options={SEX_OPTIONS}
+            isLoading={isPending} error={errors.sex?.message} {...register("sex")} />
+          <FormInput label="Date of Birth" type="date"
+            isLoading={isPending} error={errors.dob?.message} {...register("dob")} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Phone" name="phone" placeholder="+234 800 000 0000" value={form.phone} onChange={set("phone")} isLoading={isPending} />
+          <FormInput label="Phone" placeholder="+234 800 000 0000"
+            isLoading={isPending} error={errors.phone?.message} {...register("phone")} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Address" name="address" placeholder="Street address" value={form.address} onChange={set("address")} isLoading={isPending} />
+          <FormInput label="Address" placeholder="Street address"
+            isLoading={isPending} error={errors.address?.message} {...register("address")} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
-          <FormInput label="City"  name="city"  placeholder="City"  value={form.city}  onChange={set("city")}  isLoading={isPending} />
-          <FormInput label="State" name="state" placeholder="State" value={form.state} onChange={set("state")} isLoading={isPending} />
+          <FormInput label="City" placeholder="City"
+            isLoading={isPending} error={errors.city?.message}  {...register("city")} />
+          <FormInput label="State" placeholder="State"
+            isLoading={isPending} error={errors.state?.message} {...register("state")} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Country" name="country" placeholder="Country" value={form.country} onChange={set("country")} isLoading={isPending} />
+          <FormInput label="Country" placeholder="Country"
+            isLoading={isPending} error={errors.country?.message} {...register("country")} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Email Address" name="email" type="email" placeholder="admin@example.com" value={form.email} onChange={set("email")} isLoading={isPending} />
+          <FormInput label="Email Address" type="email" placeholder="admin@example.com"
+            isLoading={isPending} error={errors.email?.message} {...register("email")} />
         </motion.div>
+
+        {/* Signature — outside RHF, handled manually */}
         <motion.div variants={fieldFadeUp}>
-          <SignatureUpload />
+          <SignatureUpload onChange={(f) => setSignatureFile(f)} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp}>
           <SubmitButton label="Add Admin" isLoading={isPending} />
         </motion.div>
