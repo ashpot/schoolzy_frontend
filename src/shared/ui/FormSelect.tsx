@@ -18,7 +18,7 @@ const FormSelect = forwardRef<HTMLSelectElement, FormSelectProps>(
         {label && (
           <label
             htmlFor={name}
-            className="text-xs font-semibold text-label leading-[18px] tracking-wide"
+            className="text-xs font-semibold text-label leading-4.5 tracking-wide"
           >
             {label}
           </label>
