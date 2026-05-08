@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
+import { teacherSchema, type TeacherFormValues } from "../../schemas";
 import { staggerContainer, fieldFadeUp } from "../../animations/variants";
+import { useAddTeacher } from "../../hooks/useTeachers";
 import PhotoUpload  from "../shared/PhotoUpload";
 import SubmitButton from "../shared/SubmitButton";
-import FormInput        from "@/shared/ui/FormInput";
-import FormSelect       from "@/shared/ui/FormSelect";
-import { useAddTeacher } from "../../hooks/useTeachers";
+import FormInput from "@/shared/ui/FormInput";
+import FormSelect from "@/shared/ui/FormSelect";
 
 const SEX_OPTIONS = [
   { value: "Male", label: "Male" }, { value: "Female", label: "Female" },
@@ -13,63 +16,93 @@ const SEX_OPTIONS = [
 
 const TeacherForm: React.FC = () => {
   const { mutate, isPending } = useAddTeacher();
-  const [form, setForm] = useState({
-    empNo: "", firstName: "", lastName: "", middleName: "", sex: "",
-    dob: "", phone: "", address: "", city: "", state: "", country: "",
-    email: "", dateOfEmployment: "",
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<TeacherFormValues>({
+    resolver: zodResolver(teacherSchema),
+    defaultValues: {
+      empNo: "", firstName: "", lastName: "", middleName: "",
+      sex: undefined, dob: "", phone: "", address: "", city: "",
+      state: "", country: "", email: "", dateOfEmployment: "",
+    },
   });
 
-  const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: wire to real API
+  const onSubmit = (values: TeacherFormValues) => {
+    // TODO: replace mock logic with real API in useAddTeacher queryFn
     mutate({
-      ...form,
-      sex: form.sex as "Male" | "Female",
-      classLabel: "JSS 1A",
-      username: `@${form.firstName.toLowerCase()}.${form.lastName.toLowerCase()}`,
-    });
+      ...values,
+      classLabel: "TBD",
+      username: `@${values.firstName.toLowerCase()}.${values.lastName.toLowerCase()}`,
+    },
+    { onSuccess: () => reset() });
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <PhotoUpload />
+
       <motion.div variants={staggerContainer} initial="hidden" animate="show" className="flex flex-col gap-3.5 mt-2">
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Employment Number" name="empNo" placeholder="e.g. TCH/2024/013" value={form.empNo} onChange={set("empNo")} isLoading={isPending} />
+          <FormInput label="Employment Number" placeholder="e.g. TCH/2024/013"
+            isLoading={isPending} error={errors.empNo?.message} {...register("empNo")} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
-          <FormInput label="First Name" name="firstName" placeholder="First name" value={form.firstName} onChange={set("firstName")} isLoading={isPending} />
-          <FormInput label="Last Name"  name="lastName"  placeholder="Last name"  value={form.lastName}  onChange={set("lastName")}  isLoading={isPending} />
+          <FormInput label="First Name" placeholder="First name"
+            isLoading={isPending} error={errors.firstName?.message} {...register("firstName")} />
+          <FormInput label="Last Name"  placeholder="Last name"
+            isLoading={isPending} error={errors.lastName?.message}  {...register("lastName")} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Middle Name" name="middleName" placeholder="Middle name" value={form.middleName} onChange={set("middleName")} isLoading={isPending} />
+          <FormInput label="Middle Name" placeholder="Middle name"
+            isLoading={isPending} {...register("middleName")} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
-          <FormSelect label="Sex" name="sex" placeholder="Select..." options={SEX_OPTIONS} value={form.sex} onChange={set("sex")} isLoading={isPending} />
-          <FormInput  label="Date of Birth" name="dob" type="date" value={form.dob} onChange={set("dob")} isLoading={isPending} />
+          <FormSelect label="Sex" placeholder="Select..." options={SEX_OPTIONS}
+            isLoading={isPending} error={errors.sex?.message} {...register("sex")} />
+          <FormInput label="Date of Birth" type="date"
+            isLoading={isPending} error={errors.dob?.message} {...register("dob")} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Phone" name="phone" placeholder="+234 800 000 0000" value={form.phone} onChange={set("phone")} isLoading={isPending} />
+          <FormInput label="Phone" placeholder="+234 800 000 0000"
+            isLoading={isPending} error={errors.phone?.message} {...register("phone")} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Address" name="address" placeholder="Street address" value={form.address} onChange={set("address")} isLoading={isPending} />
+          <FormInput label="Address" placeholder="Street address"
+            isLoading={isPending} error={errors.address?.message} {...register("address")} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
-          <FormInput label="City"  name="city"  placeholder="City"  value={form.city}  onChange={set("city")}  isLoading={isPending} />
-          <FormInput label="State" name="state" placeholder="State" value={form.state} onChange={set("state")} isLoading={isPending} />
+          <FormInput label="City"  placeholder="City"
+            isLoading={isPending} error={errors.city?.message}  {...register("city")} />
+          <FormInput label="State" placeholder="State"
+            isLoading={isPending} error={errors.state?.message} {...register("state")} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Country" name="country" placeholder="Country" value={form.country} onChange={set("country")} isLoading={isPending} />
+          <FormInput label="Country" placeholder="Country"
+            isLoading={isPending} error={errors.country?.message} {...register("country")} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Email Address" name="email" type="email" placeholder="teacher@example.com" value={form.email} onChange={set("email")} isLoading={isPending} />
+          <FormInput label="Email Address" type="email" placeholder="teacher@example.com"
+            isLoading={isPending} error={errors.email?.message} {...register("email")} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Date of Employment" name="dateOfEmployment" type="date" value={form.dateOfEmployment} onChange={set("dateOfEmployment")} isLoading={isPending} />
+          <FormInput label="Date of Employment" type="date"
+            isLoading={isPending} error={errors.dateOfEmployment?.message}
+            {...register("dateOfEmployment")} />
         </motion.div>
+
         <motion.div variants={fieldFadeUp}>
           <SubmitButton label="Add Teacher" isLoading={isPending} />
         </motion.div>

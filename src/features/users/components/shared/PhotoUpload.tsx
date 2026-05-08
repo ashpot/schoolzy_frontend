@@ -37,12 +37,6 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ value, onChange }) => {
           <img src={preview} alt="Preview" className="w-full h-full object-cover" />
         ) : (
           <>
-            {/* Animated rotating dashes */}
-            <motion.div
-              className="absolute inset-0 rounded-full border-2 border-dashed border-brand-primary/30"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-            />
             <Camera className="w-7 h-7 text-brand-primary/60 group-hover:text-brand-primary transition-colors" />
           </>
         )}
