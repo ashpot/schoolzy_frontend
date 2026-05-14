@@ -6,7 +6,7 @@ import { teacherSchema, type TeacherFormValues } from "../../schemas";
 import { staggerContainer, fieldFadeUp } from "../../animations/variants";
 import { useAddTeacher } from "../../hooks/useTeachers";
 import PhotoUpload  from "../shared/PhotoUpload";
-import SubmitButton from "../shared/SubmitButton";
+import SubmitButton from "../../../../shared/ui/SubmitButton";
 import FormInput from "@/shared/ui/FormInput";
 import FormSelect from "@/shared/ui/FormSelect";
 

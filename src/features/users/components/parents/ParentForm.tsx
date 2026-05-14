@@ -8,7 +8,7 @@ import { parentSchema, type ParentFormValues } from "../../schemas";
 import { staggerContainer, fieldFadeUp } from "../../animations/variants";
 import { useAddParent } from "../../hooks/useParents";
 import PhotoUpload  from "../shared/PhotoUpload";
-import SubmitButton from "../shared/SubmitButton";
+import SubmitButton from "../../../../shared/ui/SubmitButton";
 
 
 const SEX_OPTIONS = [
