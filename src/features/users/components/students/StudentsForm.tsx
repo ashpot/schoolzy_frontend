@@ -6,7 +6,7 @@ import { studentSchema, type StudentFormValues } from "../../schemas";
 import { staggerContainer, fieldFadeUp } from "../../animations/variants";
 import { useAddStudent } from "../../hooks/useStudents";
 import PhotoUpload  from "../shared/PhotoUpload";
-import SubmitButton from "../shared/SubmitButton";
+import SubmitButton from "../../../../shared/ui/SubmitButton";
 import FormInput from "@/shared/ui/FormInput";
 import FormSelect from "@/shared/ui/FormSelect";
 

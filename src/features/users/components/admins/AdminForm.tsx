@@ -7,7 +7,7 @@ import { staggerContainer, fieldFadeUp } from "../../animations/variants";
 import { useAddAdmin } from "../../hooks/useAdmins";
 import PhotoUpload     from "../shared/PhotoUpload";
 import SignatureUpload from "../shared/SignatureUpload";
-import SubmitButton    from "../shared/SubmitButton";
+import SubmitButton    from "../../../../shared/ui/SubmitButton";
 import FormInput from "@/shared/ui/FormInput";
 import FormSelect from "@/shared/ui/FormSelect";
 
