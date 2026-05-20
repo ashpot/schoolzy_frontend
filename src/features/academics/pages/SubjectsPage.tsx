@@ -3,8 +3,9 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+// @ts-ignore
 import { FormInput as input, Plus } from "lucide-react";
-import { pageFade, slideFromRight, slideFromLeft } from "../animations/variants";
+import { slideFromRight, slideFromLeft } from "../animations/variants";
 import { useSubjectsList, useAddSubject, useDeleteSubject } from "../hooks/useAcademics";
 import { SECTION_OPTIONS } from "../types";
 import type { Subject, SchoolSection } from "../types";

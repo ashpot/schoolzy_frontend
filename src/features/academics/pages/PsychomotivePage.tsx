@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { pageFade, slideFromRight, slideFromLeft } from "../animations/variants";
+import { slideFromRight, slideFromLeft } from "../animations/variants";
 import { usePsychomotiveList, useAddPsychomotive, useDeletePsychomotive } from "../hooks/useAcademics";
 import { SECTION_OPTIONS } from "../types";
 import type { PsychomotiveMetric, SchoolSection } from "../types";

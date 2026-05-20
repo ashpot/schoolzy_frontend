@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Users, CheckSquare } from "lucide-react";
-import { pageFade, slideFromLeft, slideFromRight } from "../animations/variants";
+import { slideFromLeft, slideFromRight } from "../animations/variants";
 import { useSubjectTeachersList, useAssignSubjectTeacher, useDeleteSubjectTeacher } from "../hooks/useAcademics";
 import { mockTeachers, mockClasses, mockSubjects } from "../data/mockData";
 import type { SubjectTeacherAssignment, SchoolSection } from "../types";
@@ -165,7 +165,7 @@ const SubjectTeachersPage: React.FC = () => {
             {/* Subject checkbox grid */}
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-label leading-[18px] tracking-wide">Subjects</label>
+                <label className="text-xs font-semibold text-label leading-4.5 tracking-wide">Subjects</label>
                 {selectedSubjectIds.length > 0 && (
                   <span className="text-[11px] font-semibold text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded-full">
                     {selectedSubjectIds.length} Selected

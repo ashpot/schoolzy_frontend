@@ -196,9 +196,7 @@ export function useDeleteAssessmentType() {
   });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// GRADES
-// ─────────────────────────────────────────────────────────────────────────────
+
 let gradesStore = [...mockGrades];
 
 export function useGradesList(page: number, search: string, section: SchoolSection | "All") {
@@ -248,9 +246,7 @@ export function useDeleteGrade() {
   });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PSYCHOMOTIVE
-// ─────────────────────────────────────────────────────────────────────────────
+
 let psychomotiveStore = [...mockPsychomotiveMetrics];
 
 export function usePsychomotiveList(page: number, search: string, section: SchoolSection | "All") {
@@ -297,3 +293,104 @@ export function useDeletePsychomotive() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["academics", "psychomotive"] }),
   });
 }
+
+export const useLoadStudentResult = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: { studentName: string; term: string; session: string }) => {
+      // TODO: Replace with actual API call
+      // return api.post("/student-results/load", payload);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      return { success: true, data: payload };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["student-results"] });
+    },
+  });
+};
+
+export const useLoadClassResult = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: {
+      studentName: string;
+      term: string;
+      session: string,
+      class:string,
+      class_group: string
+    }) => {
+      // TODO: Replace with actual API call
+      // return api.post("/student-results/load", payload);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      return { success: true, data: payload };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["class-results"] });
+    },
+  });
+};
+
+export const usePromoteClass = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: {
+      class:string,
+      class_group: string
+    }) => {
+      // TODO: Replace with actual API call
+      // return api.post("/student-results/load", payload);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      return { success: true, data: payload };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["promote-class"] });
+    },
+  });
+};
+
+export const useManageScore = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: {
+      subject: string,
+      assessment_type: string,
+      term: string,
+      session: string,
+      class:string,
+      class_group: string
+    }) => {
+      // TODO: Replace with actual API call
+      // return api.post("/student-results/load", payload);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      return { success: true, data: payload };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["manage-score"] });
+    },
+  });
+};
+
+export const useAttendanceSummary = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payload: {
+      term: string;
+      session: string,
+      class:string,
+      class_group: string
+    }) => {
+      // TODO: Replace with actual API call
+      // return api.post("/student-results/load", payload);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      return { success: true, data: payload };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["attendance-summary"] });
+    },
+  });
+};

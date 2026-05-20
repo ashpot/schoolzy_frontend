@@ -1,21 +1,10 @@
-// const GradePage = () => {
-//   return (
-//     <div>
-//       <h1 className="page-title">Grade</h1>
-//       <p className="text-body mt-2">Manage grading system.</p>
-//     </div>
-//   );
-// };
-
-// export default GradePage;
-
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { pageFade, slideFromRight, slideFromLeft } from "../animations/variants";
+import { slideFromRight, slideFromLeft } from "../animations/variants";
 import { useGradesList, useAddGrade, useDeleteGrade } from "../hooks/useAcademics";
 import { SECTION_OPTIONS } from "../types";
 import type { Grade, GradeRemark, SchoolSection } from "../types";
@@ -62,7 +51,7 @@ const GradePage: React.FC = () => {
   const addMutation = useAddGrade();
   const deleteMutation = useDeleteGrade();
 
-  const { register, handleSubmit, reset, control, setValue, formState: { errors } } = useForm<FormValues>({
+  const { register, handleSubmit, reset, control, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { caption: "", minScore: 0, maxScore: 100, remark: "", section: "Senior Secondary" },
   });
@@ -187,7 +176,7 @@ const GradePage: React.FC = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-semibold text-label leading-[18px] tracking-wide">Remark</label>
+              <label className="text-xs font-semibold text-label leading-4.5 tracking-wide">Remark</label>
               <Controller
                 control={control}
                 name="remark"
