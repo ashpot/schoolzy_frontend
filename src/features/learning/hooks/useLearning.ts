@@ -25,6 +25,7 @@ export const useDeleteLessonNote = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    // @ts-ignore
     mutationFn: async (noteId: string) => {
       // TODO: Replace with actual API call
       // return api.delete(`/lesson-notes/${noteId}`);
@@ -58,6 +59,7 @@ export const useSaveAttendance = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    // @ts-ignore
     mutationFn: async (payload: {
       class: string;
       classGroup: string;
