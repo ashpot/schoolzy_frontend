@@ -28,8 +28,9 @@ import AttendancePage from "@/features/learning/pages/AttendancePage";
 
 // Tests
 import QuestionsPage from "@/features/tests/pages/QuestionsPage";
-import TestsListPage from "@/features/tests/pages/TestsListPage";
+import TestsPage from "@/features/tests/pages/TestsPage";
 import ScheduledTestsPage from "@/features/tests/pages/ScheduledTestsPage";
+import ResultsPage from "@/features/tests/pages/ResultsPage";
 
 // Results
 import UploadAssessmentPage from "@/features/results/pages/UploadAssessmentPage";
@@ -122,10 +123,11 @@ const AppRouter = () => {
 
           {/* Tests */}
           <Route path="tests">
-            <Route index element={<TestsListPage />} />
+            <Route index element={<TestsPage />} />
             <Route path="questions" element={<QuestionsPage />} />
-            <Route path="list" element={<TestsListPage />} />
             <Route path="scheduled" element={<ScheduledTestsPage />} />
+            <Route path="list" element={<TestsPage />} />
+            <Route path="results" element={<ResultsPage />} />
           </Route>
 
           {/* Results */}

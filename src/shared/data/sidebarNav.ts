@@ -70,6 +70,7 @@ export const sidebarNavItems: NavItem[] = [
       { id: "questions", label: "Questions", path: "/tests/questions", icon: TestsIcon },
       { id: "tests-list", label: "Tests", path: "/tests/list", icon: TestsIcon },
       { id: "scheduled-tests", label: "Scheduled Tests", path: "/tests/scheduled", icon: TestsIcon },
+      { id: "test-results", label: "Results", path: "/tests/results", icon: TestsIcon },
     ],
   },
   {
