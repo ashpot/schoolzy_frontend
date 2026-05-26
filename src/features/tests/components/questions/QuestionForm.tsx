@@ -68,9 +68,9 @@ export default function QuestionForm({ onQuestionAdded }: Props) {
     <div className="bg-white rounded-2xl card-shadow p-6">
       <div className="flex items-center gap-2 mb-6">
         <div className="w-6 h-6 rounded-md bg-blue-50 flex-center">
-          <Plus className="w-3.5 h-3.5 text-[var(--color-brand-primary)]" />
+          <Plus className="w-3.5 h-3.5 text-text-primary" />
         </div>
-        <h2 className="text-sm font-semibold text-[var(--color-text-nav)]">
+        <h2 className="text-sm font-semibold text-text-nav">
           Add Question
         </h2>
       </div>
@@ -98,7 +98,7 @@ export default function QuestionForm({ onQuestionAdded }: Props) {
           />
           {/* Question Type — driven by tabs below, slot kept for visual alignment */}
           <div>
-            <label className="block text-sm font-medium text-[var(--color-label)] mb-2">
+            <label className="block text-sm font-medium text-label mb-2">
               Question Type
             </label>
             <div className="inline-flex bg-gray-100 rounded-xl p-1 gap-0.5">
@@ -109,8 +109,8 @@ export default function QuestionForm({ onQuestionAdded }: Props) {
                   onClick={() => handleTabChange(tab.value)}
                   className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                     activeTab === tab.value
-                      ? "bg-white shadow-sm text-[var(--color-text-nav)]"
-                      : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
+                      ? "bg-white shadow-sm text-text-nav"
+                      : "text-text-muted hover:text-text-secondary"
                   }`}
                 >
                   {tab.label}
@@ -122,22 +122,22 @@ export default function QuestionForm({ onQuestionAdded }: Props) {
 
         {/* Question Text */}
         <div>
-          <label className="block text-sm font-medium text-[var(--color-label)] mb-1.5">
-            Question Text <span className="text-[var(--color-danger)]">*</span>
+          <label className="block text-sm font-medium text-label mb-1.5">
+            Question Text <span className="text-danger">*</span>
           </label>
           <textarea
             placeholder="Type your question here…"
             disabled={isLoading}
             rows={3}
-            className={`w-full px-3 py-2.5 rounded-xl border bg-[var(--color-bg-input)] text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-primary)]/20 focus:border-[var(--color-brand-primary)] transition-all resize-none disabled:opacity-60 ${
+            className={`w-full px-3 py-2.5 rounded-xl border bg-bg-input text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all resize-none disabled:opacity-60 ${
               errors.questionText
-                ? "border-[var(--color-danger)]"
-                : "border-[var(--color-border-line02)]"
+                ? "border-color-danger"
+                : "border-border-line02"
             }`}
             {...register("questionText")}
           />
           {errors.questionText && (
-            <p className="mt-1 text-xs text-[var(--color-danger)]">
+            <p className="mt-1 text-xs text-danger">
               {errors.questionText.message}
             </p>
           )}
@@ -145,23 +145,23 @@ export default function QuestionForm({ onQuestionAdded }: Props) {
 
         {/* Mark */}
         <div className="w-40">
-          <label className="block text-sm font-medium text-[var(--color-label)] mb-1.5">
-            Mark <span className="text-[var(--color-danger)]">*</span>
+          <label className="block text-sm font-medium text-label mb-1.5">
+            Mark <span className="text-danger">*</span>
           </label>
           <input
             type="number"
             placeholder="# e.g. 5"
             disabled={isLoading}
             min={1}
-            className={`w-full px-3 py-2.5 rounded-xl border bg-[var(--color-bg-input)] text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-primary)]/20 focus:border-[var(--color-brand-primary)] transition-all disabled:opacity-60 ${
+            className={`w-full px-3 py-2.5 rounded-xl border bg-bg-input text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all disabled:opacity-60 ${
               errors.marks
-                ? "border-[var(--color-danger)]"
-                : "border-[var(--color-border-line02)]"
+                ? "border-danger"
+                : "border-border-line02"
             }`}
             {...register("marks")}
           />
           {errors.marks && (
-            <p className="mt-1 text-xs text-[var(--color-danger)]">
+            <p className="mt-1 text-xs text-danger">
               {errors.marks.message}
             </p>
           )}
