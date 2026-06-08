@@ -55,7 +55,7 @@ export default function ScoreEntryRow({
 
       <td className="py-3.5 px-4">
         <div className="flex items-center gap-3">
-          <div className={`w-9 h-9 rounded-full flex-center text-sm font-semibold shrink-0 ${avatarColor(student.name)}`}>
+          <div className={`w-9 h-9 rounded-md flex-center text-sm font-semibold shrink-0 ${avatarColor(student.name)}`}>
             {getInitials(student.name)}
           </div>
           <div>
@@ -66,7 +66,7 @@ export default function ScoreEntryRow({
       </td>
 
       <td className="py-3.5 px-4">
-        <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600 border border-blue-100">
+        <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-600 border border-blue-100">
           {assessmentTypeLabel}
         </span>
       </td>
@@ -84,18 +84,18 @@ export default function ScoreEntryRow({
       </td>
 
       <td className="py-3.5 px-4">
-        <span className="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+        <span className="px-3 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-500">
           {maxScore}
         </span>
       </td>
 
       <td className="py-3.5 px-4">
         {grade ? (
-          <span className={`w-8 h-8 rounded-full flex-center text-xs font-bold ${gradeStyles[grade]}`}>
+          <span className={`w-8 h-8 rounded-md flex-center text-xs font-bold ${gradeStyles[grade]}`}>
             {grade}
           </span>
         ) : (
-          <span className="w-8 h-8 rounded-full flex-center text-xs text-text-muted bg-gray-50 border border-gray-100">
+          <span className="w-8 h-8 rounded-xl flex-center text-xs text-text-muted bg-gray-50 border border-gray-100">
             —
           </span>
         )}

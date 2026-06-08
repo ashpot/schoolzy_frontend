@@ -21,19 +21,19 @@ export default function StudentProfileCard({ record }: Props) {
 
   return (
     <div className="flex items-center gap-4 p-4 rounded-xl border border-border-line02 bg-gray-50/40">
-      <div className={`w-14 h-14 rounded-full flex-center text-lg font-bold shrink-0 ${avatarColor(student.name)}`}>
+      <div className={`w-14 h-14 rounded-2xl flex-center text-lg font-bold shrink-0 ${avatarColor(student.name)}`}>
         {getInitials(student.name)}
       </div>
       <div>
         <p className="font-semibold text-text-primary text-base leading-tight">{student.name}</p>
         <div className="flex flex-wrap items-center gap-2 mt-2">
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
             <GraduationCap size={11} />{classLabel} {groupLabel}
           </span>
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">
             <BookOpen size={11} />{subjectLabel}
           </span>
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
             <Hash size={11} />{student.studentId}
           </span>
         </div>

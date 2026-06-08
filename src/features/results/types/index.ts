@@ -18,3 +18,15 @@ export interface LoadedRecord {
   classGroup: string;
   subject:    string;
 }
+
+export type ResultScoresMap = Record<string,{ assignment: number | ""; test: number | ""; exam: number | "" }>;
+
+export interface ViewScore {
+  studentId:  string;
+  name:       string;
+  assignment: number;
+  test:       number;
+  exam:       number;
+  total:      number;
+  grade:      string;
+}
