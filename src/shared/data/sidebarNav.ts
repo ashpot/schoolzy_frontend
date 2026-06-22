@@ -92,6 +92,7 @@ export const sidebarNavItems: NavItem[] = [
     path: "/sections",
     icon: SectionsIcon,
     children: [
+      { id: "sections", label: "Sections", path: "/sections/sections", icon: SectionsIcon },
       { id: "classes", label: "Classes", path: "/sections/classes", icon: SectionsIcon },
       { id: "class-groups", label: "Class Groups", path: "/sections/class-groups", icon: SectionsIcon },
       { id: "assign-class", label: "Assign Class Form Teacher", path: "/sections/assign-class", icon: SectionsIcon },
@@ -119,7 +120,7 @@ export const sidebarNavItems: NavItem[] = [
     icon: InventoryIcon,
     children: [
       { id: "items", label: "Items", path: "/inventory/items", icon: InventoryIcon },
-      { id: "item-type", label: "Item Type", path: "/inventory/item-type", icon: InventoryIcon },
+      { id: "item-type", label: "Item Type", path: "/inventory/item-types", icon: InventoryIcon },
       { id: "record-sale", label: "Record Sale", path: "/inventory/record-sale", icon: InventoryIcon },
       { id: "inventory-report", label: "Inventory Report", path: "/inventory/inventory-report", icon: InventoryIcon },
     ],

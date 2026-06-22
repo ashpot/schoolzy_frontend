@@ -42,20 +42,20 @@ import ViewScoresPage from "@/features/results/pages/ViewScoresPage";
 // Sections
 import ClassesPage from "@/features/sections/pages/ClassesPage";
 import ClassGroupsPage from "@/features/sections/pages/ClassGroupsPage";
-import AssignClassPage from "@/features/sections/pages/AssignClassPage";
-import ClassAveragePage from "@/features/sections/pages/ClassAveragePage";
+// import AssignClassPage from "@/features/sections/pages/AssignClassPage";
+// import ClassAveragePage from "@/features/sections/pages/ClassAveragePage";
 
 // Finances
 import FeesPage from "@/features/finances/pages/FeesPage";
 import FeeTypePage from "@/features/finances/pages/FeeTypePage";
 import AssignFeesPage from "@/features/finances/pages/AssignFeesPage";
 import PaymentsPage from "@/features/finances/pages/PaymentsPage";
-import PaidListsPage from "@/features/finances/pages/PaidListsPage";
+import PaidListPage from "@/features/finances/pages/PaidListPage";
 import ExpensesPage from "@/features/finances/pages/ExpensesPage";
 
 // Inventory
 import ItemsPage from "@/features/inventory/pages/ItemsPage";
-import ItemTypePage from "@/features/inventory/pages/ItemTypePage";
+import ItemTypesPage from "@/features/inventory/pages/ItemTypesPage";
 import RecordSalePage from "@/features/inventory/pages/RecordSalePage";
 import InventoryReportPage from "@/features/inventory/pages/InventoryReportPage";
 
@@ -68,6 +68,8 @@ import TestimonialsPage from "@/features/settings/pages/TestimonialsPage";
 import NewsEventsPage from "@/features/settings/pages/NewsEventsPage";
 import DashboardLayout from "./layouts/DashboardLayout";
 import { AuthLayout, PublicLayout } from "./layouts";
+import { ClassAvgDenominatorPage, SectionsPage } from "@/features/sections";
+import AssignFormTeacherPage from "@/features/sections/pages/AssignFormTeacherPage";
 
 const AppRouter = () => {
   const location = useLocation();
@@ -142,11 +144,12 @@ const AppRouter = () => {
 
           {/* Sections */}
           <Route path="sections">
-            <Route index element={<ClassesPage />} />
+            <Route index element={<SectionsPage />} />
+            <Route path="sections" element={<SectionsPage />} />
             <Route path="classes" element={<ClassesPage />} />
             <Route path="class-groups" element={<ClassGroupsPage />} />
-            <Route path="assign-class" element={<AssignClassPage />} />
-            <Route path="class-average" element={<ClassAveragePage />} />
+            <Route path="assign-class" element={<AssignFormTeacherPage />} />
+            <Route path="class-average" element={<ClassAvgDenominatorPage />} />
           </Route>
 
           {/* Finances */}
@@ -156,7 +159,7 @@ const AppRouter = () => {
             <Route path="fee-type" element={<FeeTypePage />} />
             <Route path="assign-fees" element={<AssignFeesPage />} />
             <Route path="payments" element={<PaymentsPage />} />
-            <Route path="paid-lists" element={<PaidListsPage />} />
+            <Route path="paid-lists" element={<PaidListPage />} />
             <Route path="expenses" element={<ExpensesPage />} />
           </Route>
 
@@ -164,7 +167,7 @@ const AppRouter = () => {
           <Route path="inventory">
             <Route index element={<ItemsPage />} />
             <Route path="items" element={<ItemsPage />} />
-            <Route path="item-type" element={<ItemTypePage />} />
+            <Route path="item-types" element={<ItemTypesPage />} />
             <Route path="record-sale" element={<RecordSalePage />} />
             <Route path="inventory-report" element={<InventoryReportPage />} />
           </Route>
