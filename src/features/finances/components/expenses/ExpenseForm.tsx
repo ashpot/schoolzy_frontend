@@ -6,13 +6,9 @@ import { useCreateExpense } from "../../hooks/useFinances";
 import type { Expense } from "../../types";
 import FormHeader from "@/shared/ui/FormHeader";
 import SubmitButton from "@/shared/ui/SubmitButton";
+import type {z} from "zod";
 
 const STAFF = ["Mrs. Okafor", "Mr. Adebayo", "Miss Lawal", "Mr. Nwosu", "Mr. Chukwu"];
-
-const CATEGORIES = [
-  "Utilities", "Maintenance", "Supplies", "Salaries",
-  "Events", "Transport", "Food & Catering", "ICT", "Training",
-];
 
 interface ExpenseFormProps {
   onSuccess: (expense: Expense) => void;
@@ -28,9 +24,9 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
     watch,
     reset,
     formState: { errors },
-  } = useForm<ExpenseValues>({
+  } = useForm<z.input<typeof expenseSchema>, any, ExpenseValues>({
     resolver: zodResolver(expenseSchema),
-    defaultValues: { description: "", amount: "" as unknown as number },
+    defaultValues: { description: "", amount: undefined },
   });
 
   const descLen = (watch("description") ?? "").length;
@@ -94,7 +90,7 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
                   step={0.01}
                   placeholder="0.00"
                   disabled={mutation.isPending}
-                  value={field.value === "" || field.value === undefined ? "" : field.value}
+                  value={typeof field.value === "number" ? field.value : ""}
                   onChange={(e) => field.onChange(e.target.value === "" ? ("" as unknown as number) : Number(e.target.value))}
                   className={`w-full pl-7 pr-3 py-2.5 rounded-xl border text-sm bg-bg-input text-text-primary placeholder:text-text-muted outline-none transition-all
                     focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20

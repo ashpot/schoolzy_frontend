@@ -22,7 +22,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
       <div className="flex flex-col gap-1">
         <label
           htmlFor={name}
-          className="text-xs font-semibold text-label leading-[18px] tracking-wide"
+          className="text-xs font-semibold text-label leading-4.5 tracking-wide"
         >
           {label}
         </label>

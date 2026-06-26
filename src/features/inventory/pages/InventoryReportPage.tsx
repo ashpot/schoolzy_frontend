@@ -10,7 +10,6 @@ import ReportStatCards from "../components/inventory-report/ReportStatCards";
 import ReportCharts from "../components/inventory-report/ReportCharts";
 import InventoryBreakdownTable from "../components/inventory-report/InventoryBreakdownTable";
 
-const LOW_STOCK_THRESHOLD = 5;
 
 export default function InventoryReportPage() {
   const [timeRange, setTimeRange] = useState("month");

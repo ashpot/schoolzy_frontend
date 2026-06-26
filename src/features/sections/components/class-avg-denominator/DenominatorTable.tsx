@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Percent, Search } from "lucide-react";
 import { staggerContainer, rowVariant } from "../../animations/variants";
-import { useDeleteDenominator } from "../../hooks/useSections";
+// import { useDeleteDenominator } from "../../hooks/useSections";
 import { getClassBadgeColor } from "../../utils/colors";
 import type { Denominator } from "../../types";
 import NumberSpan from "../shared/NumberSpan";
@@ -12,10 +12,10 @@ interface Props { denominators: Denominator[]; onDelete: (id: string) => void; }
 
 const PAGE_SIZE = 10;
 
-export default function DenominatorTable({ denominators, onDelete }: Props) {
+export default function DenominatorTable({ denominators, /*onDelete*/ }: Props) {
   const [search, setSearch] = useState("");
   const [page,   setPage]   = useState(1);
-  const deleteDenominator = useDeleteDenominator();
+  // const deleteDenominator = useDeleteDenominator();
 
   const filtered   = denominators.filter((d) => d.className.toLowerCase().includes(search.toLowerCase()));
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);

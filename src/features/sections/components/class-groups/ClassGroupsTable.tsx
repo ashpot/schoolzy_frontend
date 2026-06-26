@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { FolderOpen, Search } from "lucide-react";
 import { staggerContainer, rowVariant } from "../../animations/variants";
-import { useDeleteClassGroup } from "../../hooks/useSections";
+// import { useDeleteClassGroup } from "../../hooks/useSections";
 import { getClassBadgeColor } from "../../utils/colors";
 import type { ClassGroup } from "../../types";
 import NumberSpan from "../shared/NumberSpan";
@@ -12,10 +12,10 @@ interface Props { groups: ClassGroup[]; onDelete: (id: string) => void; }
 
 const PAGE_SIZE = 8;
 
-export default function ClassGroupsTable({ groups, onDelete }: Props) {
+export default function ClassGroupsTable({ groups, /*onDelete*/ }: Props) {
   const [search, setSearch] = useState("");
   const [page,   setPage]   = useState(1);
-  const deleteGroup = useDeleteClassGroup();
+  // const deleteGroup = useDeleteClassGroup();
 
   const filtered   = groups.filter((g) => g.name.toLowerCase().includes(search.toLowerCase()) || g.code.toLowerCase().includes(search.toLowerCase()));
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);

@@ -10,6 +10,7 @@ import StudentSearchInput from "./StudentSearchInput";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import FormHeader from "@/shared/ui/FormHeader";
 import FeeTypeBadge from "../shared/FeeTypeBadge";
+import {z} from "zod";
 
 interface PaymentsFormProps {
   onSuccess: (payment: Payment) => void;
@@ -27,9 +28,9 @@ export default function PaymentsForm({ onSuccess }: PaymentsFormProps) {
     reset,
     setValue,
     formState: { errors },
-  } = useForm<PaymentValues>({
+  } = useForm<z.input<typeof paymentSchema>, any, PaymentValues>({
     resolver: zodResolver(paymentSchema),
-    defaultValues: { studentId: "", feeId: "", amount: "" as unknown as number },
+    defaultValues: { studentId: "", feeId: "", amount: undefined },
   });
 
   const studentId = watch("studentId");
@@ -151,7 +152,7 @@ export default function PaymentsForm({ onSuccess }: PaymentsFormProps) {
                   step={0.01}
                   placeholder="0.00"
                   disabled={mutation.isPending}
-                  value={field.value === "" || field.value === undefined ? "" : field.value}
+                  value={typeof field.value === "number" ? field.value : ""}
                   onChange={(e) => field.onChange(e.target.value === "" ? ("" as unknown as number) : Number(e.target.value))}
                   className={`w-full pl-7 pr-3 py-2.5 rounded-xl border text-sm bg-bg-input text-text-primary placeholder:text-text-muted outline-none transition-all
                     focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20

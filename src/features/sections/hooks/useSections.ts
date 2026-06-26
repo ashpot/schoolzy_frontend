@@ -7,7 +7,7 @@ const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 function createDelete(queryKey: string) {
   return function () {
     const qc = useQueryClient();
-    return useMutation({
+    return useMutation({// @ts-ignore
       mutationFn: async (id: string) => {
         // TODO: Replace with actual API call e.g. api.delete(`/${queryKey}/${id}`)
         await delay(500);

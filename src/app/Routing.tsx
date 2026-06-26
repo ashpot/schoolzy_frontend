@@ -70,6 +70,7 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import { AuthLayout, PublicLayout } from "./layouts";
 import { ClassAvgDenominatorPage, SectionsPage } from "@/features/sections";
 import AssignFormTeacherPage from "@/features/sections/pages/AssignFormTeacherPage";
+import { SessionsPage } from "@/features/sessions";
 
 const AppRouter = () => {
   const location = useLocation();
@@ -174,7 +175,8 @@ const AppRouter = () => {
 
           {/* Sessions */}
           <Route path="sessions">
-            <Route index element={<TermsPage />} />
+            <Route index element={<SessionsPage />} />
+            <Route path="sessions" element={<SessionsPage />} />
             <Route path="terms" element={<TermsPage />} />
           </Route>
 

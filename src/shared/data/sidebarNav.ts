@@ -24,11 +24,11 @@ export const sidebarNavItems: NavItem[] = [
   {
     id: "users",
     label: "Users",
-    path: "/users",
+    path: "/dashboard/users",
     icon: ProfileUsers,
     children: [
       { id: "students", label: "Students", path: "/users/students", icon: ProfileUsers },
-      { id: "teachers", label: "Teachers", path: "/users/teachers", icon: ProfileUsers },
+      { id: "teachers", label: "Teachers", path: "/dashboard/users/teachers", icon: ProfileUsers },
       { id: "admins", label: "Admins", path: "/users/admins", icon: ProfileUsers },
       { id: "parents", label: "Parents", path: "/users/parents", icon: ProfileUsers },
     ],
@@ -131,7 +131,9 @@ export const sidebarNavItems: NavItem[] = [
     path: "/sessions",
     icon: SessionsIcon,
     children: [
+      { id: "sessions", label: "Sessions", path: "/sessions/sessions", icon: SessionsIcon },
       { id: "terms", label: "Terms", path: "/sessions/terms", icon: SessionsIcon },
+
     ],
   },
   {

@@ -10,7 +10,7 @@ interface StudentSearchInputProps {
   error?: string;
   isLoading?: boolean;
 }
-
+// @ts-ignore
 export default function StudentSearchInput({ value, onChange, error, isLoading }: StudentSearchInputProps) {
   const [query, setQuery]       = useState("");
   const [open, setOpen]         = useState(false);

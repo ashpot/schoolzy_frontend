@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Layers, Search, CheckCircle, EyeOff } from "lucide-react";
 import { staggerContainer, rowVariant } from "../../animations/variants";
-import { useDeleteSection } from "../../hooks/useSections";
+// import { useDeleteSection } from "../../hooks/useSections";
 import type { Section } from "../../types";
 import NumberSpan from "../shared/NumberSpan";
 // import DeleteButton from "@/shared/ui/DeleteButton";
@@ -11,10 +11,10 @@ interface Props { sections: Section[]; onDelete: (id: string) => void; }
 
 const PAGE_SIZE = 8;
 
-export default function SectionsTable({ sections, onDelete }: Props) {
+export default function SectionsTable({ sections, /*onDelete*/ }: Props) {
   const [search, setSearch] = useState("");
   const [page,   setPage]   = useState(1);
-  const deleteSection = useDeleteSection();
+  // const deleteSection = useDeleteSection();
 
   const filtered   = sections.filter((s) => s.title.toLowerCase().includes(search.toLowerCase()) || s.code.toLowerCase().includes(search.toLowerCase()));
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);

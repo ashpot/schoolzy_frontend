@@ -2,11 +2,9 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { UserCheck, Search } from "lucide-react";
 import { staggerContainer, rowVariant } from "../../animations/variants";
-import { useDeleteAssignment } from "../../hooks/useSections";
 import { getClassBadgeColor } from "../../utils/colors";
 import type { FormTeacherAssignment } from "../../types";
 import NumberSpan from "../shared/NumberSpan";
-// import DeleteButton from "@/shared/ui/DeleteButton";
 
 interface Props { assignments: FormTeacherAssignment[]; onDelete: (id: string) => void; }
 
@@ -20,10 +18,9 @@ const AVATAR_COLORS = [
 const avatarColor = (name: string) => AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length];
 const getInitials = (name: string) => name.replace(/^(Mrs?|Ms)\.?\s/, "").split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase();
 
-export default function FormTeacherTable({ assignments, onDelete }: Props) {
+export default function FormTeacherTable({ assignments }: Props) {
   const [search, setSearch] = useState("");
   const [page,   setPage]   = useState(1);
-  const deleteAssignment = useDeleteAssignment();
 
   const filtered   = assignments.filter((a) => a.className.toLowerCase().includes(search.toLowerCase()) || a.teacherName.toLowerCase().includes(search.toLowerCase()));
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);

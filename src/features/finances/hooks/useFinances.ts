@@ -5,6 +5,7 @@ function createDelete(queryKey: string) {
   return function () {
     const qc = useQueryClient();
     return useMutation({
+      // @ts-ignore
       mutationFn: async (id: string) => {
         // TODO: Replace with actual API call e.g. api.delete(`/${queryKey}/${id}`)
         await new Promise((r) => setTimeout(r, 500));

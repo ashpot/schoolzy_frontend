@@ -6,7 +6,7 @@ import { classSelectOptions } from "../../data/mockData";
 import { useAddDenominator } from "../../hooks/useSections";
 import type { Denominator } from "../../types";
 import FormSelect   from "@/shared/ui/FormSelect";
-import SubmitButton from "@/shared/ui/SubmitButton";
+import {z} from "zod";
 import Button from "@/shared/ui/Button";
 
 interface Props { onSuccess: (d: Denominator) => void; }
@@ -16,7 +16,7 @@ const QUICK_VALUES = [50, 100, 200, 300];
 export default function DenominatorForm({ onSuccess }: Props) {
   const addDenominator = useAddDenominator();
 
-  const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm<DenominatorValues>({
+  const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm<z.input<typeof denominatorSchema>, any, DenominatorValues>({
     resolver: zodResolver(denominatorSchema),
     defaultValues: { denominator: "" as unknown as number, classValue: "" },
   });

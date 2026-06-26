@@ -9,6 +9,7 @@ import FormInput from "@/shared/ui/FormInput";
 import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import FormHeader from "@/shared/ui/FormHeader";
+import  { z } from "zod";
 
 interface FeesFormProps {
   onSuccess: (newFee: Fee) => void;
@@ -27,13 +28,13 @@ export default function FeesForm({ onSuccess, feeTypes }: FeesFormProps) {
     watch,
     reset,
     formState: { errors },
-  } = useForm<FeeValues>({
+  } = useForm<z.input<typeof feeSchema>, any, FeeValues>({
     resolver: zodResolver(feeSchema),
     defaultValues: {
       name: "",
       feeTypeId: "",
       term: "",
-      amount: "" as unknown as number,
+      amount: undefined,
       dateDue: "",
     },
   });
@@ -102,7 +103,7 @@ export default function FeesForm({ onSuccess, feeTypes }: FeesFormProps) {
                   step={0.01}
                   placeholder="0.00"
                   disabled={mutation.isPending}
-                  value={field.value === "" || field.value === undefined ? "" : field.value}
+                  value={typeof field.value === "number" ? field.value : ""}
                   onChange={(e) => field.onChange(e.target.value === "" ? ("" as unknown as number) : Number(e.target.value))}
                   className={`w-full pl-7 pr-3 py-2.5 rounded-xl border text-sm bg-bg-input text-text-primary placeholder:text-text-muted outline-none transition-all
                     focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20

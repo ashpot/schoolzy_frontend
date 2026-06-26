@@ -8,6 +8,7 @@ import FormInput from "@/shared/ui/FormInput";
 import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import FormHeader from "@/shared/ui/FormHeader";
+import {z} from "zod";
 
 interface Props {
   itemTypes: ItemType[];
@@ -15,8 +16,8 @@ interface Props {
 }
 
 export default function ItemForm({ itemTypes, onSuccess }: Props) {
-  const { register, handleSubmit, watch, reset, formState: { errors } } =
-    useForm<InventoryItemValues>({
+  const { register, handleSubmit, reset, formState: { errors } } =
+    useForm<z.input<typeof inventoryItemSchema>, any, InventoryItemValues>({
       resolver: zodResolver(inventoryItemSchema),
       defaultValues: { name: "", typeId: "", quantity: "" as unknown as number, unitPrice: "" as unknown as number },
     });

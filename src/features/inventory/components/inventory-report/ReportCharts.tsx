@@ -31,7 +31,7 @@ export default function ReportCharts() {
             <Tooltip
               cursor={{ fill: "rgba(59,130,246,0.06)" }}
               contentStyle={{ borderRadius: 10, border: "1px solid #e8e8ef", fontSize: 12 }}
-              formatter={(v: number) => [`${v} units`, "Units Sold"]}
+              formatter={(value) => [`${Number(value)} units`, "Units Sold"]}
             />
             <Bar dataKey="units" fill="hsla(205,83%,45%,1)" radius={[6, 6, 0, 0]} />
           </BarChart>
@@ -60,7 +60,7 @@ export default function ReportCharts() {
             <YAxis tickFormatter={formatK} tick={{ fontSize: 11, fill: "#9ca3b0" }} axisLine={false} tickLine={false} />
             <Tooltip
               contentStyle={{ borderRadius: 10, border: "1px solid #e8e8ef", fontSize: 12 }}
-              formatter={(v: number) => [formatNaira(v), "Revenue"]}
+              formatter={(value)=>[formatNaira(Number(value)),"Revenue"]}
             />
             <Area
               type="monotone"

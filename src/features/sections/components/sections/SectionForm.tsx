@@ -5,13 +5,14 @@ import { sectionSchema, type SectionValues } from "../../schemas";
 import { useAddSection } from "../../hooks/useSections";
 import type { Section } from "../../types";
 import Button from "@/shared/ui/Button";
+import {z} from "zod";
 
 interface Props { onSuccess: (s: Section) => void; }
 
 export default function SectionForm({ onSuccess }: Props) {
   const addSection = useAddSection();
 
-  const { register, handleSubmit, watch, control, reset, formState: { errors } } = useForm<SectionValues>({
+  const { register, handleSubmit, watch, control, reset, formState: { errors } } = useForm<z.input<typeof sectionSchema>, any, SectionValues>({
     resolver: zodResolver(sectionSchema),
     defaultValues: { title: "", code: "", showPosition: false },
   });
