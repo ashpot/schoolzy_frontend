@@ -67,7 +67,7 @@ const SignupPage = (): React.ReactElement => {
 
       {/* signup layout [form + image] */}
       <section className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-x-10 xl:gap-x-20 my-4 md:my-8 px-4 md:px-6 lg:px-8">
-        
+
         {/* Left: Form */}
         <div className="bg-bg-main order-2 lg:order-1">
           {/* progress bar */}
@@ -98,7 +98,7 @@ const SignupPage = (): React.ReactElement => {
             </div>
 
             {/* Animated step container */}
-            <div className="relative overflow-hidden min-h-[400px] md:min-h-[450px]">
+            <div className="relative overflow-hidden min-h-100 md:min-h-112.5">
               <AnimatePresence custom={direction}>
                 <motion.div
                   key={currentStep}
@@ -136,7 +136,7 @@ const SignupPage = (): React.ReactElement => {
           <img
             src={signupImage}
             alt="signup image"
-            className="w-full max-w-[500px] xl:max-w-[562px] rounded-2xl md:rounded-3xl object-cover"
+            className="w-full max-w-125 xl:max-w-140.5 rounded-2xl md:rounded-3xl object-cover"
           />
         </div>
       </section>

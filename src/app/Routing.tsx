@@ -1,7 +1,6 @@
 import { AnimatePresence } from "framer-motion";
 import { Route, Routes, useLocation } from "react-router";
 import { SigninPage, SignupPage } from "@/features/auth";
-import { LandingPage } from "@/features/landing";
 import DashboardHome from "@/features/dashboard/pages/DashboardHome";
 
 // Users
@@ -71,6 +70,7 @@ import { AuthLayout, PublicLayout } from "./layouts";
 import { ClassAvgDenominatorPage, SectionsPage } from "@/features/sections";
 import AssignFormTeacherPage from "@/features/sections/pages/AssignFormTeacherPage";
 import { SessionsPage } from "@/features/sessions";
+import { LandingPage } from "@/features/landing";
 
 const AppRouter = () => {
   const location = useLocation();

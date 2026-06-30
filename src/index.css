@@ -26,6 +26,8 @@
   /* background */
   --color-bg-main: hsla(0, 0%, 100%, 1);
   --color-bg-soft: hsla(0, 0%, 94%, 0.8);
+  --color-bg-dark: hsla(222, 47%, 11%, 1);
+  --color-text-inverse-muted: hsla(220, 14%, 75%, 1);
 
 
   /* fonts */
