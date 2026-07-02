@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import brand_logo from "@/assets/brand/schoolzy_brand_name.svg";
+import { Link } from "react-router";
 
 const navLinks = [
   { label: "Features", href: "#features" },
@@ -15,12 +16,12 @@ export default function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-bg-main/95 backdrop-blur-sm border-b border-border-line03">
+    <header className="sticky top-0 z-50 w-full bg-bg-main/95 backdrop-blur-sm border-b border-border-line03" id="back-to-top">
       <div className="mx-auto max-w-7xl px-6">
         <div className="flex h-20 items-center justify-between">
           <div>
-                  <img src={brand_logo} alt="schoolzy logo" />
-                </div>
+            <img src={brand_logo} alt="schoolzy logo" />
+          </div>
 
           {/* Desktop nav */}
           <nav className="hidden lg:flex items-center gap-8">
@@ -37,19 +38,24 @@ export default function Header() {
 
           {/* Desktop actions */}
           <div className="hidden lg:flex items-center gap-6">
-            <a
-              href="#client-login"
+            <Link
+              to="/signin"
               className="text-sm font-jakarta font-medium text-text-nav hover:text-brand-primary transition-colors"
             >
-              Client Login
-            </a>
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="rounded-full bg-brand-primary px-6 py-2.5 text-sm font-jakarta font-semibold text-white hover:bg-brand-hover transition-colors"
+              Request a Demo
+            </Link>
+            <Link
+              to="/signin"
             >
-              Get Started
-            </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="rounded-full bg-brand-primary px-6 py-2.5 text-sm font-jakarta font-semibold text-white hover:bg-brand-hover transition-colors"
+              >
+                Get Started
+              </motion.button>
+            </Link>
+
           </div>
 
           {/* Mobile toggle */}
@@ -84,16 +90,21 @@ export default function Header() {
                   {link.label}
                 </a>
               ))}
-              <a
-                href="#client-login"
+              <Link
+                to="/signin"
                 onClick={() => setOpen(false)}
                 className="text-sm font-jakarta font-medium text-text-nav"
               >
-                Client Login
-              </a>
-              <button className="mt-2 rounded-full bg-brand-primary px-6 py-2.5 text-sm font-jakarta font-semibold text-white hover:bg-brand-hover transition-colors">
-                Get Started
-              </button>
+                Request a Demo
+              </Link>
+              <Link
+                to="/signin"
+              >
+                <button className="mt-2 rounded-full bg-brand-primary px-6 py-2.5 text-sm font-jakarta font-semibold text-white hover:bg-brand-hover transition-colors">
+                  Get Started
+                </button>
+              </Link>
+
             </div>
           </motion.div>
         )}

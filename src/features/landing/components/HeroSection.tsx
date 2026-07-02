@@ -3,6 +3,8 @@ import hero_image from "@/assets/hero_image.webp";
 import avatar_01 from "@/assets/landing/avatar/avatar_01.webp";
 import avatar_02 from "@/assets/landing/avatar/avatar_02.webp";
 import avatar_03 from "@/assets/landing/avatar/avatar_03.webp";
+import { Link } from "react-router";
+
 
 const avatars = [
   avatar_01,
@@ -40,6 +42,9 @@ export default function HeroSection() {
 
             {/* CTAs */}
             <div className="mt-8 flex flex-wrap items-center gap-4">
+              <Link
+                to="/signin"
+              >
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
@@ -47,13 +52,19 @@ export default function HeroSection() {
               >
                 Get Started
               </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="rounded-full border border-border-line01 px-7 py-3.5 text-sm font-jakarta font-semibold text-text-primary hover:bg-bg-soft transition-colors"
+              </Link>
+              <Link
+                to="/signin"
               >
-                Request a Demo
-              </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="rounded-full border border-border-line01 px-7 py-3.5 text-sm font-jakarta font-semibold text-text-primary hover:bg-bg-soft transition-colors"
+                >
+                  Request a Demo
+                </motion.button>
+              </Link>
+
             </div>
 
             {/* Community card */}

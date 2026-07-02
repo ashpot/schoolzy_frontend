@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Check, X } from "lucide-react";
+import { Link } from "react-router";
 
 const plans = [
   {
@@ -9,6 +10,7 @@ const plans = [
     note: "Up to 200 students.",
     popular: false,
     dark: false,
+    path: "/signup",
     features: [
       { label: "Student & staff management", included: true },
       { label: "Attendance tracking", included: true },
@@ -25,6 +27,7 @@ const plans = [
     note: null,
     popular: true,
     dark: true,
+    path: "/signup",
     features: [
       { label: "All Basic features", included: true },
       { label: "Up to 500 students", included: true },
@@ -42,6 +45,7 @@ const plans = [
     note: null,
     popular: false,
     dark: false,
+    path: "/signup",
     features: [
       { label: "All Standard features", included: true },
       { label: "Unlimited students", included: true },
@@ -56,7 +60,7 @@ const plans = [
 
 export default function PricingSection() {
   return (
-    <section className="w-full bg-bg-main py-16 md:py-20 lg:py-28">
+    <section className="w-full bg-bg-main py-16 md:py-20 lg:py-28" id="pricing">
       <div className="mx-auto max-w-7xl px-6">
         {/* Header */}
         <div className="flex flex-col items-center text-center mb-14">
@@ -157,18 +161,22 @@ export default function PricingSection() {
                   </li>
                 ))}
               </ul>
-
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`mt-8 w-full rounded-full py-3.5 text-sm font-jakarta font-semibold transition-colors ${
-                  plan.dark
-                    ? "bg-white text-brand-primary hover:bg-bg-soft"
-                    : "border border-border-line01 text-brand-primary hover:bg-bg-soft"
-                }`}
+              <Link
+                to={plan.path}
               >
-                Get Started
-              </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`mt-8 w-full rounded-full py-3.5 text-sm font-jakarta font-semibold transition-colors ${
+                    plan.dark
+                      ? "bg-white text-brand-primary hover:bg-bg-soft"
+                      : "border border-border-line01 text-brand-primary hover:bg-bg-soft"
+                  }`}
+                >
+                  Get Started
+                </motion.button>
+              </Link>
+
             </motion.div>
           ))}
         </div>

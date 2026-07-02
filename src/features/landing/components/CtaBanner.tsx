@@ -1,36 +1,50 @@
 import { motion } from "framer-motion";
+import ctaImage from "@/assets/landing/cta_01.webp";
+import { Link } from "react-router";
 
-export default function CtaBanner() {
+export default function CtaSection() {
   return (
-    <section className="w-full bg-bg-main px-6 py-16 md:py-20 lg:py-24">
+    <section className="w-full bg-bg-main px-6 py-16 md:py-20 lg:py-24" id="contact">
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-bg-dark"
+        className="relative mx-auto max-w-7xl overflow-hidden rounded-4xl bg-bg-dark min-h-115 lg:min-h-125"
       >
-        <div className="grid grid-cols-1 lg:grid-cols-2 items-end">
-          {/* Text */}
-          <div className="px-8 sm:px-12 py-14 lg:py-20">
-            <span className="inline-flex items-center rounded-full border border-white/25 px-4 py-1.5 text-xs font-jakarta font-semibold tracking-wide text-white">
-              JOIN 500+ SCHOOLS
-            </span>
+        {/* Image — absolutely positioned, does NOT affect card height */}
+        <div className="hidden lg:block absolute bottom-0 right-0 h-full w-1/2 pointer-events-none">
+          <img
+            src={ctaImage}
+            alt=""
+            className="absolute bottom-0 right-0 h-full w-auto object-contain object-bottom-right grayscale"
+            draggable={false}
+          />
+        </div>
 
-            <h2 className="mt-6 text-4xl sm:text-5xl lg:text-[3.2rem] font-jakarta font-semibold leading-[1.1] text-white">
-              Start Managing
-              <br />
-              Your School
-              <br />
-              <span className="text-brand-hover">Smarter Today</span>
-            </h2>
+        {/* Text — sits above image via z-index */}
+        <div className="relative z-10 px-8 sm:px-12 py-12 lg:py-16 max-w-xl">
+          <span className="inline-flex items-center rounded-full border border-white/25 px-4 py-1.5 text-xs font-jakarta font-semibold tracking-wide text-white">
+            JOIN 500+ SCHOOLS
+          </span>
 
-            <p className="mt-6 max-w-md text-base font-jakarta text-text-inverse-muted">
-              Join growing schools across Nigeria. Get Schoolzy running in
-              your institution, request a demo today.
-            </p>
+          <h2 className="mt-6 text-4xl sm:text-5xl lg:text-[3.2rem] font-jakarta font-semibold leading-[1.1] text-white">
+            Start Managing
+            <br />
+            Your School
+            <br />
+            <span className="text-brand-hover">Smarter Today</span>
+          </h2>
 
-            <div className="mt-8 flex flex-wrap items-center gap-4">
+          <p className="mt-6 max-w-md text-base font-jakarta text-text-inverse-muted">
+            Join growing schools across Nigeria. Get Schoolzy running in
+            your institution, request a demo today.
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <Link
+              to="/signup"
+            >
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
@@ -38,6 +52,11 @@ export default function CtaBanner() {
               >
                 Get Started
               </motion.button>
+            </Link>
+
+            <Link
+              to="/signup"
+            >
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
@@ -45,16 +64,8 @@ export default function CtaBanner() {
               >
                 Request a Demo
               </motion.button>
-            </div>
-          </div>
+            </Link>
 
-          {/* Image */}
-          <div className="relative h-64 sm:h-80 lg:h-full lg:min-h-[480px]">
-            <img
-              src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=900&q=80"
-              alt="Smiling student with arms crossed"
-              className="absolute inset-0 h-full w-full object-cover object-top grayscale"
-            />
           </div>
         </div>
       </motion.div>

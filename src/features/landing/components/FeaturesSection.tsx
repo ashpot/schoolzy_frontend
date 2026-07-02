@@ -49,7 +49,7 @@ const features = [
 
 export default function FeaturesSection() {
   return (
-    <section className="w-full bg-bg-main py-16 md:py-20 lg:py-28">
+    <section className="w-full bg-bg-main py-16 md:py-20 lg:py-28" id="features">
       <div className="mx-auto max-w-7xl px-6">
         {/* Header row */}
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-10 mb-12 md:mb-16">
@@ -59,7 +59,7 @@ export default function FeaturesSection() {
             </span>
           </div>
 
-          <div className="md:text-right md:max-w-2xl">
+          <div className="md:text-right md:max-w-3xl">
             <h2 className="text-3xl sm:text-4xl lg:text-[2.6rem] font-jakarta font-semibold leading-tight text-text-primary">
               All the tools to run a modern school
             </h2>

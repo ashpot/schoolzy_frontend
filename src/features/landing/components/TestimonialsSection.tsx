@@ -33,7 +33,7 @@ const testimonials = [
     quote:
       "The payment module has reduced our defaulters drastically. I can see exactly who has paid, who hasn't and send reminders automatically.",
     avatar: "https://i.pravatar.cc/80?img=14",
-    rating: 4,
+    rating: 5,
   },
 ];
 
@@ -78,7 +78,7 @@ export default function TestimonialsSection() {
   };
 
   return (
-    <section className="w-full bg-bg-main py-16 md:py-20 lg:py-28 overflow-hidden">
+    <section className="w-full bg-bg-main py-16 md:py-20 lg:py-28 overflow-hidden" id="testimonials">
       <div className="mx-auto max-w-7xl px-6">
         {/* Header */}
         <div className="flex flex-col items-center text-center mb-14">

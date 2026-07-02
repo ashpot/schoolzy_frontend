@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
+import b_01 from "@/assets/landing/b_01.webp";
+import b_02 from "@/assets/landing/b_02.webp";
+import b_03 from "@/assets/landing/b_03.webp";
 
 const beneficiaries = [
   {
@@ -11,11 +13,10 @@ const beneficiaries = [
       "Control who accesses what across the entire platform.",
       "Communicate directly with staff and parents.",
     ],
-    image:
-      "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=700&q=80",
-    imageAlt: "School administrator working at a computer",
-    imageSide: "right",
-    bg: "bg-bg-main",
+    image: b_01,
+    imageAlt: "Student working at a computer in a library",
+    imageSide: "right" as const,
+    bg: "bg-bg-soft",
   },
   {
     number: "02",
@@ -26,10 +27,9 @@ const beneficiaries = [
       "Design class timetables with built-in tools",
       "Process fees, generate receipts and keep daily records",
     ],
-    image:
-      "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=700&q=80",
-    imageAlt: "Teacher holding a book in a classroom",
-    imageSide: "left",
+    image: b_02,
+    imageAlt: "Teacher holding a book smiling",
+    imageSide: "left" as const,
     bg: "bg-bg-main",
   },
   {
@@ -41,38 +41,46 @@ const beneficiaries = [
       "Access class timetables and online courses",
       "Stay notified of everything happening at school",
     ],
-    image:
-      "https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?w=700&q=80",
-    imageAlt: "Parent helping a child with schoolwork",
-    imageSide: "right",
+    image: b_03,
+    imageAlt: "Parent helping child with schoolwork on a laptop",
+    imageSide: "right" as const,
     bg: "bg-bg-soft",
   },
 ];
-
-function BlobBackdrop() {
+function Blobs({ flip = false }: { flip?: boolean }) {
   return (
     <svg
-      className="pointer-events-none absolute inset-0 h-full w-full opacity-60"
-      viewBox="0 0 800 400"
+      className={`pointer-events-none absolute inset-0 h-full w-full ${flip ? "scale-x-[-1]" : ""}`}
+      viewBox="0 0 870 600"
       fill="none"
       preserveAspectRatio="xMidYMid slice"
+      aria-hidden
     >
-      <circle cx="60" cy="60" r="50" stroke="hsla(220,13%,91%,1)" strokeWidth="1.5" />
-      <circle cx="650" cy="40" r="36" stroke="hsla(220,13%,91%,1)" strokeWidth="1.5" />
-      <circle cx="540" cy="160" r="14" fill="hsla(220,13%,91%,0.6)" />
-      <rect x="320" y="10" width="70" height="70" rx="20" stroke="hsla(220,13%,91%,1)" strokeWidth="1.5" transform="rotate(8 355 45)" />
-      <rect x="700" y="180" width="90" height="90" rx="24" stroke="hsla(220,13%,91%,1)" strokeWidth="1.5" transform="rotate(-6 745 225)" />
+      {/* top-left large circle outline */}
+      <circle cx="60" cy="80" r="80" stroke="hsla(214,32%,91%,1)" strokeWidth="1.5" />
+      {/* top-right rounded square outline */}
+      <rect x="680" y="20" width="120" height="120" rx="30" stroke="hsla(214,32%,91%,1)" strokeWidth="1.5" transform="rotate(8 740 80)" />
+      {/* mid-right medium circle outline */}
+      <circle cx="820" cy="300" r="55" stroke="hsla(214,32%,91%,1)" strokeWidth="1.5" />
+      {/* mid-left small filled circle */}
+      <circle cx="30" cy="360" r="22" fill="hsla(214,32%,91%,0.7)" />
+      {/* bottom-left rounded square outline */}
+      <rect x="60" y="460" width="100" height="100" rx="28" stroke="hsla(214,32%,91%,1)" strokeWidth="1.5" transform="rotate(-6 110 510)" />
+      {/* bottom-right small circle */}
+      <circle cx="750" cy="520" r="30" stroke="hsla(214,32%,91%,1)" strokeWidth="1.5" />
+      {/* center-left pill */}
+      <rect x="100" y="250" width="50" height="80" rx="25" stroke="hsla(214,32%,91%,1)" strokeWidth="1.5" />
     </svg>
   );
 }
 
 export default function BeneficiariesSection() {
   return (
-    <section className="w-full bg-bg-soft">
+      <section className="w-full overflow-hidden">
       {/* Header */}
-      <div className="relative overflow-hidden">
-        <BlobBackdrop />
-        <div className="relative mx-auto max-w-7xl px-6 pt-16 pb-12 md:pt-20 md:pb-16">
+      <div className="relative">
+        <Blobs />
+        <div className="relative mx-auto max-w-7xl px-6 pt-16 pb-10 md:pt-20 md:pb-14">
           <span className="inline-flex items-center rounded-full border border-border-line03 px-4 py-1.5 text-xs font-jakarta font-semibold tracking-wide text-text-muted01">
             BUILT FOR EVERYONE
           </span>
@@ -83,7 +91,7 @@ export default function BeneficiariesSection() {
             Multiple <span className="text-brand-primary">Beneficiaries</span>
           </h2>
 
-          <p className="mt-4 max-w-xl text-base font-jakarta text-text-secondary">
+          <p className="mt-4 max-w-md text-sm sm:text-base font-jakarta text-text-secondary">
             Schoolzy isn&apos;t a tool for admins only. Every stakeholder gets
             what they need, where they need it.
           </p>
@@ -91,69 +99,61 @@ export default function BeneficiariesSection() {
       </div>
 
       {/* Rows */}
-      <div className="flex flex-col">
-        {beneficiaries.map((item, i) => (
-          <div key={item.number} className={`relative overflow-hidden ${item.bg}`}>
-            <BlobBackdrop />
-            <div className="relative mx-auto max-w-7xl px-6 py-14 md:py-20">
-              <div
-                className={`grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center ${
-                  item.imageSide === "left" ? "md:[&>*:first-child]:order-2" : ""
-                }`}
+      {beneficiaries.map((item, i) => (
+        <div key={item.number} className={`relative overflow-hidden ${item.bg}`}>
+          <Blobs flip={i % 2 !== 0} />
+          <div className="relative mx-auto max-w-7xl px-6 py-14 md:py-20">
+            <div
+              className={`grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 items-center ${
+                item.imageSide === "left" ? "md:grid-flow-dense" : ""
+              }`}
+            >
+              {/* Text */}
+              <motion.div
+                initial={{ opacity: 0, x: item.imageSide === "right" ? -30 : 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className={item.imageSide === "left" ? "md:col-start-2" : ""}
               >
-                {/* Text */}
-                <motion.div
-                  initial={{ opacity: 0, x: item.imageSide === "left" ? 30 : -30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                >
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-brand-primary text-sm font-jakarta font-semibold text-white">
-                    {item.number}
-                  </span>
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-primary text-base font-jakarta font-semibold text-white">
+                  {item.number}
+                </span>
 
-                  <h3 className="mt-5 text-2xl sm:text-3xl font-jakarta font-semibold text-text-primary">
-                    {item.title}
-                  </h3>
+                <h3 className="mt-5 text-2xl sm:text-3xl font-jakarta font-bold text-text-primary">
+                  {item.title}
+                </h3>
 
-                  <ul className="mt-6 flex flex-col gap-3">
-                    {item.points.map((point) => (
-                      <li key={point} className="flex items-start gap-3">
-                        <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand-primary/10">
-                          <Check className="h-3 w-3 text-brand-primary" strokeWidth={3} />
-                        </span>
-                        <span className="text-sm sm:text-base font-jakarta text-text-secondary leading-relaxed">
-                          {point}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
+                <ul className="mt-5 flex flex-col gap-2">
+                  {item.points.map((point) => (
+                    <li key={point} className="flex items-start gap-3">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-text-secondary" />
+                      <span className="text-sm sm:text-base font-jakarta text-text-secondary leading-relaxed">
+                        {point}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
 
-                {/* Image */}
-                <motion.div
-                  initial={{ opacity: 0, x: item.imageSide === "left" ? -30 : 30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                >
-                  <img
-                    src={item.image}
-                    alt={item.imageAlt}
-                    className="aspect-[4/3] w-full rounded-2xl object-cover"
-                  />
-                </motion.div>
-              </div>
+              {/* Image */}
+              <motion.div
+                initial={{ opacity: 0, x: item.imageSide === "right" ? 30 : -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className={item.imageSide === "left" ? "md:col-start-1 md:row-start-1" : ""}
+              >
+                <img
+                  src={item.image}
+                  alt={item.imageAlt}
+                  className="aspect-4/3 w-full rounded-2xl object-cover"
+                />
+              </motion.div>
             </div>
-
-            {i < beneficiaries.length - 1 && (
-              <div className="relative mx-auto max-w-7xl px-6">
-                <div className="border-t border-border-line03" />
-              </div>
-            )}
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </section>
   );
 }

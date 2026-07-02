@@ -1,3 +1,4 @@
+import brand_logo from "@/assets/brand/schoolzy_brand_name.svg";
 
 
 function XIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -57,26 +58,10 @@ export default function LandingFooter() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8">
           {/* Brand */}
           <div className="lg:col-span-1 sm:col-span-2">
-            <a href="/" className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="h-5 w-5 text-white"
-                >
-                  <path
-                    d="M12 3 2 8l10 5 8-4.18V17h2V8L12 3Z"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="M6 11.5V16c0 1.66 2.69 3 6 3s6-1.34 6-3v-4.5l-6 3-6-3Z"
-                    fill="currentColor"
-                  />
-                </svg>
-              </span>
-              <span className="font-jakarta font-bold text-xl text-text-primary lowercase">
-                schoolzy
-              </span>
+            <a href="#back-to-top" className="flex items-center gap-2.5">
+              <div>
+                <img src={brand_logo} alt="schoolzy logo" />
+              </div>
             </a>
 
             <p className="mt-4 max-w-xs text-sm font-jakarta text-text-secondary leading-relaxed">
