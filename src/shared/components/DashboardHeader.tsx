@@ -166,7 +166,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </button>
             <DropdownOverlay
               isOpen={openMenu === "user"}
-              className="right-0 min-w-[180px]"
+              className="right-0 min-w-45"
               items={[
                 { icon: <User className="w-4 h-4" />, label: "Profile", onClick: close },
                 { icon: <LogOut className="w-4 h-4" />, label: "Logout", danger: true, onClick: close },

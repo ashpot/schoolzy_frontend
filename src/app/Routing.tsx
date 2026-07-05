@@ -1,76 +1,22 @@
 import { AnimatePresence } from "framer-motion";
 import { Route, Routes, useLocation } from "react-router";
-import { SigninPage, SignupPage } from "@/features/auth";
-import DashboardHome from "@/features/dashboard/pages/DashboardHome";
-
-// Users
-import StudentsPage from "@/features/users/pages/StudentsPage";
-import TeachersPage from "@/features/users/pages/TeachersPage";
-import AdminsPage from "@/features/users/pages/AdminsPage";
-import ParentsPage from "@/features/users/pages/ParentsPage";
-
-// Academics
-import SubjectsPage from "@/features/academics/pages/SubjectsPage";
-import SubjectTeachersPage from "@/features/academics/pages/SubjectTeachersPage";
-import AssessmentTypesPage from "@/features/academics/pages/AssessmentTypesPage";
-import GradePage from "@/features/academics/pages/GradePage";
-import PsychomotivePage from "@/features/academics/pages/PsychomotivePage";
-import ViewStudentResultPage from "@/features/academics/pages/ViewStudentResultPage";
-import ViewClassResultPage from "@/features/academics/pages/ViewClassResultPage";
-import PromoteStudentsPage from "@/features/academics/pages/PromoteStudentsPage";
-import ManageScoresPage from "@/features/academics/pages/ManageScoresPage";
-import AttendanceSummariesPage from "@/features/academics/pages/AttendanceSummariesPage";
-
-// Learning
-import LessonNotesPage from "@/features/learning/pages/LessonNotesPage";
-import AttendancePage from "@/features/learning/pages/AttendancePage";
-
-// Tests
-import QuestionsPage from "@/features/tests/pages/QuestionsPage";
-import TestsPage from "@/features/tests/pages/TestsPage";
-import ScheduledTestsPage from "@/features/tests/pages/ScheduledTestsPage";
-import ResultsPage from "@/features/tests/pages/ResultsPage";
-
-// Results
-import UploadAssessmentPage from "@/features/results/pages/UploadAssessmentPage";
-import UploadOmittedPage from "@/features/results/pages/UploadOmittedPage";
-import UploadWeeklyPage from "@/features/results/pages/UploadWeeklyPage";
-import UploadResultsPage from "@/features/results/pages/UploadResultsPage";
-import ViewScoresPage from "@/features/results/pages/ViewScoresPage";
-
-// Sections
-import ClassesPage from "@/features/sections/pages/ClassesPage";
-import ClassGroupsPage from "@/features/sections/pages/ClassGroupsPage";
-// import AssignClassPage from "@/features/sections/pages/AssignClassPage";
-// import ClassAveragePage from "@/features/sections/pages/ClassAveragePage";
-
-// Finances
-import FeesPage from "@/features/finances/pages/FeesPage";
-import FeeTypePage from "@/features/finances/pages/FeeTypePage";
-import AssignFeesPage from "@/features/finances/pages/AssignFeesPage";
-import PaymentsPage from "@/features/finances/pages/PaymentsPage";
-import PaidListPage from "@/features/finances/pages/PaidListPage";
-import ExpensesPage from "@/features/finances/pages/ExpensesPage";
-
-// Inventory
-import ItemsPage from "@/features/inventory/pages/ItemsPage";
-import ItemTypesPage from "@/features/inventory/pages/ItemTypesPage";
-import RecordSalePage from "@/features/inventory/pages/RecordSalePage";
-import InventoryReportPage from "@/features/inventory/pages/InventoryReportPage";
-
-// Sessions
-import TermsPage from "@/features/sessions/pages/TermsPage";
-
-// Settings
-import SchoolSettingsPage from "@/features/settings/pages/SchoolSettingsPage";
-import TestimonialsPage from "@/features/settings/pages/TestimonialsPage";
-import NewsEventsPage from "@/features/settings/pages/NewsEventsPage";
-import DashboardLayout from "./layouts/DashboardLayout";
+import { SigninPage, SignupPage } from "@/auth";
 import { AuthLayout, PublicLayout } from "./layouts";
-import { ClassAvgDenominatorPage, SectionsPage } from "@/features/sections";
-import AssignFormTeacherPage from "@/features/sections/pages/AssignFormTeacherPage";
-import { SessionsPage } from "@/features/sessions";
-import { LandingPage } from "@/features/landing";
+import { LandingPage } from "@/landing";
+import DashboardLayout from "./layouts/DashboardLayout";
+import { DashboardHome } from "@/usersDashboard/admin/features/dashboard";
+import { AdminsPage, ParentsPage, StudentsPage, TeachersPage } from "@/usersDashboard/admin/features/users";
+import { AssessmentTypesPage, AttendanceSummariesPage, GradePage, ManageScoresPage, PromoteStudentsPage, PsychomotivePage, SubjectsPage, SubjectTeachersPage, ViewClassResultPage, ViewStudentResultPage } from "@/usersDashboard/admin/features/academics";
+import { AttendancePage, LessonNotesPage } from "@/usersDashboard/admin/features/learning";
+import { QuestionsPage, ResultsPage, ScheduledTestsPage, TestsPage } from "@/usersDashboard/admin/features/tests";
+import { UploadAssessmentPage, UploadOmittedPage, UploadResultsPage, UploadWeeklyPage, ViewScoresPage } from "@/usersDashboard/admin/features/results";
+import { ClassAvgDenominatorPage, ClassesPage, ClassGroupsPage, SectionsPage } from "@/usersDashboard/admin/features/sections";
+import AssignFormTeacherPage from "@/usersDashboard/admin/features/sections/pages/AssignFormTeacherPage";
+import { AssignFeesPage, ExpensesPage, FeesPage, FeeTypePage, PaidListPage, PaymentsPage } from "@/usersDashboard/admin/features/finances";
+import { InventoryReportPage, ItemsPage, ItemTypesPage, RecordSalePage } from "@/usersDashboard/admin/features/inventory";
+import { SessionsPage, TermsPage } from "@/usersDashboard/admin/features/sessions";
+import { NewsEventsPage, SchoolSettingsPage, TestimonialsPage } from "@/usersDashboard/admin/features/settings";
+
 
 const AppRouter = () => {
   const location = useLocation();
