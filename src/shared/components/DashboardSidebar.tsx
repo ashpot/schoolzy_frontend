@@ -3,26 +3,35 @@ import { NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
-import { sidebarNavItems } from "../data/sidebarNav";
 import type { NavItem } from "@/shared/types/navigation";
 import brandLogo from "@/assets/brand/schoolzy_brand_name.svg";
 
-const UserAvatar = () => (
+const UserAvatar = ({ initials }: { initials: string }) => (
   <div className="w-9 h-9 rounded-full bg-brand-primary flex items-center justify-center text-white text-sm font-semibold shrink-0">
-    BU
+    {initials}
   </div>
 );
 
-const user = {
-  name: "Ben Uche",
-  role: "Admin",
-};
-
 interface DashboardSidebarProps {
+  navItems: NavItem[];
+  userName?: string;
+  roleLabel?: string;
   className?: string;
 }
 
-const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ className }) => {
+const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
+  navItems,
+  userName = "Ben Uche",
+  roleLabel = "Admin",
+  className,
+}) => {
+  const initials = userName
+    .split(" ")
+    .slice(0, 2)
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+
   return (
     <aside
       className={cn(
@@ -38,7 +47,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ className }) => {
       {/* Navigation */}
       <nav className="flex-1 px-2 py-4 overflow-y-auto">
         <ul className="space-y-1">
-          {sidebarNavItems.map((item) => (
+          {navItems.map((item) => (
             <SidebarItem key={item.id} item={item} />
           ))}
         </ul>
@@ -47,12 +56,12 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ className }) => {
       {/* Footer */}
       <div className="border-t border-border-line02 p-3">
         <div className="flex items-center gap-3 px-2 py-1">
-          <UserAvatar />
+          <UserAvatar initials={initials} />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-text-primary truncate">
-              {user.name}
+              {userName}
             </p>
-            <p className="text-xs text-text-muted">{user.role}</p>
+            <p className="text-xs text-text-muted">{roleLabel}</p>
           </div>
           <ChevronRight className="w-4 h-4 text-text-muted shrink-0" />
         </div>
@@ -73,7 +82,6 @@ const SidebarItem: React.FC<{ item: NavItem }> = ({ item }) => {
   const location = useLocation();
   const hasChildren = item.children && item.children.length > 0;
 
-  // Active check: parent is active if its path matches OR any child is active
   const isActive = hasChildren
     ? item.children!.some((child) => location.pathname.startsWith(child.path!))
     : item.path
@@ -83,13 +91,12 @@ const SidebarItem: React.FC<{ item: NavItem }> = ({ item }) => {
   const [expanded, setExpanded] = useState(isActive);
   const toggleExpand = () => setExpanded((prev) => !prev);
 
-  // ---- Parent with NO children ----
   if (!hasChildren) {
     return (
       <li>
         <NavLink
           to={item.path!}
-          end={item.path === "/dashboard"}
+          end={item.id === "dashboard"}
           className={({ isActive }) =>
             cn(
               "flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-base font-medium font-lato transition-all duration-150",
@@ -179,4 +186,5 @@ const SidebarItem: React.FC<{ item: NavItem }> = ({ item }) => {
     </li>
   );
 };
+
 export default DashboardSidebar;

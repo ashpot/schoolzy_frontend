@@ -1,0 +1,1 @@
+export {default as MyClassPage} from './pages/MyClassPage'
