@@ -20,8 +20,8 @@ export const teacherNavItems: NavItem[] = [
     path: `/${TEACHER_ROOT_ROUTE}/my-classes`,
     icon: DashboardIcon,
     children: [
-      { id: "class-list", label: "Class List", path: `/${TEACHER_ROOT_ROUTE}/my-classes/class-list`, icon: ClassesIcon },
-      { id: "attendance-summary", label: "Attendance Summary", path: `/${TEACHER_ROOT_ROUTE}/my-classes/attendance-summary`, icon: ClassesIcon },
+      { id: "class-list", label: "Class List", path: `/${TEACHER_ROOT_ROUTE}/my-classes/class-list`, icon: DashboardIcon },
+      { id: "attendance-summary", label: "Attendance Summary", path: `/${TEACHER_ROOT_ROUTE}/my-classes/attendance-summary`, icon: DashboardIcon },
     ],
   },
   {

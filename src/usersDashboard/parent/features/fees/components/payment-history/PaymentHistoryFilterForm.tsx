@@ -33,8 +33,7 @@ export default function PaymentHistoryFilterForm({ onLoaded }: { onLoaded: (reco
         <h2 className="section-title">Check Child Payment History</h2>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col md:flex-row gap-4 md:items-end">
-        <div className="flex-1">
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
           <FormSelect
             label="Select Child"
             error={errors.childId?.message}
@@ -43,8 +42,7 @@ export default function PaymentHistoryFilterForm({ onLoaded }: { onLoaded: (reco
             placeholder="Choose a child"
             {...register("childId")}
           />
-        </div>
-        <SubmitButton label="Load Payment History" isLoading={mutation.isPending} />
+        <SubmitButton label="Load Payment History" isLoading={mutation.isPending}/>
       </form>
     </div>
   );
