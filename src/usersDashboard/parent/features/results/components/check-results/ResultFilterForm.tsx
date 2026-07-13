@@ -60,7 +60,7 @@ export default function ResultFilterForm({ onLoaded }: { onLoaded: (result: Resu
         />
 
         <div className="md:col-span-3">
-          <SubmitButton label="Load Result" isLoading={mutation.isPending} />
+          <SubmitButton label="Load Result" isLoading={mutation.isPending}/>
         </div>
       </form>
     </div>

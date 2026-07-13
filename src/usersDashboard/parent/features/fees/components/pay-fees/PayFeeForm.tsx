@@ -1,14 +1,16 @@
-// src/usersDashboard/parent/features/fees/components/pay-fees/PayFeeForm.tsx
 import { useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreditCard, ExternalLink } from "lucide-react";
+import { CreditCard } from "lucide-react";
+import { z } from "zod";
 import { payFeeSchema, type PayFeeValues } from "../../schemas";
 import { childOptions, feeOptionsByChild } from "../../data/mockData";
 import FormSelect from "@/shared/ui/FormSelect";
 import FormInput from "@/shared/ui/FormInput";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import { usePayFee } from "../../hooks/useFees";
+
+type PayFeeFormInput = z.input<typeof payFeeSchema>;
 
 export default function PayFeeForm() {
   const {
@@ -19,7 +21,7 @@ export default function PayFeeForm() {
     control,
     reset,
     formState: { errors },
-  } = useForm<PayFeeValues>({
+  } = useForm<PayFeeFormInput, any, PayFeeValues>({
     resolver: zodResolver(payFeeSchema),
     defaultValues: { childId: "", feeId: "", amount: "" as unknown as number },
   });
@@ -32,10 +34,9 @@ export default function PayFeeForm() {
   useEffect(() => {
     const selected = feeOptions.find((f) => f.id === feeId);
     setValue("amount", selected ? selected.amount : ("" as unknown as number));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [feeId]);
 
-  const onSubmit = (values: PayFeeValues) => {
+  const onSubmit: SubmitHandler<PayFeeValues> = (values) => {
     mutation.mutate(values, { onSuccess: () => reset() });
   };
 

@@ -6,7 +6,8 @@ import DashboardHeader from "@/shared/components/DashboardHeader";
 import { useRoleConfig } from "@/shared/hooks/useRoleConfig";
 
 const DashboardLayout: React.FC = () => {
-  const { navItems, userLabel } = useRoleConfig();
+  const { navItems, userLabel, role } = useRoleConfig();
+  const showSearch = role === "teacher"
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
 
@@ -50,7 +51,7 @@ const DashboardLayout: React.FC = () => {
       )}
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <DashboardHeader onMenuClick={() => setMobileOpen(true)} roleLabel={userLabel} />
+          <DashboardHeader onMenuClick={() => setMobileOpen(true)} roleLabel={userLabel} showSearch={showSearch} />
 
         <main className="flex-1 overflow-y-auto">
           <div className="admin-p py-6 md:py-10">

@@ -55,7 +55,7 @@ const AdminDashboardLayout: React.FC = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <DashboardHeader onMenuClick={() => setMobileOpen(true)} roleLabel="Admin" />
+        <DashboardHeader onMenuClick={() => setMobileOpen(true)} roleLabel="Admin" showSearch={true} />
 
         <main className="flex-1 overflow-y-auto">
           <div className="admin-p py-6 md:py-10">

@@ -4,6 +4,7 @@ import { mockPaymentHistory } from "../data/mockData";
 
 export const useLoadPaymentHistory = () => {
   return useMutation({
+    // @ts-ignore
     mutationFn: async (values: LoadHistoryValues) => {
       // TODO: Replace with actual API call
       // return api.get(`/fees/history?childId=${values.childId}`);
@@ -15,6 +16,7 @@ export const useLoadPaymentHistory = () => {
 
 export const usePayFee = () => {
   return useMutation({
+    // @ts-ignore
     mutationFn: async (values: PayFeeValues) => {
       // TODO: Replace with actual API call
       // return api.post("/fees/pay", values);

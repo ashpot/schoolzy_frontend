@@ -25,12 +25,12 @@ export default function ParentDetailsCard({ parent }: { parent: ParentDetails })
           {initials}
         </div>
         <p className="font-semibold text-text-primary">{parent.name}</p>
-        <span className="mt-1 px-2.5 py-0.5 rounded-full text-xs bg-blue-50 text-brand-primary">
+        <span className="font-semibold mt-1 px-2.5 py-0.5 rounded-full text-xs bg-blue-50 text-brand-primary">
           {parent.gender}
         </span>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 font-semibold">
         <DetailRow icon={MapPin} label="Address" value={parent.address} />
         <DetailRow icon={Mail} label="Email Address" value={parent.email} />
         <DetailRow icon={Phone} label="Phone Number" value={parent.phone} />
