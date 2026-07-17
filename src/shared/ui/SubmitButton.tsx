@@ -1,19 +1,25 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
+import { cn } from "../utils/cn";
 
-interface SubmitButtonProps {
+interface SubmitButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   label: string;
   isLoading?: boolean;
+  className?: string;
 }
 
-const SubmitButton: React.FC<SubmitButtonProps> = ({ label, isLoading }) => (
+const SubmitButton: React.FC<SubmitButtonProps> = ({ label, isLoading, className}) => (
   <motion.button
     type="submit"
     disabled={isLoading}
     whileHover={!isLoading ? { scale: 1.01, y: -1 } : {}}
     whileTap={!isLoading ? { scale: 0.98 } : {}}
-    className="w-full mt-2 bg-brand-primary hover:bg-brand-hover text-white font-lato font-semibold py-3 rounded-xl transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm"
+    className={cn(
+      "flex items-center justify-center rounded-lg bg-brand-primary text-white px-4 py-2 w-full",
+      isLoading ? "cursor-not-allowed opacity-70" : "hover:bg-brand-primary/90",
+      className
+    )}
   >
     {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
     {label}

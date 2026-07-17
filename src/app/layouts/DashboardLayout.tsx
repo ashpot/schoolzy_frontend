@@ -3,8 +3,11 @@ import { Outlet } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardSidebar from "@/shared/components/DashboardSidebar";
 import DashboardHeader from "@/shared/components/DashboardHeader";
+import { useRoleConfig } from "@/shared/hooks/useRoleConfig";
 
 const DashboardLayout: React.FC = () => {
+  const { navItems, userLabel, role } = useRoleConfig();
+  const showSearch = role === "teacher"
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
 
@@ -19,15 +22,12 @@ const DashboardLayout: React.FC = () => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-dashboard-bg">
-      {/* Desktop Sidebar */}
-      {isDesktop && <DashboardSidebar />}
+      {isDesktop && <DashboardSidebar navItems={navItems} roleLabel={userLabel} /> }
 
-      {/* Mobile Sidebar */}
       {!isDesktop && (
         <AnimatePresence>
           {mobileOpen && (
             <>
-              {/* Overlay */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -36,7 +36,6 @@ const DashboardLayout: React.FC = () => {
                 onClick={() => setMobileOpen(false)}
                 className="fixed inset-0 bg-black/30 z-40"
               />
-              {/* Sidebar */}
               <motion.div
                 initial={{ x: -280 }}
                 animate={{ x: 0 }}
@@ -44,16 +43,15 @@ const DashboardLayout: React.FC = () => {
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 className="fixed top-0 left-0 z-50 h-full"
               >
-                <DashboardSidebar />
+                <DashboardSidebar navItems={navItems} roleLabel={userLabel} />
               </motion.div>
             </>
           )}
         </AnimatePresence>
       )}
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <DashboardHeader onMenuClick={() => setMobileOpen(true)} />
+          <DashboardHeader onMenuClick={() => setMobileOpen(true)} roleLabel={userLabel} showSearch={showSearch} />
 
         <main className="flex-1 overflow-y-auto">
           <div className="admin-p py-6 md:py-10">

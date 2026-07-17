@@ -26,6 +26,8 @@
   /* background */
   --color-bg-main: hsla(0, 0%, 100%, 1);
   --color-bg-soft: hsla(0, 0%, 94%, 0.8);
+  --color-bg-dark: hsla(222, 47%, 11%, 1);
+  --color-text-inverse-muted: hsla(220, 14%, 75%, 1);
 
 
   /* fonts */
@@ -82,4 +84,7 @@
 }
 @utility text-body-small{
   @apply text-text-muted font-jakarta font-normal text-xs;
+}
+.select-field {
+  @apply px-3 py-2.5 text-sm rounded-xl border border-border-line02 bg-bg-input focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 min-w-[160px];
 }

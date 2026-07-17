@@ -17,13 +17,15 @@ type OpenMenu = "session" | "term" | "user" | "bell" | "message" | null;
 interface DashboardHeaderProps {
   onMenuClick: () => void;
   userName?: string;
-  userRole?: string;
+  roleLabel?: string;
+  showSearch?: boolean;
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onMenuClick,
   userName = "Ben Uche",
-  userRole = "Admin",
+  roleLabel = "Admin",
+  showSearch = true,
 }) => {
   const [query, setQuery] = useState("");
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
@@ -54,20 +56,22 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <ChevronsLeft className="w-6 h-6 text-white" />
           </Button>
 
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search students, teachers, classes..."
-              className={cn(
-                "w-full pl-9 pr-4 py-2 rounded-lg border border-border-line02 bg-bg-input",
-                "text-sm text-text-primary placeholder:text-text-muted",
-                "focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all"
-              )}
-            />
-          </div>
+          {showSearch && (
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search students, teachers, classes..."
+                className={cn(
+                  "w-full pl-9 pr-4 py-2 rounded-lg border border-border-line02 bg-bg-input",
+                  "text-sm text-text-primary placeholder:text-text-muted",
+                  "focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all"
+                )}
+              />
+            </div>
+          )}
         </div>
 
         {/* Right: Controls */}
@@ -160,13 +164,13 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               <UserAvatar />
               <div className="hidden md:block text-left">
                 <p className="text-sm font-semibold text-text-primary leading-tight">{userName}</p>
-                <p className="text-xs text-text-muted">{userRole}</p>
+                <p className="text-xs text-text-muted">{roleLabel}</p>
               </div>
               <ChevronDown className={cn("hidden md:block w-4 h-4 text-text-muted transition-transform duration-200", openMenu === "user" && "rotate-180")} />
             </button>
             <DropdownOverlay
               isOpen={openMenu === "user"}
-              className="right-0 min-w-[180px]"
+              className="right-0 min-w-45"
               items={[
                 { icon: <User className="w-4 h-4" />, label: "Profile", onClick: close },
                 { icon: <LogOut className="w-4 h-4" />, label: "Logout", danger: true, onClick: close },

@@ -1,0 +1,1 @@
+export {default as MyFeesPage} from './pages/MyFees'

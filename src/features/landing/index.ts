@@ -1,1 +1,0 @@
-export {default as LandingPage} from "@/features/landing/pages/LandingPage"

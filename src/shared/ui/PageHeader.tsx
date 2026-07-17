@@ -2,7 +2,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Upload, Plus } from "lucide-react";
 import { pageFade } from "../utils/animations";
-import Button from "./Button";
 
 interface PageHeaderProps {
   title: string;

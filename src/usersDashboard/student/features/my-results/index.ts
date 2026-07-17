@@ -1,0 +1,1 @@
+export {default as MyResultsPage} from './pages/MyResults'

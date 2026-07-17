@@ -1,0 +1,1 @@
+export { default as CheckResultsPage } from "./pages/CheckResultsPage";
