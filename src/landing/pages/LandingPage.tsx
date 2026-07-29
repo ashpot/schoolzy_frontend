@@ -10,11 +10,16 @@ import PricingSection from "../components/PricingSection";
 import CtaBanner from "../components/CtaBanner";
 import LandingFooter from "../components/LandingFooter";
 import { fadeIn } from "../animations/variants";
+import { Navigate } from "react-router-dom";
+import { isTenantDomain } from "@/shared/utils/tenant";
 
 
 export default function LandingPage() {
+  if (isTenantDomain()) {
+    return <Navigate to="/auth/signin" replace />;
+  }
   return (
-    <motion.div variants={fadeIn} initial="hidden" animate="show">
+   <motion.div variants={fadeIn} initial="hidden" animate="show">
       <LandingNav />
       <main>
         <HeroSection />

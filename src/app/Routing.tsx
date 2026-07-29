@@ -56,8 +56,8 @@ const AppRouter = () => {
 
         {/* Auth */}
         <Route element={<AuthLayout />}>
-          <Route path="signup" element={<SignupPage />} />
-          <Route path="signin" element={<SigninPage />} />
+          <Route path="/auth/signup" element={<SignupPage />} />
+          <Route path="/auth/signin" element={<SigninPage />} />
         </Route>
 
         {/*____________________ School Admin Dashboard __________________*/}

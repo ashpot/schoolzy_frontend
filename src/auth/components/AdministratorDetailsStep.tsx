@@ -42,15 +42,22 @@ const AdministratorDetailsStep: React.FC<AdministratorDetailsStepProps> = ({
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 md:space-y-5">
-        {/* Full Name */}
+        {/* First Name */}
         <FormInput
-          label="Full Name"
-          placeholder="Enter your full name"
-          error={errors.fullName?.message}
+          label="First Name"
+          placeholder="Enter your first name"
+          error={errors.first_name?.message}
           isLoading={isLoading}
-          {...register("fullName")}
+          {...register("first_name")}
         />
-
+        {/* Last Name */}
+        <FormInput
+          label="Last Name"
+          placeholder="Enter your last name"
+          error={errors.last_name?.message}
+          isLoading={isLoading}
+          {...register("last_name")}
+        />
         {/* Email Address */}
         <FormInput
           label="Email Address"
@@ -79,6 +86,14 @@ const AdministratorDetailsStep: React.FC<AdministratorDetailsStepProps> = ({
           error={errors.password?.message}
           isLoading={isLoading}
           {...register("password")}
+        />
+        <FormInput
+          label="Confirm Password"
+          type="password"
+          placeholder="Re-enter password"
+          error={errors.confirm_password?.message}
+          isLoading={isLoading}
+          {...register("confirm_password")}
         />
 
         {/* Password Hint */}
