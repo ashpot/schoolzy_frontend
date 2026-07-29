@@ -176,7 +176,7 @@ const LoginForm: React.FC = () => {
           className="text-body text-xs md:text-sm text-center mt-4 md:mt-6"
         >
           Don't have an account?{' '}
-          <Link to="/signup" className="text-brand-primary hover:underline font-normal transition-colors">
+          <Link to="/auth/signup" className="text-brand-primary hover:underline font-normal transition-colors">
             Signup
           </Link>
         </motion.p>

@@ -1,10 +1,14 @@
 import { z } from "zod";
 
 export const administratorDetailsSchema = z.object({
-  fullName: z
+  first_name: z
     .string()
-    .min(2, "Full name must be at least 2 characters")
-    .max(100, "Full name must be under 100 characters"),
+    .min(2, "first name must be at least 2 characters")
+    .max(100, "first name must be under 100 characters"),
+  last_name: z
+    .string()
+    .min(2, "last name must be at least 2 characters")
+    .max(100, "last name must be under 100 characters"),
   email: z
     .string()
     .email("Please enter a valid email address"),
@@ -20,7 +24,9 @@ export const administratorDetailsSchema = z.object({
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/,
       "Password must have at least 8 characters, alphanumeric with at least one capital letter & special character"
     ),
-});
+    confirm_password: z.string(),
+}).refine((data)=>data.password === data.confirm_password,
+  {message: "Passwords does not match", path: ["confirm_password"]});
 
 export const schoolDetailsSchema = z.object({
   schoolName: z
