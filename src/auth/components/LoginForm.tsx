@@ -7,6 +7,7 @@ import { BrandIcon, LoginIcon } from '@/shared/lib/SvgLib';
 import Button from '@/shared/ui/Button';
 import Sponsor from '@/shared/ui/Sponsor';
 import { Link } from 'react-router';
+import type { TenantInfo } from '@/shared/hooks/useTenantCheck';
 
 interface LoginCredentials {
   username: string;
@@ -17,6 +18,10 @@ interface LoginResponse {
   success: boolean;
   message?: string;
   token?: string;
+}
+
+interface LoginFormProps {
+  tenant?: TenantInfo;
 }
 
 const loginUser = async (credentials: LoginCredentials): Promise<LoginResponse> => {
@@ -56,7 +61,7 @@ const itemVariants: Variants = {
   },
 };
 
-const LoginForm: React.FC = () => {
+const LoginForm: React.FC<LoginFormProps> = ({ tenant }) => {
   const {
     register,
     handleSubmit,
@@ -73,6 +78,8 @@ const LoginForm: React.FC = () => {
   const onSubmit = (data: LoginCredentials) => {
     mutation.mutate(data);
   };
+
+  const schoolName = tenant?.school_name ?? 'My School';
 
   return (
     <motion.div
@@ -93,12 +100,20 @@ const LoginForm: React.FC = () => {
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="w-16 h-16 md:w-20 md:h-20 bg-brand-primary rounded-2xl md:rounded-3xl flex justify-center items-center shadow-lg"
+            className="w-16 h-16 md:w-20 md:h-20 bg-brand-primary rounded-2xl md:rounded-3xl flex justify-center items-center shadow-lg overflow-hidden"
           >
-            <BrandIcon className="text-bg-main w-8 h-8 md:w-10 md:h-10" />
+            {tenant?.logo ? (
+              <img
+                src={tenant.logo}
+                alt={`${schoolName} logo`}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <BrandIcon className="text-bg-main w-8 h-8 md:w-10 md:h-10" />
+            )}
           </motion.div>
           <h1 className="text-center text-2xl md:text-3xl font-black text-text-primary tracking-wide font-jakarta">
-            My School
+            {schoolName}
           </h1>
         </motion.div>
 

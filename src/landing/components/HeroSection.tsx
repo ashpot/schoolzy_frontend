@@ -5,13 +5,11 @@ import avatar_02 from "@/assets/landing/avatar/avatar_02.webp";
 import avatar_03 from "@/assets/landing/avatar/avatar_03.webp";
 import { Link } from "react-router";
 
-
 const avatars = [
   avatar_01,
   avatar_02,
   avatar_03,
 ];
-
 export default function HeroSection() {
   return (
     <section className="w-full bg-bg-main">
