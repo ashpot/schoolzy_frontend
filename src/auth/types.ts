@@ -1,14 +1,27 @@
-export interface AuthUser {
-  id: string
-  username: string
-}
+export type UserRole = "Admin" | "Teacher" | "Student" | "Parent";
 
-export interface LoginResponse {
-  user: AuthUser
-  token: string
+export interface AuthUser {
+  id: number;
+  username: string;
+  fullname: string;
+  email: string;
+  role: UserRole;
 }
 
 export interface LoginPayload {
-  username: string
-  password: string
+  user: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  success: boolean;
+  message: string;
+  token: string;
+  user: AuthUser;
+}
+
+export interface ApiErrorResponse {
+  success?: false;
+  message?: string;
+  error?: string;
 }

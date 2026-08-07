@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import { getRoleConfigFromPath } from "@/shared/config/navigation";
+import { getRoleConfigFromPath } from "@/shared/navigation";
 
 export const useRoleConfig = () => {
   const { pathname } = useLocation();

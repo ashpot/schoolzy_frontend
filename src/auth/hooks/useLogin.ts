@@ -1,25 +1,33 @@
-// // src/features/auth/hooks/useLogin.ts
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { apiRequest } from "@/shared/lib/apiClient";
+import { AUTH_ENDPOINTS } from "../api";
+import type { LoginPayload, LoginResponse, UserRole } from "../types";
 
-// import { useMutation } from '@tanstack/react-query'
-// import type { LoginPayload, LoginResponse } from '../types'
-// // import { login } from '../api' // TODO: enable when backend ready
+const ROLE_ROUTE_MAP: Record<UserRole, string> = {
+  Admin: "/admin-dashboard",
+  Teacher: "/teacher-dashboard",
+  Student: "/student-dashboard",
+  Parent: "/parent-dashboard",
+};
 
-// export function useLogin() {
-//   return useMutation<LoginResponse, Error, LoginPayload>({
-//     mutationFn: async (data) => {
-//       // TODO: Replace with real API
-//       return new Promise<LoginResponse>((resolve, reject) => {
-//         setTimeout(() => {
-//           if (data.username === 'admin' && data.password === 'password') {
-//             resolve({
-//               user: { id: '1', username: 'admin' },
-//               token: 'mock-token',
-//             })
-//           } else {
-//             reject(new Error('Invalid credentials'))
-//           }
-//         }, 1000)
-//       })
-//     },
-//   })
-// }
+export const useLogin = () => {
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: async (payload: LoginPayload) => {
+      return apiRequest<LoginResponse>(AUTH_ENDPOINTS.SIGNIN, {
+        method: "POST",
+        body: JSON.stringify(payload),
+        skipAuth: true,
+      });
+    },
+    onSuccess: (data) => {
+      localStorage.setItem("schoolzy_token", data.token);
+      localStorage.setItem("schoolzy_user", JSON.stringify(data.user));
+
+      const destination = ROLE_ROUTE_MAP[data.user.role] ?? "/auth/signin";
+      navigate(destination, { replace: true });
+    },
+  });
+};
