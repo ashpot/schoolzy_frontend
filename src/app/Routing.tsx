@@ -1,6 +1,6 @@
 import { AnimatePresence } from "framer-motion";
 import { Route, Routes, useLocation } from "react-router";
-import { SigninPage, SignupPage } from "@/auth";
+import { RegistrationSuccessPage, SigninPage, SignupPage } from "@/auth";
 import { AdminDashboardLayout, AuthLayout, DashboardLayout, PublicLayout } from "./layouts";
 import { LandingPage } from "@/landing";
 import { DashboardHome } from "@/usersDashboard/admin/features/dashboard";
@@ -35,6 +35,7 @@ import {
 } from "@/usersDashboard/teacher/features/results";
 import NotFoundPage from "@/shared/components/NotFoundPage";
 import { CheckResultsPage } from "@/usersDashboard/parent/features/results";
+import LoginTestPage from "@/auth/pages/LoginTestPage";
 
 
 
@@ -58,6 +59,8 @@ const AppRouter = () => {
         <Route element={<AuthLayout />}>
           <Route path="/auth/signup" element={<SignupPage />} />
           <Route path="/auth/signin" element={<SigninPage />} />
+          <Route path="/auth/registration-success" element={<RegistrationSuccessPage />} />
+          <Route path="/login-test" element={<LoginTestPage />} />
         </Route>
 
         {/*____________________ School Admin Dashboard __________________*/}

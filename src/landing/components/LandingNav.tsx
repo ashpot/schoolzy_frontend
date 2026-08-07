@@ -39,13 +39,13 @@ export default function Header() {
           {/* Desktop actions */}
           <div className="hidden lg:flex items-center gap-6">
             <Link
-              to="/signin"
+              to="/auth/signup"
               className="text-sm font-jakarta font-medium text-text-nav hover:text-brand-primary transition-colors"
             >
               Request a Demo
             </Link>
             <Link
-              to="/signin"
+              to="/auth/signup"
             >
               <motion.button
                 whileHover={{ scale: 1.03 }}
@@ -91,14 +91,14 @@ export default function Header() {
                 </a>
               ))}
               <Link
-                to="/signin"
+                to="/auth/signup"
                 onClick={() => setOpen(false)}
                 className="text-sm font-jakarta font-medium text-text-nav"
               >
                 Request a Demo
               </Link>
               <Link
-                to="/signin"
+                to="/auth/signup"
               >
                 <button className="mt-2 rounded-full bg-brand-primary px-6 py-2.5 text-sm font-jakarta font-semibold text-white hover:bg-brand-hover transition-colors">
                   Get Started

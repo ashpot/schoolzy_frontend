@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormInput from "@/shared/ui/FormInput";
 import FormSelect from "@/shared/ui/FormSelect";
 import Button from "@/shared/ui/Button";
 import { schoolDetailsSchema, type SchoolDetailsFormData } from "../schema/signupSchema";
+import { slugify } from "@/shared/utils/slugify";
 
 const states = [
   { value: "lagos", label: "Lagos" },
@@ -51,13 +52,23 @@ const SchoolDetailsStep: React.FC<SchoolDetailsStepProps> = ({
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<SchoolDetailsFormData>({
     resolver: zodResolver(schoolDetailsSchema),
     defaultValues,
   });
 
+  const [slugTouched, setSlugTouched] = useState(false);
   const selectedState = watch("state");
+  const schoolName = watch("schoolName");
+
+  React.useEffect(() => {
+  if (!slugTouched && schoolName) {
+    const firstWord = schoolName.trim().split(/\s+/)[0] || "";
+    setValue("schoolSlug", slugify(firstWord));
+  }
+}, [schoolName, slugTouched, setValue]);
 
   return (
     <div className="w-full max-w-lg mx-auto px-4 md:px-0">
@@ -68,7 +79,7 @@ const SchoolDetailsStep: React.FC<SchoolDetailsStepProps> = ({
         </h1>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 md:space-y-5">
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4 md:space-y-5">
         {/* School Name */}
         <FormInput
           label="School Name"
@@ -77,6 +88,22 @@ const SchoolDetailsStep: React.FC<SchoolDetailsStepProps> = ({
           isLoading={isLoading}
           {...register("schoolName")}
         />
+
+        {/* School Subdomain (slug) */}
+        <div className="space-y-1">
+          <FormInput
+            label="School Web Address"
+            placeholder="your-school-name"
+            error={errors.schoolSlug?.message}
+            isLoading={isLoading}
+            {...register("schoolSlug", {
+              onChange: () => setSlugTouched(true),
+            })}
+          />
+          <p className="text-xs text-text-muted">
+            yourschool.schoolzy.com.ng — you can change this later in settings
+          </p>
+        </div>
 
         {/* School Location */}
         <div className="space-y-1">
