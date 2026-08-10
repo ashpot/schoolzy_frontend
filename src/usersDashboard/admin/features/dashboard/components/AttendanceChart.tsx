@@ -6,7 +6,6 @@ import {
 } from "recharts";
 import { useAttendance } from "../hooks/useDashboardStats";
 import { fadeIn, fadeUp } from "../animation/variant";
-import { useCountUp } from "../animation/useCountUp";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
@@ -23,29 +22,6 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         </p>
       ))}
     </motion.div>
-  );
-};
-
-// Animated stat number sub-component
-const AnimatedStat: React.FC<{
-  value: number;
-  suffix?: string;
-  prefix?: string;
-  decimals?: number;
-  className?: string;
-  inView: boolean;
-}> = ({ value, suffix = "", prefix = "", decimals = 0, className, inView }) => {
-  const { value: counted, ref } = useCountUp(inView ? value : 0, 1100, decimals);
-  return (
-    <motion.p
-      ref={ref as any}
-      className={className}
-      initial={{ opacity: 0, y: 8 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.4, delay: 0.5 }}
-    >
-      {prefix}{decimals > 0 ? counted.toFixed(decimals) : Math.round(counted).toLocaleString()}{suffix}
-    </motion.p>
   );
 };
 
@@ -109,27 +85,6 @@ const AttendanceChart: React.FC = () => {
           </ResponsiveContainer>
         </motion.div>
       )}
-
-      {/* Bottom stats with count-up */}
-      <motion.div
-        className="grid grid-cols-3 divide-x divide-border-line02 pt-2 border-t border-border-line02"
-        initial={{ opacity: 0 }}
-        animate={inView ? { opacity: 1 } : {}}
-        transition={{ delay: 0.4, duration: 0.4 }}
-      >
-        <div className="text-center px-2">
-          <AnimatedStat value={91.3} suffix="%" decimals={1} className="text-xl font-lato font-bold text-brand-primary" inView={inView} />
-          <p className="text-xs text-text-muted mt-0.5">Avg Attendance</p>
-        </div>
-        <div className="text-center px-2">
-          <AnimatedStat value={3412} className="text-xl font-lato font-bold text-text-primary" inView={inView} />
-          <p className="text-xs text-text-muted mt-0.5">Today Present</p>
-        </div>
-        <div className="text-center px-2">
-          <AnimatedStat value={435} className="text-xl font-lato font-bold text-danger" inView={inView} />
-          <p className="text-xs text-text-muted mt-0.5">Today Absent</p>
-        </div>
-      </motion.div>
     </motion.div>
   );
 };

@@ -10,6 +10,8 @@ import ItemsSold from "../components/ItemsSold";
 import RecentSales from "../components/RecentSales";
 
 const DashboardPage: React.FC = () => {
+  const name = JSON.parse(localStorage.getItem("schoolzy_user") || '{"fullname":"Ben Uche"}').fullname.split(" ")[0];
+  console.log(name)
   return (
     <motion.div
       className="flex flex-col gap-6"
@@ -20,7 +22,7 @@ const DashboardPage: React.FC = () => {
       {/* Page title */}
       <motion.div variants={fadeUp}>
         <h1 className="page-title">Dashboard</h1>
-        <p className="text-body-small mt-1">Welcome back, Ben</p>
+        <p className="capitalize text-body-small mt-1">Welcome back, {name}</p>
       </motion.div>
 
       {/* Primary stat cards */}

@@ -12,7 +12,7 @@ import { useLogin } from '../hooks/useLogin';
 import type { TenantInfo } from '@/shared/hooks/useTenantCheck';
 
 const loginSchema = z.object({
-  user: z.string().min(1, 'Username or email is required'),
+  username: z.string().min(1, 'Username or email is required'),
   password: z.string().min(1, 'Password is required'),
 });
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -38,7 +38,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ tenant }) => {
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { user: "", password: "" },
+    defaultValues: { username: "", password: "" },
   });
 
   const mutation = useLogin();
@@ -64,7 +64,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ tenant }) => {
               <BrandIcon className="text-bg-main w-8 h-8 md:w-10 md:h-10" />
             )}
           </motion.div>
-          <h1 className="text-center text-2xl md:text-3xl font-black text-text-primary tracking-wide font-jakarta">
+          <h1 className="capitalize text-center text-2xl md:text-3xl font-black text-text-primary tracking-wide font-jakarta">
             {schoolName}
           </h1>
         </motion.div>
@@ -78,9 +78,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ tenant }) => {
             <FormInput
               label="Username"
               placeholder="Enter username"
-              error={errors.user?.message}
+              error={errors.username?.message}
               isLoading={mutation.isPending}
-              {...register('user')}
+              {...register('username')}
             />
           </motion.div>
 

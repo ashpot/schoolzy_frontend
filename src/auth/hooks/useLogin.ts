@@ -11,6 +11,8 @@ const ROLE_ROUTE_MAP: Record<UserRole, string> = {
   Parent: "/parent-dashboard",
 };
 
+const DEFAULT_ROUTE = "/admin-dashboard";
+
 export const useLogin = () => {
   const navigate = useNavigate();
 
@@ -26,7 +28,8 @@ export const useLogin = () => {
       localStorage.setItem("schoolzy_token", data.token);
       localStorage.setItem("schoolzy_user", JSON.stringify(data.user));
 
-      const destination = ROLE_ROUTE_MAP[data.user.role] ?? "/auth/signin";
+      const role = data.user.role;
+      const destination = role && ROLE_ROUTE_MAP[role] ? ROLE_ROUTE_MAP[role] : DEFAULT_ROUTE;
       navigate(destination, { replace: true });
     },
   });
