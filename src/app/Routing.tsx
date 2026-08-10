@@ -35,7 +35,6 @@ import {
 } from "@/usersDashboard/teacher/features/results";
 import NotFoundPage from "@/shared/components/NotFoundPage";
 import { CheckResultsPage } from "@/usersDashboard/parent/features/results";
-import LoginTestPage from "@/auth/pages/LoginTestPage";
 
 
 
@@ -60,7 +59,6 @@ const AppRouter = () => {
           <Route path="/auth/signup" element={<SignupPage />} />
           <Route path="/auth/signin" element={<SigninPage />} />
           <Route path="/auth/registration-success" element={<RegistrationSuccessPage />} />
-          <Route path="/login-test" element={<LoginTestPage />} />
         </Route>
 
         {/*____________________ School Admin Dashboard __________________*/}

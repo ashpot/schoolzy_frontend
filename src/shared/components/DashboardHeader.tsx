@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ChevronsLeft, Search, ChevronDown, Calendar, BookOpen, User, LogOut } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 import { useOutsideClick } from "@/shared/hooks/useOutsideClick";
@@ -8,6 +8,7 @@ import MessageOverlay from "./MessageOverlay";
 import UserAvatar from "./UseAvatar";
 import Button from "../ui/Button";
 import { BellIcon, MessageIcon } from "../lib/SvgLib";
+import { useNavigate } from "react-router";
 
 const SESSIONS = ["2025/2026", "2024/2025", "2023/2024"];
 const TERMS = ["First Term", "Second Term", "Third Term"];
@@ -33,9 +34,17 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const [term, setTerm] = useState("Second Term");
   const [hasNotification, setHasNotification] = useState(true);
   const [hasMessage, setHasMessage] = useState(true);
+  const user = JSON.parse(localStorage.getItem("schoolzy_user") || "{}");
+  const navigate = useNavigate();
+
 
   const toggle = (menu: OpenMenu) => setOpenMenu((prev) => (prev === menu ? null : menu));
   const close = () => setOpenMenu(null);
+  const handleLogout = ()=>{
+    localStorage.removeItem("schoolzy_user");
+    localStorage.removeItem("schoolzy_token");
+    navigate("/auth/signin");
+  }
 
   const sessionRef = useOutsideClick(() => openMenu === "session" && close());
   const termRef    = useOutsideClick(() => openMenu === "term"    && close());
@@ -161,10 +170,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               onClick={() => toggle("user")}
               className="flex items-center gap-2 md:gap-2.5 pl-2 md:pl-3 border-l border-border-line02 hover:bg-bg-soft rounded-lg px-2 py-1 transition-colors"
             >
-              <UserAvatar />
+              <UserAvatar name={user.fullname || userName}/>
               <div className="hidden md:block text-left">
-                <p className="text-sm font-semibold text-text-primary leading-tight">{userName}</p>
-                <p className="text-xs text-text-muted">{roleLabel}</p>
+                <p className="capitalize text-sm font-semibold text-text-primary leading-tight">{user.fullname || userName}</p>
+                <p className="capitalize text-xs text-text-muted">{user.role || roleLabel}</p>
               </div>
               <ChevronDown className={cn("hidden md:block w-4 h-4 text-text-muted transition-transform duration-200", openMenu === "user" && "rotate-180")} />
             </button>
@@ -173,7 +182,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               className="right-0 min-w-45"
               items={[
                 { icon: <User className="w-4 h-4" />, label: "Profile", onClick: close },
-                { icon: <LogOut className="w-4 h-4" />, label: "Logout", danger: true, onClick: close },
+                { icon: <LogOut className="w-4 h-4" />, label: "Logout", danger: true, onClick: handleLogout },
               ]}
             />
           </div>

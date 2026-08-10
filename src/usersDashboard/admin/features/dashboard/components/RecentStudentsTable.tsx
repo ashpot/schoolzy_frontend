@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
-import { Trash2, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { Trash2, ChevronLeft, ChevronRight, Plus, Users } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 import { useRecentStudents } from "../hooks/useDashboardStats";
 import { listContainer, fadeUpFast, fadeUp } from "../animation/variant";
@@ -113,6 +113,20 @@ const RecentStudentsTable: React.FC = () => {
                       ))}
                     </motion.tr>
                   ))
+                : data && data.data.length === 0
+                ? (
+                    <motion.tr variants={fadeUpFast}>
+                      <td colSpan={7} className="px-5 py-12 text-center">
+                        <div className="flex flex-col items-center gap-2">
+                          <div className="w-10 h-10 rounded-full bg-bg-soft flex-center">
+                            <Users className="w-5 h-5 text-text-muted" />
+                          </div>
+                          <p className="text-sm text-text-secondary font-medium">Not available</p>
+                          <p className="text-xs text-text-muted">No recent students data yet</p>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  )
                 : data?.data.map((student) => (
                     <motion.tr
                       key={student.id}

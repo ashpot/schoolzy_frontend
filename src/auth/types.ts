@@ -5,13 +5,14 @@ export interface AuthUser {
   username: string;
   fullname: string;
   email: string;
-  role: UserRole;
+  role: UserRole | "";
 }
 
 export interface LoginPayload {
-  user: string;
+  username: string;
   password: string;
 }
+
 
 export interface LoginResponse {
   success: boolean;
