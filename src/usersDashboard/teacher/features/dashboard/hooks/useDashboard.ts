@@ -1,26 +1,35 @@
 import { useQuery } from "@tanstack/react-query";
-import { mockTeacherDetails, mockSubjects } from "../data/mockData";
+import { apiRequest } from "@/shared/lib/apiClient";
+import { DASHBOARD_ENDPOINTS } from "../api";
+import type { TeacherDashboardResponse, TeacherDetails, Subject } from "../types";
+
+const useTeacherDashboard = () =>
+  useQuery({
+    queryKey: ["dashboard", "teacher"],
+    queryFn: () => apiRequest<TeacherDashboardResponse>(DASHBOARD_ENDPOINTS.TEACHER),
+  });
 
 export const useTeacherDetails = () => {
-  return useQuery({
-    queryKey: ["teacher-details"],
-    queryFn: async () => {
-      // TODO: Replace with actual API call
-      // return api.get("/teacher/me");
-      await new Promise((r) => setTimeout(r, 300));
-      return mockTeacherDetails;
-    },
-  });
+  const query = useTeacherDashboard();
+
+  const data: TeacherDetails | undefined = query.data
+    ? {
+        name: query.data.profile.full_name,
+        role: "Teacher", // TODO: real API has no subject-title role text (e.g. "Mathematics Teacher") — flag to backend
+        classAssigned: "Not assigned yet", // TODO: assigned_classes has no confirmed item shape yet
+        email: query.data.profile.email,
+        phone: query.data.profile.phone ?? "Not available",
+      }
+    : undefined;
+
+  return { ...query, data };
 };
 
 export const useMySubjects = () => {
-  return useQuery({
-    queryKey: ["teacher-subjects"],
-    queryFn: async () => {
-      // TODO: Replace with actual API call
-      // return api.get("/teacher/subjects");
-      await new Promise((r) => setTimeout(r, 300));
-      return mockSubjects;
-    },
-  });
+  const query = useTeacherDashboard();
+
+  // TODO: assigned_subjects has no confirmed item shape yet — stays empty until backend defines it
+  const data: Subject[] = [];
+
+  return { ...query, data, isLoading: query.isLoading };
 };
