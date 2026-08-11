@@ -1,58 +1,82 @@
-import React from "react";
-import { useForm } from "react-hook-form";
+import React, { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { studentSchema, type StudentFormValues } from "../../schemas";
 import { staggerContainer, fieldFadeUp } from "../../animations/variants";
 import { useAddStudent } from "../../hooks/useStudents";
-import PhotoUpload  from "../shared/PhotoUpload";
+import { generateUsername } from "@/shared/utils/generateUsername";
+import PhotoUpload from "../shared/PhotoUpload";
 import FormInput from "@/shared/ui/FormInput";
 import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
-
-const CLASS_GROUP_OPTIONS = [
-  { value: "JSS", label: "Junior Secondary (JSS)" },
-  { value: "SS",  label: "Senior Secondary (SS)"  },
-  { value: "PRI", label: "Primary"                 },
-];
+import UserCreatedModal from "../shared/UserCreatedModal";
 
 const SEX_OPTIONS = [
-  { value: "Male",   label: "Male"   },
+  { value: "Male", label: "Male" },
   { value: "Female", label: "Female" },
 ];
 
 const StudentForm: React.FC = () => {
   const { mutate, isPending } = useAddStudent();
+  const [createdUser, setCreatedUser] = useState<{ fullName: string; username: string; password: string } | null>(null);
 
   const {
     register,
     handleSubmit,
     reset,
+    control,
+    setValue,
     formState: { errors },
-  } = useForm<StudentFormValues>({
+  } = useForm({
     resolver: zodResolver(studentSchema),
     defaultValues: {
       admNo: "", firstName: "", lastName: "", middleName: "",
       sex: undefined, dob: "", phone: "", address: "", city: "",
-      state: "", country: "", email: "", classGroup: "", dateOfAdmission: "",
+      state: "", country: "", email: "", classGroup: "" as unknown as number, dateOfAdmission: "",
+      username: "", password: "", confirmPassword: "",
     },
   });
 
+  const firstName = useWatch({ control, name: "firstName" });
+  const lastName = useWatch({ control, name: "lastName" });
+
+  React.useEffect(() => {
+    setValue("username", generateUsername(firstName, lastName));
+  }, [firstName, lastName, setValue]);
+
   const onSubmit = (values: StudentFormValues) => {
-    // TODO: replace mock logic with real API in useAddStudent queryFn
-    mutate({
-      ...values,
-      section:   values.classGroup === "SS" ? "Snr Sec" : "Jnr Sec",
-      classLabel:`${values.classGroup} 1A`,
-      username:  `@${values.firstName.toLowerCase()}.${values.lastName.toLowerCase()}`,
-    },
-    { onSuccess: () => reset() });
+    mutate(
+      {
+        first_name: values.firstName,
+        last_name: values.lastName,
+        username: values.username,
+        password: values.password,
+        email: values.email,
+        class_group: values.classGroup,
+      },
+      { onSuccess: () => {
+        setCreatedUser({
+          fullName: `${values.firstName} ${values.lastName}`,
+          username: values.username,
+          password: values.password,
+        });
+        reset()
+      } }
+    );
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <PhotoUpload />
-
+      <UserCreatedModal
+        isOpen={!!createdUser}
+        onClose={() => setCreatedUser(null)}
+        fullName={createdUser?.fullName ?? ""}
+        username={createdUser?.username ?? ""}
+        password={createdUser?.password ?? ""}
+        role="Student"
+      />
       <motion.div
         variants={staggerContainer}
         initial="hidden"
@@ -70,10 +94,10 @@ const StudentForm: React.FC = () => {
         </motion.div>
 
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
-          <FormInput label="First Name"  placeholder="First name"
+          <FormInput label="First Name" placeholder="First name"
             isLoading={isPending} error={errors.firstName?.message} {...register("firstName")} />
-          <FormInput label="Last Name"  placeholder="Last name"
-            isLoading={isPending} error={errors.lastName?.message}  {...register("lastName")} />
+          <FormInput label="Last Name" placeholder="Last name"
+            isLoading={isPending} error={errors.lastName?.message} {...register("lastName")} />
         </motion.div>
 
         <motion.div variants={fieldFadeUp}>
@@ -105,7 +129,7 @@ const StudentForm: React.FC = () => {
 
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
           <FormInput label="City" placeholder="City"
-            isLoading={isPending} error={errors.city?.message}  {...register("city")} />
+            isLoading={isPending} error={errors.city?.message} {...register("city")} />
           <FormInput label="State" placeholder="State"
             isLoading={isPending} error={errors.state?.message} {...register("state")} />
         </motion.div>
@@ -121,16 +145,29 @@ const StudentForm: React.FC = () => {
         </motion.div>
 
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
-          <FormSelect
-            label="Class Group" placeholder="Select group"
-            options={CLASS_GROUP_OPTIONS} isLoading={isPending}
-            error={errors.classGroup?.message} {...register("classGroup")}
+          {/* TODO: swap for a FormSelect populated from GET /sections/class-groups/ once wired */}
+          <FormInput
+            label="Class Group ID" type="number" placeholder="e.g. 1"
+            isLoading={isPending} error={errors.classGroup?.message}
+            {...register("classGroup")}
           />
           <FormInput
             label="Date of Admission" type="date"
             isLoading={isPending} error={errors.dateOfAdmission?.message}
             {...register("dateOfAdmission")}
           />
+        </motion.div>
+
+        <motion.div variants={fieldFadeUp}>
+          <FormInput label="Username" readOnly
+            isLoading={isPending} {...register("username")} />
+        </motion.div>
+
+        <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
+          <FormInput label="Password" type="password" placeholder="Create password"
+            isLoading={isPending} error={errors.password?.message} {...register("password")} />
+          <FormInput label="Confirm Password" type="password" placeholder="Re-enter password"
+            isLoading={isPending} error={errors.confirmPassword?.message} {...register("confirmPassword")} />
         </motion.div>
 
         <motion.div variants={fieldFadeUp}>

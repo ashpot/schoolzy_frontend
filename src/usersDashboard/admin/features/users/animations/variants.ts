@@ -39,3 +39,9 @@ export const scaleIn: Variants = {
   hidden: { opacity: 0, scale: 0.88 },
   show: { opacity: 1, scale: 1, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
 };
+
+export const modalVariant: Variants = {
+  hidden: { opacity: 0, scale: 0.95, y: 10 },
+  show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.25, ease: "easeOut" } },
+  exit: { opacity: 0, scale: 0.95, y: 10, transition: { duration: 0.2 } },
+};

@@ -13,3 +13,31 @@ export interface ParentDetails {
   email: string;
   phone: string;
 }
+
+export interface ParentDashboardChild {
+  id: number;
+  first_name: string;
+  last_name: string;
+  middle_name: string | null;
+  full_name: string;
+  admission_number: string | null;
+  photo: string;
+  class_group: string | number | null;
+  status: string;
+}
+
+export interface ParentDashboardResponse {
+  profile: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    middle_name: string | null;
+    full_name: string;
+    email: string;
+    phone: string | null;
+    photo: string;
+    sex: string | null;
+    status: string;
+  };
+  children: ParentDashboardChild[];
+}

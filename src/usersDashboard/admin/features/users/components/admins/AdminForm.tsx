@@ -1,15 +1,17 @@
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { adminSchema, type AdminFormValues } from "../../schemas";
 import { staggerContainer, fieldFadeUp } from "../../animations/variants";
 import { useAddAdmin } from "../../hooks/useAdmins";
-import PhotoUpload     from "../shared/PhotoUpload";
+import { generateUsername } from "@/shared/utils/generateUsername";
+import PhotoUpload from "../shared/PhotoUpload";
 import SignatureUpload from "../shared/SignatureUpload";
 import FormInput from "@/shared/ui/FormInput";
 import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
+import UserCreatedModal from "../shared/UserCreatedModal";
 
 const SEX_OPTIONS = [
   { value: "Male", label: "Male" }, { value: "Female", label: "Female" },
@@ -17,36 +19,66 @@ const SEX_OPTIONS = [
 
 const AdminForm: React.FC = () => {
   const { mutate, isPending } = useAddAdmin();
-  // Signature is a File — not part of zod, managed separately
   const [_signatureFile, setSignatureFile] = useState<File | null>(null);
+  const [createdUser, setCreatedUser] = useState<{ fullName: string; username: string; password: string } | null>(null);
+
 
   const {
     register,
     handleSubmit,
     reset,
+    control,
+    setValue,
     formState: { errors },
   } = useForm<AdminFormValues>({
     resolver: zodResolver(adminSchema),
     defaultValues: {
       firstName: "", lastName: "", middleName: "", sex: undefined,
       dob: "", phone: "", address: "", city: "", state: "", country: "", email: "",
+      username: "", password: "", confirmPassword: "",
     },
   });
 
+  const firstName = useWatch({ control, name: "firstName" });
+  const lastName = useWatch({ control, name: "lastName" });
+
+  React.useEffect(() => {
+    setValue("username", generateUsername(firstName, lastName));
+  }, [firstName, lastName, setValue]);
+
   const onSubmit = (values: AdminFormValues) => {
     // TODO: include signatureFile in FormData when wiring to real API
-    mutate({
-      ...values,
-      adminId:  `ADM-${Date.now()}`,
-      username: `@${values.firstName.toLowerCase()}.${values.lastName.toLowerCase()}`,
-    },
-    { onSuccess: () => { reset(); setSignatureFile(null); } });
+    mutate(
+      {
+        first_name: values.firstName,
+        last_name: values.lastName,
+        username: values.username,
+        password: values.password,
+        email: values.email,
+      },
+      { onSuccess: () => {
+        setCreatedUser({
+          fullName: `${values.firstName} ${values.lastName}`,
+          username: values.username,
+          password: values.password,
+        });
+        reset();
+        setSignatureFile(null)
+      } }
+    );
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <PhotoUpload />
-
+      <UserCreatedModal
+        isOpen={!!createdUser}
+        onClose={() => setCreatedUser(null)}
+        fullName={createdUser?.fullName ?? ""}
+        username={createdUser?.username ?? ""}
+        password={createdUser?.password ?? ""}
+        role="Admin"
+      />
       <motion.div variants={staggerContainer} initial="hidden" animate="show" className="flex flex-col gap-3.5 mt-2">
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
           <FormInput label="First Name" placeholder="First name"
@@ -97,6 +129,18 @@ const AdminForm: React.FC = () => {
         {/* Signature — outside RHF, handled manually */}
         <motion.div variants={fieldFadeUp}>
           <SignatureUpload onChange={(f) => setSignatureFile(f)} />
+        </motion.div>
+
+        <motion.div variants={fieldFadeUp}>
+          <FormInput label="Username" readOnly
+            isLoading={isPending} {...register("username")} />
+        </motion.div>
+
+        <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
+          <FormInput label="Password" type="password" placeholder="Create password"
+            isLoading={isPending} error={errors.password?.message} {...register("password")} />
+          <FormInput label="Confirm Password" type="password" placeholder="Re-enter password"
+            isLoading={isPending} error={errors.confirmPassword?.message} {...register("confirmPassword")} />
         </motion.div>
 
         <motion.div variants={fieldFadeUp}>
