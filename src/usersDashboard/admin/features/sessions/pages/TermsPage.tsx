@@ -2,38 +2,27 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { BookOpen } from "lucide-react";
 import { fadeUp } from "../animations/variants";
-import { mockTerms, mockSessions } from "../data/mockData";
+import { mockTerms } from "../data/mockData";
 import type { Term } from "../types";
-import type { TermValues } from "../schemas";
 import SplitLayout from "../components/shared/SplitLayout";
 import StatPill from "../components/shared/StatPill";
 import TermForm from "../components/terms-page/TermForm";
 import TermsTable from "../components/terms-page/TermsTable";
+import SessionCreatedModal from "../components/shared/SessionCreateModal";
 
 export default function TermsPage() {
   const [terms, setTerms] = useState<Term[]>(mockTerms);
+  const [createdTerm, setCreatedTerm] = useState<Term | null>(null);
 
-  const activeTerm    = terms.find((t) => t.isActive);
-  const activeSession = mockSessions.find((s) => s.isActive);
+  const activeTerm = terms.find((t) => t.isActive);
 
-  const handleCreate = (values: TermValues) => {
-    const session = mockSessions.find((s) => s.id === values.sessionId);
-    const newTerm: Term = {
-      id:              String(Date.now()),
-      name:            values.name,
-      sessionId:       values.sessionId,
-      sessionName:     session?.name ?? "",
-      tag:             values.tag,
-      startDate:       values.startDate,
-      endDate:         values.endDate,
-      isActive:        values.isActive,
-      resultPublished: values.resultPublished,
-    };
+  const handleCreate = (term: Term) => {
     setTerms((prev) =>
-      values.isActive
-        ? [...prev.map((t) => ({ ...t, isActive: false })), newTerm]
-        : [...prev, newTerm]
+      term.isActive
+        ? [...prev.map((t) => ({ ...t, isActive: false })), term]
+        : [term, ...prev]
     );
+    setCreatedTerm(term);
   };
 
   const handleDelete = (id: string) => {
@@ -41,7 +30,7 @@ export default function TermsPage() {
   };
 
   const statLabel = activeTerm
-    ? `Active: ${activeTerm.name} — ${activeSession?.name ?? ""}`
+    ? `Active: ${activeTerm.name} — ${activeTerm.sessionName}`
     : "No active term";
 
   return (
@@ -59,6 +48,14 @@ export default function TermsPage() {
       <SplitLayout
         left={<TermForm onSuccess={handleCreate} />}
         right={<TermsTable terms={terms} onDelete={handleDelete} />}
+      />
+
+      <SessionCreatedModal
+        isOpen={!!createdTerm}
+        onClose={() => setCreatedTerm(null)}
+        title="Term Created"
+        name={createdTerm?.name ?? ""}
+        id={createdTerm?.id ?? ""}
       />
     </motion.div>
   );

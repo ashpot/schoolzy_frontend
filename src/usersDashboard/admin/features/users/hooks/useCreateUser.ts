@@ -1,4 +1,3 @@
-// src/usersDashboard/admin/features/users/hooks/useCreateUser.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/shared/lib/apiClient";
 import { USERS_ENDPOINTS } from "../api";

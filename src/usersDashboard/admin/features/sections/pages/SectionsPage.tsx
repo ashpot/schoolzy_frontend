@@ -8,12 +8,17 @@ import SplitLayout   from "../components/shared/SplitLayout";
 import StatPill      from "../components/shared/StatPill";
 import SectionForm   from "../components/sections/SectionForm";
 import SectionsTable from "../components/sections/SectionsTable";
+import ClassCreatedModal from "../components/shared/ClassCreateModal";
 
 export default function SectionsPage() {
   const [sections, setSections] = useState<Section[]>(mockSections);
+  const [createdSection, setCreatedSection] = useState<Section | null>(null);
 
-  const handleAdd    = (s: Section)  => setSections((p) => [s, ...p]);
-  const handleDelete = (id: string)  => setSections((p) => p.filter((s) => s.id !== id));
+  const handleAdd = (s: Section) => {
+    setSections((p) => [s, ...p]);
+    setCreatedSection(s);
+  };
+  const handleDelete = (id: string) => setSections((p) => p.filter((s) => s.id !== id));
 
   return (
     <motion.div variants={fadeUp} initial="hidden" animate="show" className="dashboard-p space-y-6">
@@ -29,6 +34,14 @@ export default function SectionsPage() {
       <SplitLayout
         left={<SectionForm onSuccess={handleAdd} />}
         right={<SectionsTable sections={sections} onDelete={handleDelete} />}
+      />
+
+      <ClassCreatedModal
+        isOpen={!!createdSection}
+        onClose={() => setCreatedSection(null)}
+        title="Section Created"
+        name={createdSection?.title ?? ""}
+        id={createdSection?.id ?? ""}
       />
     </motion.div>
   );

@@ -3,7 +3,7 @@ import { z } from "zod";
 export const sectionSchema = z.object({
   title:        z.string().min(1, "Title is required"),
   code:         z.string().min(1, "Code is required").max(8, "Max 8 characters"),
-  showPosition: z.boolean().default(false),
+  // showPosition: z.boolean().default(false),
 });
 export type SectionValues = z.infer<typeof sectionSchema>;
 

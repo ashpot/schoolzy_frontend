@@ -3,11 +3,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Layers } from "lucide-react";
 import { sessionSchema, type SessionValues } from "../../schemas";
 import { useCreateSession } from "../../hooks/useSessions";
+import type { Session } from "../../types";
 import FormInput from "@/shared/ui/FormInput";
 import SubmitButton from "@/shared/ui/SubmitButton";
 
 interface Props {
-  onSuccess: (values: SessionValues) => void;
+  onSuccess: (session: Session) => void;
 }
 
 export default function SessionForm({ onSuccess }: Props) {
@@ -25,8 +26,14 @@ export default function SessionForm({ onSuccess }: Props) {
 
   const onSubmit = (values: SessionValues) => {
     mutation.mutate(values, {
-      onSuccess: () => {
-        onSuccess(values);
+      onSuccess: (data) => {
+        onSuccess({
+          id: String(data.id),
+          name: data.name,
+          startDate: data.start_date,
+          endDate: data.end_date,
+          isActive: data.is_active,
+        });
         reset();
       },
     });
@@ -66,7 +73,7 @@ export default function SessionForm({ onSuccess }: Props) {
           {...register("endDate")}
         />
 
-        {/* Active toggle */}
+        {/* Active toggle — TODO: currently cosmetic, backend doesn't accept is_active on create */}
         <label className="flex items-start gap-3 p-4 rounded-xl border border-border-line02 bg-bg-input cursor-pointer hover:border-brand-primary transition-colors">
           <input
             type="checkbox"
@@ -75,7 +82,7 @@ export default function SessionForm({ onSuccess }: Props) {
           />
           <div>
             <p className="text-sm font-medium text-text-primary">Set as Active Session</p>
-            <p className="text-xs text-text-muted mt-0.5">Marking this active will deactivate any current session</p>
+            <p className="text-xs text-text-muted mt-0.5">Not yet wired to backend — new sessions always start inactive</p>
           </div>
         </label>
 
