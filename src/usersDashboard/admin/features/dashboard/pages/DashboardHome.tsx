@@ -11,7 +11,6 @@ import RecentSales from "../components/RecentSales";
 
 const DashboardPage: React.FC = () => {
   const name = JSON.parse(localStorage.getItem("schoolzy_user") || '{"fullname":"Ben Uche"}').fullname.split(" ")[0];
-  console.log(name)
   return (
     <motion.div
       className="flex flex-col gap-6"

@@ -17,3 +17,44 @@ export interface Term {
   isActive: boolean;
   resultPublished: boolean;
 }
+
+// NEW — real API shapes
+export interface SessionPayload {
+  name: string;
+  start_date: string;
+  end_date: string;
+}
+export interface SessionResponse {
+  id: number;
+  name: string;
+  is_active: boolean;
+  start_date: string;
+  end_date: string;
+}
+export interface SessionListItem {
+  id: number;
+  name: string;
+  is_active: boolean;
+  start_date: string;
+  end_date: string;
+}
+
+export interface TermPayload {
+  name: string;
+  is_active: boolean;
+  result_published: boolean;
+  tag: "1" | "2" | "3";
+  start_date: string;
+  end_date: string;
+  session: number;
+}
+export interface TermResponse {
+  id: number;
+  name: string;
+  is_active: boolean;
+  result_published: boolean;
+  tag: string;
+  start_date: string;
+  end_date: string;
+  session: number;
+}

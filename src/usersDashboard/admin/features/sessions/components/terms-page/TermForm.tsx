@@ -2,17 +2,21 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BookOpen, Hash } from "lucide-react";
 import { termSchema, type TermValues } from "../../schemas";
-import { useCreateTerm } from "../../hooks/useSessions";
-import { sessionSelectOptions } from "../../data/mockData";
+import { useCreateTerm, useSessionsList } from "../../hooks/useSessions";
+import type { Term } from "../../types";
 import FormInput from "@/shared/ui/FormInput";
 import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
 
 interface Props {
-  onSuccess: (values: TermValues) => void;
+  onSuccess: (term: Term) => void;
 }
 
-const TAGS = ["1st", "2nd", "3rd"] as const;
+const TAGS = [
+  { value: "1", label: "1st" },
+  { value: "2", label: "2nd" },
+  { value: "3", label: "3rd" },
+] as const;
 
 export default function TermForm({ onSuccess }: Props) {
   const {
@@ -27,7 +31,7 @@ export default function TermForm({ onSuccess }: Props) {
     defaultValues: {
       name:            "",
       sessionId:       "",
-      tag:             "1st",
+      tag:             "1",
       startDate:       "",
       endDate:         "",
       isActive:        false,
@@ -36,12 +40,29 @@ export default function TermForm({ onSuccess }: Props) {
   });
 
   const mutation = useCreateTerm();
+  const { data: sessions, isLoading: sessionsLoading } = useSessionsList();
   const selectedTag = watch("tag");
+
+  const sessionOptions = (sessions ?? []).map((s) => ({
+    value: String(s.id),
+    label: s.name,
+  }));
 
   const onSubmit = (values: TermValues) => {
     mutation.mutate(values, {
-      onSuccess: () => {
-        onSuccess(values);
+      onSuccess: (data) => {
+        const session = sessions?.find((s) => s.id === data.session);
+        onSuccess({
+          id: String(data.id),
+          name: data.name,
+          sessionId: String(data.session),
+          sessionName: session?.name ?? "",
+          tag: (TAGS.find((t) => t.value === data.tag)?.label ?? "1st") as Term["tag"],
+          startDate: data.start_date,
+          endDate: data.end_date,
+          isActive: data.is_active,
+          resultPublished: data.result_published,
+        });
         reset();
       },
     });
@@ -67,13 +88,13 @@ export default function TermForm({ onSuccess }: Props) {
 
         <FormSelect
           label="Session *"
-          placeholder="Select session"
-          options={sessionSelectOptions}
+          placeholder={sessionsLoading ? "Loading sessions..." : "Select session"}
+          options={sessionOptions}
           error={errors.sessionId?.message}
+          isLoading={mutation.isPending || sessionsLoading}
           {...register("sessionId")}
         />
 
-        {/* Tag buttons */}
         <div>
           <p className="text-sm font-medium text-label mb-2">Tag (term number)</p>
           <Controller
@@ -83,17 +104,17 @@ export default function TermForm({ onSuccess }: Props) {
               <div className="flex gap-2">
                 {TAGS.map((t) => (
                   <button
-                    key={t}
+                    key={t.value}
                     type="button"
-                    onClick={() => field.onChange(t)}
+                    onClick={() => field.onChange(t.value)}
                     className={`w-full flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium border transition-all ${
-                      selectedTag === t
+                      selectedTag === t.value
                         ? "bg-brand-primary text-white border-brand-primary"
                         : "bg-bg-input text-text-secondary border-border-line02 hover:border-brand-primary hover:text-brand-primary"
                     }`}
                   >
                     <Hash size={12} />
-                    {t}
+                    {t.label}
                   </button>
                 ))}
               </div>
@@ -117,7 +138,6 @@ export default function TermForm({ onSuccess }: Props) {
           {...register("endDate")}
         />
 
-        {/* Active toggle */}
         <label className="flex items-start gap-3 p-4 rounded-xl border border-border-line02 bg-bg-input cursor-pointer hover:border-brand-primary transition-colors">
           <input
             type="checkbox"
@@ -130,7 +150,6 @@ export default function TermForm({ onSuccess }: Props) {
           </div>
         </label>
 
-        {/* Result Published toggle */}
         <label className="flex items-start gap-3 p-4 rounded-xl border border-border-line02 bg-bg-input cursor-pointer hover:border-brand-primary transition-colors">
           <input
             type="checkbox"

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { School } from "lucide-react";
@@ -9,12 +8,17 @@ import SplitLayout  from "../components/shared/SplitLayout";
 import StatPill     from "../components/shared/StatPill";
 import ClassForm    from "../components/classes/ClassForm";
 import ClassesTable from "../components/classes/ClassesTable";
+import ClassCreatedModal from "../components/shared/ClassCreateModal";
 
 export default function ClassesPage() {
   const [classes, setClasses] = useState<Class[]>(mockClasses);
+  const [createdClass, setCreatedClass] = useState<Class | null>(null);
 
-  const handleAdd    = (c: Class)    => setClasses((p) => [c, ...p]);
-  const handleDelete = (id: string)  => setClasses((p) => p.filter((c) => c.id !== id));
+  const handleAdd = (c: Class) => {
+    setClasses((p) => [c, ...p]);
+    setCreatedClass(c);
+  };
+  const handleDelete = (id: string) => setClasses((p) => p.filter((c) => c.id !== id));
 
   return (
     <motion.div variants={fadeUp} initial="hidden" animate="show" className="dashboard-p space-y-6">
@@ -30,6 +34,14 @@ export default function ClassesPage() {
       <SplitLayout
         left={<ClassForm onSuccess={handleAdd} />}
         right={<ClassesTable classes={classes} onDelete={handleDelete} />}
+      />
+
+      <ClassCreatedModal
+        isOpen={!!createdClass}
+        onClose={() => setCreatedClass(null)}
+        title="Class Created"
+        name={createdClass?.name ?? ""}
+        id={createdClass?.id ?? ""}
       />
     </motion.div>
   );

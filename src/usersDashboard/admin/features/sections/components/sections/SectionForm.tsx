@@ -1,9 +1,9 @@
-import { useForm, Controller } from "react-hook-form";
+import { useForm, /*Controller*/ } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Tag, Hash } from "lucide-react";
 import { sectionSchema, type SectionValues } from "../../schemas";
 import { useAddSection } from "../../hooks/useSections";
-import type { Section } from "../../types";
+import type { Section, SectionPayload } from "../../types";
 import Button from "@/shared/ui/Button";
 import {z} from "zod";
 
@@ -12,16 +12,24 @@ interface Props { onSuccess: (s: Section) => void; }
 export default function SectionForm({ onSuccess }: Props) {
   const addSection = useAddSection();
 
-  const { register, handleSubmit, watch, control, reset, formState: { errors } } = useForm<z.input<typeof sectionSchema>, any, SectionValues>({
+  const { register, handleSubmit, watch, /*control,*/ reset, formState: { errors } } = useForm<z.input<typeof sectionSchema>, any, SectionValues>({
     resolver: zodResolver(sectionSchema),
-    defaultValues: { title: "", code: "", showPosition: false },
+    defaultValues: { title: "", code: "",},
   });
 
   const codeLen = (watch("code") ?? "").length;
 
-  const onSubmit = (values: SectionValues) => {
+  const onSubmit = (values: SectionPayload) => {
     addSection.mutate(values, {
-      onSuccess: () => { onSuccess({ id: Date.now().toString(), ...values, code: values.code.toUpperCase() }); reset(); },
+      onSuccess: (data) => {
+        onSuccess({
+          id: String(data.id),
+          title: data.title,
+          code: data.code,
+          showPosition: data.show_position_in_result,
+        });
+        reset();
+      },
     });
   };
 
@@ -60,7 +68,7 @@ export default function SectionForm({ onSuccess }: Props) {
           {errors.code && <p className="mt-1 text-xs text-danger">{errors.code.message}</p>}
         </div>
 
-        <Controller
+        {/* <Controller
           name="showPosition"
           control={control}
           render={({ field }) => (
@@ -75,7 +83,7 @@ export default function SectionForm({ onSuccess }: Props) {
               </div>
             </div>
           )}
-        />
+        /> */}
         <Button
           leftIcon={<Plus size={19} />}
           size="lg" type="submit"

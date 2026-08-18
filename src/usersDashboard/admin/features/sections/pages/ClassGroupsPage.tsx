@@ -8,12 +8,17 @@ import SplitLayout      from "../components/shared/SplitLayout";
 import StatPill         from "../components/shared/StatPill";
 import ClassGroupForm   from "../components/class-groups/ClassGroupForm";
 import ClassGroupsTable from "../components/class-groups/ClassGroupsTable";
+import ClassCreatedModal from "../components/shared/ClassCreateModal";
 
 export default function ClassGroupsPage() {
   const [groups, setGroups] = useState<ClassGroup[]>(mockClassGroups);
+  const [createdGroup, setCreatedGroup] = useState<ClassGroup | null>(null);
 
-  const handleAdd    = (g: ClassGroup) => setGroups((p) => [g, ...p]);
-  const handleDelete = (id: string)   => setGroups((p) => p.filter((g) => g.id !== id));
+  const handleAdd = (g: ClassGroup) => {
+    setGroups((p) => [g, ...p]);
+    setCreatedGroup(g);
+  };
+  const handleDelete = (id: string) => setGroups((p) => p.filter((g) => g.id !== id));
 
   return (
     <motion.div variants={fadeUp} initial="hidden" animate="show" className="dashboard-p space-y-6">
@@ -29,6 +34,14 @@ export default function ClassGroupsPage() {
       <SplitLayout
         left={<ClassGroupForm onSuccess={handleAdd} />}
         right={<ClassGroupsTable groups={groups} onDelete={handleDelete} />}
+      />
+
+      <ClassCreatedModal
+        isOpen={!!createdGroup}
+        onClose={() => setCreatedGroup(null)}
+        title="Class Group Created"
+        name={createdGroup?.name ?? ""}
+        id={createdGroup?.id ?? ""}
       />
     </motion.div>
   );

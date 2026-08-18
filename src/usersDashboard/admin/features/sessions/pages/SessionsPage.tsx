@@ -4,30 +4,25 @@ import { CalendarDays } from "lucide-react";
 import { fadeUp } from "../animations/variants";
 import { mockSessions } from "../data/mockData";
 import type { Session } from "../types";
-import type { SessionValues } from "../schemas";
 import SplitLayout from "../components/shared/SplitLayout";
 import StatPill from "../components/shared/StatPill";
 import SessionForm from "../components/sessions-page/SessionForm";
 import SessionsTable from "../components/sessions-page/SessionsTable";
+import SessionCreatedModal from "../components/shared/SessionCreateModal";
 
 export default function SessionsPage() {
   const [sessions, setSessions] = useState<Session[]>(mockSessions);
+  const [createdSession, setCreatedSession] = useState<Session | null>(null);
 
   const activeSession = sessions.find((s) => s.isActive);
 
-  const handleCreate = (values: SessionValues) => {
-    const newSession: Session = {
-      id:        String(Date.now()),
-      name:      values.name,
-      startDate: values.startDate,
-      endDate:   values.endDate,
-      isActive:  values.isActive,
-    };
+  const handleCreate = (session: Session) => {
     setSessions((prev) =>
-      values.isActive
-        ? [...prev.map((s) => ({ ...s, isActive: false })), newSession]
-        : [...prev, newSession]
+      session.isActive
+        ? [...prev.map((s) => ({ ...s, isActive: false })), session]
+        : [session, ...prev]
     );
+    setCreatedSession(session);
   };
 
   const handleDelete = (id: string) => {
@@ -51,6 +46,14 @@ export default function SessionsPage() {
       <SplitLayout
         left={<SessionForm onSuccess={handleCreate} />}
         right={<SessionsTable sessions={sessions} onDelete={handleDelete} />}
+      />
+
+      <SessionCreatedModal
+        isOpen={!!createdSession}
+        onClose={() => setCreatedSession(null)}
+        title="Session Created"
+        name={createdSession?.name ?? ""}
+        id={createdSession?.id ?? ""}
       />
     </motion.div>
   );
