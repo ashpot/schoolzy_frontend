@@ -1,26 +1,27 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { School, Search } from "lucide-react";
+import { School, Search, Trash2 } from "lucide-react";
 import { staggerContainer, rowVariant } from "../../animations/variants";
 import { getSectionBadgeColor } from "../../utils/colors";
-import type { Class } from "../../types";
+import type { ClassListItem } from "../../types";
 import NumberSpan from "../shared/NumberSpan";
 
-interface Props { classes: Class[]; onDelete: (id: string) => void; }
+interface Props { classes: ClassListItem[]; }
 
 const PAGE_SIZE = 8;
 
-export default function ClassesTable({ classes, /*onDelete*/ }: Props) {
+export default function ClassesTable({ classes }: Props) {
   const [search, setSearch] = useState("");
-  const [page,   setPage]   = useState(1);
-  // const deleteClass = useDeleteClass();
+  const [page, setPage] = useState(1);
 
-  const filtered   = classes.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()) || c.code.toLowerCase().includes(search.toLowerCase()));
+  const filtered = classes.filter((c) =>
+    c.name.toLowerCase().includes(search.toLowerCase()) || c.code.toLowerCase().includes(search.toLowerCase())
+  );
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
-    <div className="bg-white rounded-2xl card-shadow overflow-hidden">
+    <div className="bg-white rounded-2xl card-shadow overflow-hidden uppercase">
       <div className="flex items-center justify-between px-5 py-4 border-b border-border-line02">
         <div className="flex items-center gap-2">
           <School size={16} className="text-brand-primary" />
@@ -48,7 +49,7 @@ export default function ClassesTable({ classes, /*onDelete*/ }: Props) {
             {paginated.map((c, i) => (
               <motion.tr key={c.id} variants={rowVariant} className="border-b border-border-line02 hover:bg-gray-50/50">
                 <td className="py-3.5 px-4 text-sm text-text-muted">
-                  <NumberSpan number={(page - 1) * PAGE_SIZE + i + 1}/>
+                  <NumberSpan number={(page - 1) * PAGE_SIZE + i + 1} />
                 </td>
                 <td className="py-3.5 px-4">
                   <div className="flex items-center gap-2">
@@ -60,16 +61,24 @@ export default function ClassesTable({ classes, /*onDelete*/ }: Props) {
                   <span className="px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 text-xs font-mono font-semibold">{c.code}</span>
                 </td>
                 <td className="py-3.5 px-4">
-                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getSectionBadgeColor(c.section)}`}>{c.section}</span>
+                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getSectionBadgeColor(c.section_title)}`}>{c.section_title}</span>
                 </td>
-                <td className="py-3.5 px-4" onClick={(e) => e.stopPropagation()}>
-                  {/* <DeleteButton onDelete={() => deleteClass.mutate(c.id, { onSuccess: () => onDelete(c.id) })} /> */}
+                <td className="py-3.5 px-4">
+                  <button type="button" disabled className="p-1.5 rounded-lg text-text-muted opacity-40 cursor-not-allowed" title="Delete not available yet">
+                    <Trash2 size={15} />
+                  </button>
                 </td>
               </motion.tr>
             ))}
           </motion.tbody>
         </table>
       </div>
+
+      {classes.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-10 text-center">
+          <p className="text-body-small text-text-secondary">No classes yet</p>
+        </div>
+      )}
 
       <div className="flex items-center justify-between px-5 py-3 border-t border-border-line02">
         <p className="text-xs text-text-muted">Showing {Math.min((page - 1) * PAGE_SIZE + 1, filtered.length)}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length} classes</p>

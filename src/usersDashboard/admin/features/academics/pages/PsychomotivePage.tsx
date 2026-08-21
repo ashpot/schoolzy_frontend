@@ -7,9 +7,8 @@ import { z } from "zod";
 import { slideFromRight, slideFromLeft } from "../animations/variants";
 import { usePsychomotiveList, useAddPsychomotive, useDeletePsychomotive } from "../hooks/useAcademics";
 import { SECTION_OPTIONS } from "../types";
-import type { PsychomotiveMetric, SchoolSection } from "../types";
+import type { PsychomotiveMetric } from "../types";
 import AcademicsListPanel from "../components/shared/AcademicsListPanel";
-
 import DeleteButton from "../components/shared/DeleteButton";
 import PageHeader from "@/shared/ui/PageHeader";
 import FormHeader from "../components/shared/FormHeader";
@@ -30,7 +29,7 @@ type FormValues = z.infer<typeof schema>;
 const PsychomotivePage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [section, setSection] = useState<SchoolSection | "All">("All");
+  const [section, setSection] = useState<string | "All">("All");
 
   const { data, isLoading } = usePsychomotiveList(page, search, section);
   const addMutation = useAddPsychomotive();

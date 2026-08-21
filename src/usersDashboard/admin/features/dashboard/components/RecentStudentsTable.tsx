@@ -32,9 +32,9 @@ const FeesBadge: React.FC<{ fees: string }> = ({ fees }) => {
 };
 
 const AvatarInitials: React.FC<{ name: string }> = ({ name }) => {
-  const initials = name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+  const initials = name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
   const colors = ["bg-brand-primary", "bg-success", "bg-warning", "bg-purple-500", "bg-pink-500"];
-  const color  = colors[name.charCodeAt(0) % colors.length];
+  const color  = colors[name?.charCodeAt(0) % colors.length];
   return (
     <div className={cn("w-8 h-8 rounded-full flex-center text-white text-xs font-semibold shrink-0", color)}>
       {initials}

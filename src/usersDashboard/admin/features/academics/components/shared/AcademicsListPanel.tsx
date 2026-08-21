@@ -1,7 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
-import type { SchoolSection } from "../../types";
 import SectionTabs from "./SectionTabs";
 import { listStagger, rowFadeUp } from "../../animations/variants";
 
@@ -21,11 +20,11 @@ interface AcademicsListPanelProps<T extends { id: string }> {
   page: number;
   perPage?: number;
   search: string;
-  section: SchoolSection | "All";
+  section: string;
   isLoading?: boolean;
   onSearch: (v: string) => void;
   onPageChange: (p: number) => void;
-  onSectionChange: (s: SchoolSection | "All") => void;
+  onSectionChange: (section: string) => void;
   searchPlaceholder?: string;
 }
 

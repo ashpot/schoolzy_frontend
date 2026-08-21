@@ -19,7 +19,7 @@ export async function apiRequest<T>(url: string, options: RequestOptions = {}): 
 
   const res = await fetch(url, { ...rest, headers: finalHeaders });
   // console.log(url, { ...rest, headers: finalHeaders });
-  // console.log(await res.json());
+  // console.log(res.text().then(n=>n));
 
   if (res.status === 401) {
     localStorage.removeItem("schoolzy_token");

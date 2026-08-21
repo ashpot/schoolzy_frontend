@@ -2,23 +2,17 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { FolderOpen } from "lucide-react";
 import { fadeUp } from "../animations/variants";
-import type { ClassGroup } from "../types";
-import { mockClassGroups } from "../data/mockData";
-import SplitLayout      from "../components/shared/SplitLayout";
-import StatPill         from "../components/shared/StatPill";
-import ClassGroupForm   from "../components/class-groups/ClassGroupForm";
+import type { ClassGroupListItem } from "../types";
+import SplitLayout from "../components/shared/SplitLayout";
+import StatPill from "../components/shared/StatPill";
+import ClassGroupForm from "../components/class-groups/ClassGroupForm";
 import ClassGroupsTable from "../components/class-groups/ClassGroupsTable";
+import { useClassGroupsList } from "../hooks/useSections";
 import ClassCreatedModal from "../components/shared/ClassCreateModal";
 
 export default function ClassGroupsPage() {
-  const [groups, setGroups] = useState<ClassGroup[]>(mockClassGroups);
-  const [createdGroup, setCreatedGroup] = useState<ClassGroup | null>(null);
-
-  const handleAdd = (g: ClassGroup) => {
-    setGroups((p) => [g, ...p]);
-    setCreatedGroup(g);
-  };
-  const handleDelete = (id: string) => setGroups((p) => p.filter((g) => g.id !== id));
+  const { data: groups = [] } = useClassGroupsList();
+  const [createdGroup, setCreatedGroup] = useState<ClassGroupListItem | null>(null);
 
   return (
     <motion.div variants={fadeUp} initial="hidden" animate="show" className="dashboard-p space-y-6">
@@ -32,8 +26,8 @@ export default function ClassGroupsPage() {
         <StatPill icon={FolderOpen} label={`${groups.length} groups`} />
       </div>
       <SplitLayout
-        left={<ClassGroupForm onSuccess={handleAdd} />}
-        right={<ClassGroupsTable groups={groups} onDelete={handleDelete} />}
+        left={<ClassGroupForm onSuccess={setCreatedGroup} />}
+        right={<ClassGroupsTable groups={groups} />}
       />
 
       <ClassCreatedModal

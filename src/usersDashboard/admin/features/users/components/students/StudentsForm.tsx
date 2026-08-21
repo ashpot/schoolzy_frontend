@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { studentSchema, type StudentFormValues } from "../../schemas";
 import { staggerContainer, fieldFadeUp } from "../../animations/variants";
-import { useAddStudent } from "../../hooks/useStudents";
+import { useAddStudent, useClassGroupsList } from "../../hooks/useStudents";
 import { generateUsername } from "@/shared/utils/generateUsername";
 import PhotoUpload from "../shared/PhotoUpload";
 import FormInput from "@/shared/ui/FormInput";
@@ -12,13 +12,9 @@ import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import UserCreatedModal from "../shared/UserCreatedModal";
 
-const SEX_OPTIONS = [
-  { value: "Male", label: "Male" },
-  { value: "Female", label: "Female" },
-];
-
 const StudentForm: React.FC = () => {
   const { mutate, isPending } = useAddStudent();
+  const { data: classGroups, isLoading: classGroupsLoading } = useClassGroupsList();
   const [createdUser, setCreatedUser] = useState<{ fullName: string; username: string; password: string } | null>(null);
 
   const {
@@ -31,9 +27,7 @@ const StudentForm: React.FC = () => {
   } = useForm({
     resolver: zodResolver(studentSchema),
     defaultValues: {
-      admNo: "", firstName: "", lastName: "", middleName: "",
-      sex: undefined, dob: "", phone: "", address: "", city: "",
-      state: "", country: "", email: "", classGroup: "" as unknown as number, dateOfAdmission: "",
+      firstName: "", lastName: "", email: "", classGroup: "" as unknown as number,
       username: "", password: "", confirmPassword: "",
     },
   });
@@ -44,6 +38,11 @@ const StudentForm: React.FC = () => {
   React.useEffect(() => {
     setValue("username", generateUsername(firstName, lastName));
   }, [firstName, lastName, setValue]);
+
+  const classGroupOptions = (classGroups ?? []).map((cg) => ({
+    value: String(cg.id),
+    label: cg.name,
+  }));
 
   const onSubmit = (values: StudentFormValues) => {
     mutate(
@@ -83,16 +82,6 @@ const StudentForm: React.FC = () => {
         animate="show"
         className="flex flex-col gap-3.5 mt-2"
       >
-        <motion.div variants={fieldFadeUp}>
-          <FormInput
-            label="Admission Number"
-            placeholder="e.g. SCH/2024/009"
-            isLoading={isPending}
-            error={errors.admNo?.message}
-            {...register("admNo")}
-          />
-        </motion.div>
-
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
           <FormInput label="First Name" placeholder="First name"
             isLoading={isPending} error={errors.firstName?.message} {...register("firstName")} />
@@ -101,60 +90,18 @@ const StudentForm: React.FC = () => {
         </motion.div>
 
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Middle Name" placeholder="Middle name"
-            isLoading={isPending} {...register("middleName")} />
-        </motion.div>
-
-        <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
-          <FormSelect
-            label="Sex" placeholder="Select..."
-            options={SEX_OPTIONS} isLoading={isPending}
-            error={errors.sex?.message} {...register("sex")}
-          />
-          <FormInput
-            label="Date of Birth" type="date"
-            isLoading={isPending} error={errors.dob?.message} {...register("dob")}
-          />
-        </motion.div>
-
-        <motion.div variants={fieldFadeUp}>
-          <FormInput label="Phone" placeholder="+234 800 000 0000"
-            isLoading={isPending} error={errors.phone?.message} {...register("phone")} />
-        </motion.div>
-
-        <motion.div variants={fieldFadeUp}>
-          <FormInput label="Address" placeholder="Street address"
-            isLoading={isPending} error={errors.address?.message} {...register("address")} />
-        </motion.div>
-
-        <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
-          <FormInput label="City" placeholder="City"
-            isLoading={isPending} error={errors.city?.message} {...register("city")} />
-          <FormInput label="State" placeholder="State"
-            isLoading={isPending} error={errors.state?.message} {...register("state")} />
-        </motion.div>
-
-        <motion.div variants={fieldFadeUp}>
-          <FormInput label="Country" placeholder="Country"
-            isLoading={isPending} error={errors.country?.message} {...register("country")} />
-        </motion.div>
-
-        <motion.div variants={fieldFadeUp}>
           <FormInput label="Email Address" type="email" placeholder="student@example.com"
             isLoading={isPending} error={errors.email?.message} {...register("email")} />
         </motion.div>
 
-        <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
-          {/* TODO: swap for a FormSelect populated from GET /sections/class-groups/ once wired */}
-          <FormInput
-            label="Class Group ID" type="number" placeholder="e.g. 1"
-            isLoading={isPending} error={errors.classGroup?.message}
+        <motion.div variants={fieldFadeUp}>
+          <FormSelect
+            label="Class Group"
+            placeholder={classGroupsLoading ? "Loading class groups..." : "Select class group"}
+            options={classGroupOptions}
+            isLoading={isPending || classGroupsLoading}
+            error={errors.classGroup?.message}
             {...register("classGroup")}
-          />
-          <FormInput
-            label="Date of Admission" type="date"
-            isLoading={isPending} error={errors.dateOfAdmission?.message}
-            {...register("dateOfAdmission")}
           />
         </motion.div>
 

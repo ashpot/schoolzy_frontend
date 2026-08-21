@@ -3,11 +3,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Tag, Hash } from "lucide-react";
 import { sectionSchema, type SectionValues } from "../../schemas";
 import { useAddSection } from "../../hooks/useSections";
-import type { Section, SectionPayload } from "../../types";
+import type { SectionPayload } from "../../types";
 import Button from "@/shared/ui/Button";
 import {z} from "zod";
+import type { SectionListItem } from "../../../academics/types";
 
-interface Props { onSuccess: (s: Section) => void; }
+interface Props { onSuccess: (s: SectionListItem) => void; }
 
 export default function SectionForm({ onSuccess }: Props) {
   const addSection = useAddSection();
@@ -21,15 +22,7 @@ export default function SectionForm({ onSuccess }: Props) {
 
   const onSubmit = (values: SectionPayload) => {
     addSection.mutate(values, {
-      onSuccess: (data) => {
-        onSuccess({
-          id: String(data.id),
-          title: data.title,
-          code: data.code,
-          showPosition: data.show_position_in_result,
-        });
-        reset();
-      },
+      onSuccess: (data) => { onSuccess(data); reset(); },
     });
   };
 

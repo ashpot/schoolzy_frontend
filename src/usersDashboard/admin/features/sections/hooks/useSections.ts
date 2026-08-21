@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import type { ClassValues, ClassGroupValues, FormTeacherValues, DenominatorValues } from "../schemas";
-import type { ClassGroupPayload, ClassPayload, SectionPayload, SectionListItem, ClassListItem, ClassGroupResponse, ClassResponse, SectionResponse } from "../types";
+import type { ClassGroupPayload, ClassPayload, SectionPayload, SectionListItem, ClassListItem, ClassGroupResponse, ClassResponse, SectionResponse, ClassGroupListItem } from "../types";
 import { apiRequest } from "@/shared/lib/apiClient";
 import { SECTIONS_ENDPOINTS } from "../api";
 
@@ -38,7 +38,12 @@ export const useAddSection = () => {
         body: JSON.stringify(payload),
       });
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["sections"] }),
+    onSuccess: (data) => {
+      qc.setQueryData<SectionListItem[]>(["sections", "list"], (old = []) => [
+        { id: data.id, title: data.title, code: data.code, show_position_in_result: data.show_position_in_result },
+        ...old,
+      ]);
+    },
   });
 };
 
@@ -56,7 +61,12 @@ export const useAddClass = () => {
         body: JSON.stringify(payload),
       });
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["classes"] }),
+    onSuccess: (data) => {
+      qc.setQueryData<ClassListItem[]>(["classes", "list"], (old = []) => [
+        { id: data.id, section_title: data.section_title, name: data.name, code: data.code, section: data.section },
+        ...old,
+      ]);
+    },
   });
 };
 
@@ -74,7 +84,21 @@ export const useAddClassGroup = () => {
         body: JSON.stringify(payload),
       });
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["class-groups"] }),
+    onSuccess: (data) => {
+      qc.setQueryData<ClassGroupListItem[]>(["class-groups", "list"], (old = []) => [
+        {
+          id: data.id,
+          parent_class_name: data.parent_class_name,
+          section_name: data.section_name,
+          number_of_students: data.number_of_students,
+          form_teacher_name: data.form_teacher_name,
+          name: data.name,
+          code: data.code,
+          parent_class: data.parent_class,
+        },
+        ...old,
+      ]);
+    },
   });
 };
 
@@ -102,21 +126,25 @@ export const useAddDenominator = () => {
   });
 };
 
-// List queries (for dropdowns)
+// List queries (for dropdowns + tables)
 export const useSectionsList = () => {
   return useQuery({
     queryKey: ["sections", "list"],
-    queryFn: async () => {
-      return apiRequest<SectionListItem[]>(SECTIONS_ENDPOINTS.LIST_SECTIONS);
-    },
+    queryFn: async () => apiRequest<SectionListItem[]>(SECTIONS_ENDPOINTS.LIST_SECTIONS),
   });
 };
+
 
 export const useClassesList = () => {
   return useQuery({
     queryKey: ["classes", "list"],
-    queryFn: async () => {
-      return apiRequest<ClassListItem[]>(SECTIONS_ENDPOINTS.LIST_CLASSES);
-    },
+    queryFn: async () => apiRequest<ClassListItem[]>(SECTIONS_ENDPOINTS.LIST_CLASSES),
+  });
+};
+
+export const useClassGroupsList = () => {
+  return useQuery({
+    queryKey: ["class-groups", "list"],
+    queryFn: async () => apiRequest<ClassGroupListItem[]>(SECTIONS_ENDPOINTS.LIST_CLASS_GROUPS),
   });
 };

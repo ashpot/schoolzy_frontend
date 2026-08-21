@@ -3,11 +3,10 @@ import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { slideFromRight, slideFromLeft } from "../animations/variants";
-import { useGradesList, useAddGrade, useDeleteGrade } from "../hooks/useAcademics";
-import { SECTION_OPTIONS } from "../types";
-import type { Grade, GradeRemark, SchoolSection } from "../types";
+import { useGradesList, useAddGrade, useDeleteGrade, useSectionsList } from "../hooks/useAcademics";
+import { gradeSchema, type GradeFormValues } from "../schemas";
+import type { Grade, GradeRemark } from "../types";
 import AcademicsListPanel from "../components/shared/AcademicsListPanel";
 import DeleteButton from "../components/shared/DeleteButton";
 import PageHeader from "@/shared/ui/PageHeader";
@@ -17,15 +16,6 @@ import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import { fieldFadeUp } from "@/shared/utils/animations";
 import SectionBadge from "../components/shared/SectionBadge";
-
-const schema = z.object({
-  caption: z.string().min(1, "Caption is required"),
-  minScore:z.number().min(0).max(100),
-  maxScore: z.number().min(0).max(100),
-  remark: z.string().min(1, "Remark is required"),
-  section: z.enum(["Nursery", "Primary", "Junior Secondary", "Senior Secondary"], { message: "Please select a section" }),
-});
-type FormValues = z.infer<typeof schema>;
 
 const PRESET_REMARKS: GradeRemark[] = ["Excellent", "Very Good", "Good", "Average", "Pass", "Fail"];
 
@@ -44,19 +34,25 @@ const remarkBadgeColor = (remark: string) => {
 const GradePage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [section, setSection] = useState<SchoolSection | "All">("All");
+  const [section, setSection] = useState<string | "All">("All");
   const [customRemark, setCustomRemark] = useState("");
 
   const { data, isLoading } = useGradesList(page, search, section);
+  const { data: sections, isLoading: sectionsLoading } = useSectionsList();
   const addMutation = useAddGrade();
   const deleteMutation = useDeleteGrade();
 
-  const { register, handleSubmit, reset, control, formState: { errors } } = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { caption: "", minScore: 0, maxScore: 100, remark: "", section: "Senior Secondary" },
+  const sectionOptions = (sections ?? []).map((s) => ({
+    value: String(s.id),
+    label: s.title,
+  }));
+
+  const { register, handleSubmit, reset, control, formState: { errors } } = useForm<GradeFormValues>({
+    resolver: zodResolver(gradeSchema),
+    defaultValues: { caption: "", minScore: 0, maxScore: 100, remark: "", section: "" },
   });
 
-  const onSubmit = (values: FormValues) => {
+  const onSubmit = (values: GradeFormValues) => {
     addMutation.mutate(values, {
       onSuccess: () => { reset(); setCustomRemark(""); },
     });
@@ -154,10 +150,10 @@ const GradePage: React.FC = () => {
                   label="Min Score"
                   type="number"
                   min={0}
-                  max={0}
+                  max={100}
                   placeholder="0"
                   isLoading={addMutation.isPending}
-                  error={errors.caption?.message}
+                  error={errors.minScore?.message}
                   {...register("minScore", {valueAsNumber: true})}
               />
               </div>
@@ -166,7 +162,7 @@ const GradePage: React.FC = () => {
                   label="Max Score"
                   type="number"
                   min={0}
-                  max={0}
+                  max={100}
                   placeholder="100"
                   isLoading={addMutation.isPending}
                   error={errors.maxScore?.message}
@@ -211,10 +207,13 @@ const GradePage: React.FC = () => {
             </div>
 
             <div className="flex flex-col gap-1">
-            <FormSelect
-                label="Section" placeholder="Select..."
-                options={SECTION_OPTIONS} isLoading={addMutation.isPending}
-                error={errors.section?.message} {...register("section")}
+              <FormSelect
+                label="Section"
+                placeholder={sectionsLoading ? "Loading sections..." : "Select..."}
+                options={sectionOptions}
+                isLoading={addMutation.isPending || sectionsLoading}
+                error={errors.section?.message}
+                {...register("section")}
               />
             </div>
             <motion.div variants={fieldFadeUp}>

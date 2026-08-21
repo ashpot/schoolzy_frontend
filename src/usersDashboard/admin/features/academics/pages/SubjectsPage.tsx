@@ -1,14 +1,12 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-// @ts-ignore
-import { FormInput as input, Plus } from "lucide-react";
 import { slideFromRight, slideFromLeft } from "../animations/variants";
-import { useSubjectsList, useAddSubject, useDeleteSubject } from "../hooks/useAcademics";
-import { SECTION_OPTIONS } from "../types";
-import type { Subject, SchoolSection } from "../types";
+import { useSubjectsList, useAddSubject, useDeleteSubject, useSectionsList } from "../hooks/useAcademics";
+import { subjectSchema, type SubjectFormValues } from "../schemas";
+import type { Subject } from "../types";
 import AcademicsListPanel from "../components/shared/AcademicsListPanel";
 import SectionBadge from "../components/shared/SectionBadge";
 import DeleteButton from "../components/shared/DeleteButton";
@@ -19,29 +17,27 @@ import { fieldFadeUp } from "@/shared/utils/animations";
 import FormInput from "@/shared/ui/FormInput";
 import FormHeader from "../components/shared/FormHeader";
 
-const schema = z.object({
-  subjectName: z.string().min(2, "Subject name is required"),
-  code: z.string().min(2, "Subject code is required"),
-  section: z.enum(["Nursery", "Primary", "Junior Secondary", "Senior Secondary"], { message: "Please select a section" }),
-  elective: z.boolean(),
-});
-type FormValues = z.infer<typeof schema>;
-
 const SubjectsPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [section, setSection] = useState<SchoolSection | "All">("All");
+  const [section, setSection] = useState<string | "All">("All");
 
   const { data, isLoading } = useSubjectsList(page, search, section);
+  const { data: sections, isLoading: sectionsLoading } = useSectionsList();
   const addMutation = useAddSubject();
   const deleteMutation = useDeleteSubject();
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { subjectName: "", code: "", section: "Primary", elective: false },
+  const sectionOptions = (sections ?? []).map((s) => ({
+    value: String(s.id),
+    label: s.title,
+  }));
+
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<SubjectFormValues>({
+    resolver: zodResolver(subjectSchema),
+    defaultValues: { subjectName: "", code: "", section: "", elective: false },
   });
 
-  const onSubmit = (values: FormValues) => {
+  const onSubmit = (values: SubjectFormValues) => {
     addMutation.mutate(values, { onSuccess: () => reset() });
   };
 
@@ -114,6 +110,7 @@ const SubjectsPage: React.FC = () => {
             <div className="flex flex-col gap-1">
                 <FormInput
                   label="Subject Name"
+                  id="subject-name-input"
                   placeholder="e.g. Mathematics"
                   isLoading={addMutation.isPending}
                   error={errors.subjectName?.message}
@@ -133,9 +130,12 @@ const SubjectsPage: React.FC = () => {
 
             <div className="flex flex-col gap-1">
               <FormSelect
-                label="Section" placeholder="Select..."
-                options={SECTION_OPTIONS} isLoading={addMutation.isPending}
-                error={errors.section?.message} {...register("section")}
+                label="Section"
+                placeholder={sectionsLoading ? "Loading sections..." : "Select..."}
+                options={sectionOptions}
+                isLoading={addMutation.isPending || sectionsLoading}
+                error={errors.section?.message}
+                {...register("section")}
               />
             </div>
 

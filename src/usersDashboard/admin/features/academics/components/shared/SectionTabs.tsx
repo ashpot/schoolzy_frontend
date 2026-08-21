@@ -1,13 +1,12 @@
 import React from "react";
-import type { SchoolSection } from "../../types";
 import { SECTIONS } from "../../types";
 
 interface SectionTabsProps {
-  active: SchoolSection | "All";
-  onChange: (section: SchoolSection | "All") => void;
+  active: string;
+  onChange: (section: string) => void;
 }
 
-const tabs: (SchoolSection | "All")[] = ["All", ...SECTIONS];
+const tabs: (string)[] = ["All", ...SECTIONS];
 
 const SectionTabs: React.FC<SectionTabsProps> = ({ active, onChange }) => (
   <div className="flex items-center gap-2 flex-wrap">
