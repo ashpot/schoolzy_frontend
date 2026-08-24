@@ -7,13 +7,16 @@ import {
   mockPsychomotiveMetrics,
 } from "../data/mockData";
 import type {
-  Subject,
   SubjectTeacherAssignment,
-  AssessmentType,
-  Grade,
   PsychomotiveMetric,
-  SchoolSection,
+  SectionListItem,
+  GradePayload, GradeResponse,
+  SubjectPayload, SubjectResponse,
+  AssessmentTypePayload, AssessmentTypeResponse,
 } from "../types";
+import type { GradeFormValues, SubjectFormValues, AssessmentTypeFormValues } from "../schemas";
+import { apiRequest } from "@/shared/lib/apiClient";
+import { ACADEMICS_ENDPOINTS } from "../api";
 
 const PER_PAGE = 8;
 
@@ -22,11 +25,23 @@ function paginate<T>(data: T[], page: number) {
   return { items: data.slice(start, start + PER_PAGE), total: data.length };
 }
 
-function filterBySection<T extends { section: SchoolSection }>(
+function filterBySection<T extends { section: string }>(
   data: T[],
-  section: SchoolSection | "All"
+  section: string | "All"
 ) {
   return section === "All" ? data : data.filter((d) => d.section === section);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SECTIONS (dropdown, shared by Grades, Subjects, Assessment Types)
+// ─────────────────────────────────────────────────────────────────────────────
+export function useSectionsList() {
+  return useQuery({
+    queryKey: ["academics", "sections", "list"],
+    queryFn: async () => {
+      return apiRequest<SectionListItem[]>(ACADEMICS_ENDPOINTS.LIST_SECTIONS);
+    },
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -34,7 +49,7 @@ function filterBySection<T extends { section: SchoolSection }>(
 // ─────────────────────────────────────────────────────────────────────────────
 let subjectsStore = [...mockSubjects];
 
-export function useSubjectsList(page: number, search: string, section: SchoolSection | "All") {
+export function useSubjectsList(page: number, search: string, section: string | "All") {
   return useQuery({
     queryKey: ["academics", "subjects", page, search, section],
     queryFn: async () => {
@@ -55,15 +70,16 @@ export function useSubjectsList(page: number, search: string, section: SchoolSec
 export function useAddSubject() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: Omit<Subject, "id">) => {
-      // TODO: replace with api.post("/academics/subjects", payload)
-      await new Promise((r) => setTimeout(r, 500));
-      const newItem: Subject = {
-        ...payload,
-        id: `SUB-${String(subjectsStore.length + 1).padStart(3, "0")}`,
+    mutationFn: async (values: SubjectFormValues) => {
+      const payload: SubjectPayload = {
+        name: values.subjectName,
+        code: values.code,
+        section: Number(values.section),
       };
-      subjectsStore = [newItem, ...subjectsStore];
-      return newItem;
+      return apiRequest<SubjectResponse>(ACADEMICS_ENDPOINTS.CREATE_SUBJECT, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["academics", "subjects"] }),
   });
@@ -86,7 +102,7 @@ export function useDeleteSubject() {
 // ─────────────────────────────────────────────────────────────────────────────
 let subjectTeachersStore = [...mockSubjectTeachers];
 
-export function useSubjectTeachersList(page: number, search: string, section: SchoolSection | "All") {
+export function useSubjectTeachersList(page: number, search: string, section: string | "All") {
   return useQuery({
     queryKey: ["academics", "subject-teachers", page, search, section],
     queryFn: async () => {
@@ -149,7 +165,7 @@ export function useDeleteSubjectTeacher() {
 // ─────────────────────────────────────────────────────────────────────────────
 let assessmentTypesStore = [...mockAssessmentTypes];
 
-export function useAssessmentTypesList(page: number, search: string, section: SchoolSection | "All") {
+export function useAssessmentTypesList(page: number, search: string, section: string | "All") {
   return useQuery({
     queryKey: ["academics", "assessment-types", page, search, section],
     queryFn: async () => {
@@ -170,15 +186,19 @@ export function useAssessmentTypesList(page: number, search: string, section: Sc
 export function useAddAssessmentType() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: Omit<AssessmentType, "id">) => {
-      // TODO: replace with api.post("/academics/assessment-types", payload)
-      await new Promise((r) => setTimeout(r, 500));
-      const newItem: AssessmentType = {
-        ...payload,
-        id: `AT-${String(assessmentTypesStore.length + 1).padStart(3, "0")}`,
+    mutationFn: async (values: AssessmentTypeFormValues) => {
+      const payload: AssessmentTypePayload = {
+        name: values.name,
+        code: values.code,
+        terminal_percentage: values.terminalPercent,
+        base_mark: values.baseMark,
+        weeklable: values.weekly,
+        section: Number(values.section),
       };
-      assessmentTypesStore = [newItem, ...assessmentTypesStore];
-      return newItem;
+      return apiRequest<AssessmentTypeResponse>(ACADEMICS_ENDPOINTS.CREATE_ASSESSMENT_TYPE, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["academics", "assessment-types"] }),
   });
@@ -196,10 +216,12 @@ export function useDeleteAssessmentType() {
   });
 }
 
-
+// ─────────────────────────────────────────────────────────────────────────────
+// GRADES
+// ─────────────────────────────────────────────────────────────────────────────
 let gradesStore = [...mockGrades];
 
-export function useGradesList(page: number, search: string, section: SchoolSection | "All") {
+export function useGradesList(page: number, search: string, section: string | "All") {
   return useQuery({
     queryKey: ["academics", "grades", page, search, section],
     queryFn: async () => {
@@ -220,15 +242,17 @@ export function useGradesList(page: number, search: string, section: SchoolSecti
 export function useAddGrade() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: Omit<Grade, "id">) => {
-      // TODO: replace with api.post("/academics/grades", payload)
-      await new Promise((r) => setTimeout(r, 500));
-      const newItem: Grade = {
-        ...payload,
-        id: `GRD-${String(gradesStore.length + 1).padStart(3, "0")}`,
+    mutationFn: async (values: GradeFormValues) => {
+      const payload: GradePayload = {
+        caption: values.caption,
+        minimum_score: values.minScore,
+        maximum_score: values.maxScore,
+        section: Number(values.section),
       };
-      gradesStore = [newItem, ...gradesStore];
-      return newItem;
+      return apiRequest<GradeResponse>(ACADEMICS_ENDPOINTS.CREATE_GRADE, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["academics", "grades"] }),
   });
@@ -246,10 +270,12 @@ export function useDeleteGrade() {
   });
 }
 
-
+// ─────────────────────────────────────────────────────────────────────────────
+// PSYCHOMOTIVE
+// ─────────────────────────────────────────────────────────────────────────────
 let psychomotiveStore = [...mockPsychomotiveMetrics];
 
-export function usePsychomotiveList(page: number, search: string, section: SchoolSection | "All") {
+export function usePsychomotiveList(page: number, search: string, section: string | "All") {
   return useQuery({
     queryKey: ["academics", "psychomotive", page, search, section],
     queryFn: async () => {
@@ -294,6 +320,9 @@ export function useDeletePsychomotive() {
   });
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// RESULTS / PROMOTION / SCORES / ATTENDANCE (unchanged, still mock)
+// ─────────────────────────────────────────────────────────────────────────────
 export const useLoadStudentResult = () => {
   const queryClient = useQueryClient();
 

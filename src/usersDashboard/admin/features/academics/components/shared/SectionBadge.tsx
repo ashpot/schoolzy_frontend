@@ -1,29 +1,28 @@
 import React from "react";
-import type { SchoolSection } from "../../types";
 
 interface SectionBadgeProps {
-  section: SchoolSection;
+  section: string;
 }
 
-const styles: Record<SchoolSection, string> = {
-  Nursery: "text-pink-500 bg-pink-50",
-  Primary: "text-violet-500 bg-violet-50",
-  "Junior Secondary": "text-emerald-600 bg-emerald-50",
-  "Senior Secondary": "text-orange-500 bg-orange-50",
-};
+const COLOR_PALETTE = [
+  "text-pink-500 bg-pink-50",
+  "text-violet-500 bg-violet-50",
+  "text-emerald-600 bg-emerald-50",
+  "text-orange-500 bg-orange-50",
+  "text-blue-600 bg-blue-50",
+  "text-amber-600 bg-amber-50",
+];
 
-const shortLabels: Record<SchoolSection, string> = {
-  Nursery: "Nursery",
-  Primary: "Primary",
-  "Junior Secondary": "Jnr Sec",
-  "Senior Secondary": "Snr Sec",
-};
+function sectionColor(section: string) {
+  const code = section.charCodeAt(0) || 0;
+  return COLOR_PALETTE[code % COLOR_PALETTE.length];
+}
 
 const SectionBadge: React.FC<SectionBadgeProps> = ({ section }) => (
   <span
-    className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold font-lato ${styles[section]}`}
+    className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold font-lato ${sectionColor(section)}`}
   >
-    {shortLabels[section]}
+    {section}
   </span>
 );
 

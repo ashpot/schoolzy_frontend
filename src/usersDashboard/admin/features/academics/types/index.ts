@@ -1,7 +1,6 @@
 // ─── Shared ───────────────────────────────────────────────────────────────────
-export type SchoolSection = "Nursery" | "Primary" | "Junior Secondary" | "Senior Secondary";
 
-export const SECTIONS: SchoolSection[] = [
+export const SECTIONS = [
   "Nursery",
   "Primary",
   "Junior Secondary",
@@ -9,13 +8,12 @@ export const SECTIONS: SchoolSection[] = [
 ];
 
 export const SECTION_OPTIONS = SECTIONS.map((s) => ({ value: s, label: s }));
-
 // ─── Subjects ─────────────────────────────────────────────────────────────────
 export interface Subject {
   id: string;
   subjectName: string;
   code: string;
-  section: SchoolSection;
+  section: string; // section title, e.g. "PRIMARY"
   elective: boolean;
 }
 
@@ -32,7 +30,7 @@ export interface SubjectTeacherAssignment {
 export interface AssessmentType {
   id: string;
   name: string;
-  section: SchoolSection;
+  section: string;
   code: string;
   baseMark: number;
   terminalPercent: number;
@@ -55,12 +53,67 @@ export interface Grade {
   minScore: number;
   maxScore: number;
   remark: GradeRemark;
-  section: SchoolSection;
+  section: string;
 }
 
 // ─── Psychomotive ─────────────────────────────────────────────────────────────
 export interface PsychomotiveMetric {
   id: string;
   title: string;
-  section: SchoolSection;
+  section: string;
+}
+
+// ─── NEW: real API payload/response + section dropdown item ───────────────────
+export interface SectionListItem {
+  id: number;
+  title: string;
+  code: string;
+  show_position_in_result: boolean;
+}
+
+export interface GradePayload {
+  caption: string;
+  minimum_score: number;
+  maximum_score: number;
+  section: number;
+}
+export interface GradeResponse {
+  id: number;
+  caption: string;
+  minimum_score: number;
+  maximum_score: number;
+  remark: string | null;
+  is_pass: boolean;
+  section: number;
+}
+
+export interface SubjectPayload {
+  name: string;
+  code: string;
+  section: number;
+}
+export interface SubjectResponse {
+  id: number;
+  name: string;
+  code: string;
+  elective: boolean;
+  section: number;
+}
+
+export interface AssessmentTypePayload {
+  name: string;
+  code: string;
+  terminal_percentage: number;
+  base_mark: number;
+  weeklable: boolean;
+  section: number;
+}
+export interface AssessmentTypeResponse {
+  id: number;
+  name: string;
+  code: string;
+  terminal_percentage: number;
+  base_mark: number;
+  weeklable: boolean;
+  section: number;
 }

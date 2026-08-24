@@ -2,23 +2,17 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { School } from "lucide-react";
 import { fadeUp } from "../animations/variants";
-import type { Class } from "../types";
-import { mockClasses } from "../data/mockData";
-import SplitLayout  from "../components/shared/SplitLayout";
-import StatPill     from "../components/shared/StatPill";
-import ClassForm    from "../components/classes/ClassForm";
+import type { ClassListItem } from "../types";
+import SplitLayout from "../components/shared/SplitLayout";
+import StatPill from "../components/shared/StatPill";
+import ClassForm from "../components/classes/ClassForm";
 import ClassesTable from "../components/classes/ClassesTable";
+import { useClassesList } from "../hooks/useSections";
 import ClassCreatedModal from "../components/shared/ClassCreateModal";
 
 export default function ClassesPage() {
-  const [classes, setClasses] = useState<Class[]>(mockClasses);
-  const [createdClass, setCreatedClass] = useState<Class | null>(null);
-
-  const handleAdd = (c: Class) => {
-    setClasses((p) => [c, ...p]);
-    setCreatedClass(c);
-  };
-  const handleDelete = (id: string) => setClasses((p) => p.filter((c) => c.id !== id));
+  const { data: classes = [] } = useClassesList();
+  const [createdClass, setCreatedClass] = useState<ClassListItem | null>(null);
 
   return (
     <motion.div variants={fadeUp} initial="hidden" animate="show" className="dashboard-p space-y-6">
@@ -32,8 +26,8 @@ export default function ClassesPage() {
         <StatPill icon={School} label={`${classes.length} classes`} />
       </div>
       <SplitLayout
-        left={<ClassForm onSuccess={handleAdd} />}
-        right={<ClassesTable classes={classes} onDelete={handleDelete} />}
+        left={<ClassForm onSuccess={setCreatedClass} />}
+        right={<ClassesTable classes={classes} />}
       />
 
       <ClassCreatedModal

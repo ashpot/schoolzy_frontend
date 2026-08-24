@@ -3,11 +3,10 @@ import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { slideFromRight, slideFromLeft } from "../animations/variants";
-import { useAssessmentTypesList, useAddAssessmentType, useDeleteAssessmentType } from "../hooks/useAcademics";
-import { SECTION_OPTIONS } from "../types";
-import type { AssessmentType, SchoolSection } from "../types";
+import { useAssessmentTypesList, useAddAssessmentType, useDeleteAssessmentType, useSectionsList } from "../hooks/useAcademics";
+import { assessmentTypeSchema, type AssessmentTypeFormValues } from "../schemas";
+import type { AssessmentType } from "../types";
 import AcademicsListPanel from "../components/shared/AcademicsListPanel";
 import DeleteButton from "../components/shared/DeleteButton";
 import PageHeader from "@/shared/ui/PageHeader";
@@ -18,32 +17,27 @@ import SubmitButton from "@/shared/ui/SubmitButton";
 import FormHeader from "../components/shared/FormHeader";
 import SectionBadge from "../components/shared/SectionBadge";
 
-const schema = z.object({
-  name: z.string().min(1, "Name is required"),
-  section: z.enum(["Nursery", "Primary", "Junior Secondary", "Senior Secondary"], { message: "Please select a section" }),
-  code: z.string().min(1, "Code is required"),
-  // terminalPercent: z.coerce.number().min(0).max(100),
-  terminalPercent: z.number().min(0).max(100),
-  baseMark: z.number().min(0).max(100),
-  weekly: z.boolean(),
-});
-type FormValues = z.infer<typeof schema>;
-
 const AssessmentTypesPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [section, setSection] = useState<SchoolSection | "All">("All");
+  const [section, setSection] = useState<string | "All">("All");
 
   const { data, isLoading } = useAssessmentTypesList(page, search, section);
+  const { data: sections, isLoading: sectionsLoading } = useSectionsList();
   const addMutation = useAddAssessmentType();
   const deleteMutation = useDeleteAssessmentType();
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { name: "", section: "Primary", code: "", terminalPercent: 0, baseMark: 100, weekly: false },
+  const sectionOptions = (sections ?? []).map((s) => ({
+    value: String(s.id),
+    label: s.title,
+  }));
+
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<AssessmentTypeFormValues>({
+    resolver: zodResolver(assessmentTypeSchema),
+    defaultValues: { name: "", section: "", code: "", terminalPercent: 0, baseMark: 100, weekly: false },
   });
 
-  const onSubmit = (values: FormValues) => {
+  const onSubmit = (values: AssessmentTypeFormValues) => {
     addMutation.mutate(values, { onSuccess: () => reset() });
   };
 
@@ -119,14 +113,13 @@ const AssessmentTypesPage: React.FC = () => {
               icon={<Plus className="w-3.5 h-3.5 text-brand-primary" />}
             />
 
-
           <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col p-5 gap-4">
             <div className="flex flex-col gap-1">
               <FormInput
                 label="Name"
                 placeholder="e.g. Classwork, Test, Exam…"
                 isLoading={addMutation.isPending}
-                error={errors.name ?.message}
+                error={errors.name?.message}
                 {...register("name")}
                 id="at-name-input"
               />
@@ -134,9 +127,12 @@ const AssessmentTypesPage: React.FC = () => {
 
             <div className="flex flex-col gap-1">
               <FormSelect
-                label="Section" placeholder="Select..."
-                options={SECTION_OPTIONS} isLoading={addMutation.isPending}
-                error={errors.section?.message} {...register("section")}
+                label="Section"
+                placeholder={sectionsLoading ? "Loading sections..." : "Select..."}
+                options={sectionOptions}
+                isLoading={addMutation.isPending || sectionsLoading}
+                error={errors.section?.message}
+                {...register("section")}
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -163,18 +159,19 @@ const AssessmentTypesPage: React.FC = () => {
                   />
                   <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-text-muted text-xs">%</span>
                 </div>
+                {errors.terminalPercent && <p className="text-xs text-danger mt-0.5">{errors.terminalPercent.message}</p>}
               </div>
               <div className="flex flex-col gap-1">
-              <FormInput
-                type="number"
-                label="Base Mark"
-                min={0}
-                placeholder="e.g. 100"
-                isLoading={addMutation.isPending}
-                error={errors.name ?.message}
-                {...register("name")}
-              />
-            </div>
+                <FormInput
+                  type="number"
+                  label="Base Mark"
+                  min={0}
+                  placeholder="e.g. 100"
+                  isLoading={addMutation.isPending}
+                  error={errors.baseMark?.message}
+                  {...register("baseMark", { valueAsNumber: true })}
+                />
+              </div>
             </div>
 
             <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl border border-border-line02 hover:border-brand-primary/30 transition-colors">

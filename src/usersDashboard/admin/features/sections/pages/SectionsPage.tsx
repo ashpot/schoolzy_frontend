@@ -2,23 +2,17 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Layers } from "lucide-react";
 import { fadeUp } from "../animations/variants";
-import type { Section } from "../types";
-import { mockSections } from "../data/mockData";
-import SplitLayout   from "../components/shared/SplitLayout";
-import StatPill      from "../components/shared/StatPill";
-import SectionForm   from "../components/sections/SectionForm";
+import type { SectionListItem } from "../types";
+import SplitLayout from "../components/shared/SplitLayout";
+import StatPill from "../components/shared/StatPill";
+import SectionForm from "../components/sections/SectionForm";
 import SectionsTable from "../components/sections/SectionsTable";
+import { useSectionsList } from "../hooks/useSections";
 import ClassCreatedModal from "../components/shared/ClassCreateModal";
 
 export default function SectionsPage() {
-  const [sections, setSections] = useState<Section[]>(mockSections);
-  const [createdSection, setCreatedSection] = useState<Section | null>(null);
-
-  const handleAdd = (s: Section) => {
-    setSections((p) => [s, ...p]);
-    setCreatedSection(s);
-  };
-  const handleDelete = (id: string) => setSections((p) => p.filter((s) => s.id !== id));
+  const { data: sections = [] } = useSectionsList();
+  const [createdSection, setCreatedSection] = useState<SectionListItem | null>(null);
 
   return (
     <motion.div variants={fadeUp} initial="hidden" animate="show" className="dashboard-p space-y-6">
@@ -32,8 +26,8 @@ export default function SectionsPage() {
         <StatPill icon={Layers} label={`${sections.length} sections`} />
       </div>
       <SplitLayout
-        left={<SectionForm onSuccess={handleAdd} />}
-        right={<SectionsTable sections={sections} onDelete={handleDelete} />}
+        left={<SectionForm onSuccess={setCreatedSection} />}
+        right={<SectionsTable sections={sections} />}
       />
 
       <ClassCreatedModal

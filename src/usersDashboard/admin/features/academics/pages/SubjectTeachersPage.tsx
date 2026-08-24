@@ -4,7 +4,7 @@ import { Users, CheckSquare } from "lucide-react";
 import { slideFromLeft, slideFromRight } from "../animations/variants";
 import { useSubjectTeachersList, useAssignSubjectTeacher, useDeleteSubjectTeacher } from "../hooks/useAcademics";
 import { mockTeachers, mockClasses, mockSubjects } from "../data/mockData";
-import type { SubjectTeacherAssignment, SchoolSection } from "../types";
+import type { SubjectTeacherAssignment } from "../types";
 import AcademicsListPanel from "../components/shared/AcademicsListPanel";
 import DeleteButton from "../components/shared/DeleteButton";
 import PageHeader from "@/shared/ui/PageHeader";
@@ -19,7 +19,7 @@ const AVAILABLE_SUBJECTS = mockSubjects.slice(0, 16);
 const SubjectTeachersPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [section, setSection] = useState<SchoolSection | "All">("All");
+  const [section, setSection] = useState<string | "All">("All");
 
   const [teacherId, setTeacherId] = useState("");
   const [classId, setClassId] = useState("");

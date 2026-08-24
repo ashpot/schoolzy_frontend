@@ -44,6 +44,17 @@ export interface ClassGroup {
   parentClass: string;
 }
 
+export interface ClassGroupListItem {
+  id: number;
+  parent_class_name: string;
+  section_name: string;
+  number_of_students: number;
+  form_teacher_name: string | null;
+  name: string;
+  code: string;
+  parent_class: number;
+}
+
 export interface ClassGroupPayload {
   name: string;
   code: string;

@@ -5,18 +5,32 @@ export interface Student {
   email: string; classGroup: string; section: "Jnr Sec" | "Snr Sec";
   classLabel: string; dateOfAdmission: string; photo?: string;
 }
+
+export interface ClassGroupListItem {
+  id: number;
+  parent_class_name: string;
+  section_name: string;
+  number_of_students: number;
+  form_teacher_name: string | null;
+  name: string;
+  code: string;
+  parent_class: number;
+}
+
 export interface Teacher {
   id: string; empNo: string; firstName: string; middleName?: string;
   lastName: string; username: string; sex: "Male" | "Female"; dob: string;
   phone: string; address: string; city: string; state: string; country: string;
   email: string; classLabel: string; dateOfEmployment: string; photo?: string;
 }
+
 export interface Admin {
   id: string; adminId: string; firstName: string; middleName?: string;
   lastName: string; username: string; sex: "Male" | "Female"; dob: string;
   phone: string; address: string; city: string; state: string; country: string;
   email: string; signature?: string; photo?: string;
 }
+
 export interface Parent {
   id: string; parentId: string; firstName: string; middleName?: string;
   lastName: string; username: string; sex: "Male" | "Female"; dob: string;

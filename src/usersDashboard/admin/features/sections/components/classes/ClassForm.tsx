@@ -89,11 +89,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Tag, Hash } from "lucide-react";
 import { classSchema, type ClassValues } from "../../schemas";
 import { useAddClass, useSectionsList } from "../../hooks/useSections";
-import type { Class } from "../../types";
+import type { ClassListItem } from "../../types";
 import Button from "@/shared/ui/Button";
 import FormSelect from "@/shared/ui/FormSelect";
 
-interface Props { onSuccess: (c: Class) => void; }
+interface Props { onSuccess: (c: ClassListItem) => void; }
 
 export default function ClassForm({ onSuccess }: Props) {
   const addClass = useAddClass();
@@ -110,19 +110,10 @@ export default function ClassForm({ onSuccess }: Props) {
     value: String(s.id),
     label: s.title,
   }));
-  console.log(sectionOptions);
 
   const onSubmit = (values: ClassValues) => {
     addClass.mutate(values, {
-      onSuccess: (data) => {
-        onSuccess({
-          id: String(data.id),
-          name: data.name,
-          code: data.code,
-          section: data.section_title,
-        });
-        reset();
-      },
+      onSuccess: (data) => { onSuccess(data); reset(); },
     });
   };
 
