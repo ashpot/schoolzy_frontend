@@ -1,4 +1,5 @@
 import type { Student, Teacher, Admin, Parent } from "../types";
+import type { BulkUploadConfig, ReviewRow } from "../types/BulkUpload";
 
 export const mockStudents: Student[] = [
   { id: "1", admNo: "SCH/2025/001", firstName: "Amara",  lastName: "Udo",      middleName: "",  username: "@amara.u",   sex: "Female", dob: "2010-03-12", phone: "+2348012345678", address: "12 Lagos St", city: "Enugu",  state: "Enugu",  country: "Nigeria", email: "amara@school.com",  classGroup: "JSS",  section: "Jnr Sec", classLabel: "JSS 1A", dateOfAdmission: "2024-09-01" },
@@ -38,3 +39,62 @@ export const mockParents: Parent[] = [
   { id: "6", parentId: "PAR-006", firstName: "Garba",    lastName: "Suleiman",    username: "@sule.garba", sex: "Male",   dob: "1970-09-09", phone: "+2348067890123", address: "11 North Rd",   city: "Kaduna", state: "Kaduna", country: "Nigeria", email: "garba@parent.com",    middleName: "" },
   { id: "7", parentId: "PAR-007", firstName: "Adaeze",   lastName: "Nwosu",       username: "@ada.eze",    sex: "Female", dob: "1982-12-25", phone: "+2348078901234", address: "9 PH Road",     city: "PH",     state: "Rivers", country: "Nigeria", email: "ada@parent.com",      middleName: "" },
 ];
+
+const studentReviewRows: ReviewRow[] = [
+  { id: "1", identifier: "SCH/2024/009", name: "Amina Yusuf", extraFields: { class: "JSS 1A" }, status: "ready" },
+  { id: "2", identifier: "SCH/2024/010", name: "Emeka Obi", extraFields: { class: "SS 2B" }, status: "ready" },
+  { id: "3", identifier: "SCH/2024/011", name: "Fatima Sule", extraFields: { class: "JSS 3A" }, status: "ready" },
+  { id: "4", identifier: "SCH/2024/001", name: "Chidi Eze", extraFields: { class: "JSS 1B" }, issue: "Duplicate Admission No.", status: "error" },
+  { id: "5", identifier: "SCH/2024/012", name: "Ngozi Uche", extraFields: { class: "SS 1C" }, status: "ready" },
+  { id: "6", identifier: "SCH/2024/013", name: "Tunde Fashola", extraFields: { class: "INVALID" }, issue: "Invalid Class", status: "error" },
+];
+
+export const studentBulkUploadConfig: BulkUploadConfig = {
+  entityLabel: "Student",
+  entityLabelPlural: "Students",
+  description: "Add multiple students at once by uploading a completed Schoolzy student template.",
+  identifierLabel: "Adm. No.",
+  requiredFields: [
+    "Admission Number", "First Name", "Last Name", "Sex",
+    "Date of Birth", "Class Group", "Date of Admission",
+  ],
+  optionalFields: [
+    "Middle Name", "Photo", "Phone", "Address",
+    "City", "State", "Country", "Email Address",
+  ],
+  reviewColumns: [{ key: "class", header: "Class" }],
+  templateFileName: "schoolzy_student_template",
+  mockReviewData: studentReviewRows,
+  mockImportedCount: 236,
+  mockSkippedCount: 12,
+};
+
+const teacherReviewRows: ReviewRow[] = [
+  { id: "1", identifier: "TCH/2024/013", name: "Amina Garba", extraFields: { email: "amina.garba@school.com", dateOfEmployment: "01 Sep 2022" }, status: "ready" },
+  { id: "2", identifier: "TCH/2024/014", name: "Emeka Obi", extraFields: { email: "emeka.obi@school.com", dateOfEmployment: "15 Jan 2023" }, status: "ready" },
+  { id: "3", identifier: "TCH/2024/015", name: "Fatima Sule", extraFields: { email: "fatima.sule@school.com", dateOfEmployment: "03 Mar 2021" }, status: "ready" },
+  { id: "4", identifier: "TCH/2024/001", name: "Chidi Nwosu", extraFields: { email: "chidi.nwosu@school.com", dateOfEmployment: "10 Jun 2020" }, issue: "Duplicate Employment No.", status: "error" },
+];
+
+export const teacherBulkUploadConfig: BulkUploadConfig = {
+  entityLabel: "Teacher",
+  entityLabelPlural: "Teachers",
+  description: "Add multiple teachers at once by uploading a completed Schoolzy teacher template.",
+  identifierLabel: "Emp. No.",
+  requiredFields: [
+    "Employment Number", "First Name", "Last Name",
+    "Sex", "Date of Birth", "Date of Employment",
+  ],
+  optionalFields: [
+    "Middle Name", "Photo", "Phone", "Address",
+    "City", "State", "Country", "Email Address",
+  ],
+  reviewColumns: [
+    { key: "email", header: "Email" },
+    { key: "dateOfEmployment", header: "Date of Employment" },
+  ],
+  templateFileName: "schoolzy_teacher_template",
+  mockReviewData: teacherReviewRows,
+  mockImportedCount: 40,
+  mockSkippedCount: 2,
+};

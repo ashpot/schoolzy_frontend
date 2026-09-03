@@ -49,7 +49,6 @@ const ParentsPage: React.FC = () => {
       <UserPageHeader
         title="Parents"
         subtitle="Manage all parent and guardian accounts"
-        addLabel="Add Parent"
       />
       <div className="grid grid-cols-1 xl:grid-cols-[420px_1fr] gap-5 items-start">
         <UserFormPanel title="Add Parent">

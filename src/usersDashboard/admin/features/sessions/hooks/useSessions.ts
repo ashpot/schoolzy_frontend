@@ -72,6 +72,15 @@ export const useCreateTerm = () => {
   });
 };
 
+export const useTermsList = () => {
+  return useQuery({
+    queryKey: ["terms", "list"],
+    queryFn: async () => {
+      return apiRequest<TermResponse[]>(SESSIONS_ENDPOINTS.LIST_TERMS);
+    },
+  });
+};
+
 export const useDeleteTerm = () => {
   const qc = useQueryClient();
   return useMutation({

@@ -42,7 +42,6 @@ const AdminsPage: React.FC = () => {
       <UserPageHeader
         title="Admins"
         subtitle="Manage all administrative staff accounts"
-        addLabel="Add Admin"
       />
       <div className="grid grid-cols-1 xl:grid-cols-[420px_1fr] gap-5 items-start">
         <UserFormPanel title="Add Admin">
