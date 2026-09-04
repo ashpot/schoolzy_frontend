@@ -72,7 +72,7 @@ const AttendanceSummariesPage: React.FC = () => {
           <div className="grid md:grid-cols-4 gap-4 mb-5">
             <div>
               <FormSelect
-                label="Select Class"
+                label="Class"
                 placeholder="Select class"
                 options={termOptions}
                 isLoading={loadMutation.isPending}
@@ -83,7 +83,7 @@ const AttendanceSummariesPage: React.FC = () => {
 
             <div>
               <FormSelect
-                label="Select Class Group"
+                label="Class Group"
                 placeholder="Select class group"
                 options={sessionOptions}
                 isLoading={loadMutation.isPending}
@@ -94,6 +94,17 @@ const AttendanceSummariesPage: React.FC = () => {
 
              <div>
               <FormSelect
+                label="Session"
+                placeholder="Select session"
+                options={termOptions}
+                isLoading={loadMutation.isPending}
+                error={errors.session?.message}
+                {...register("session")}
+              />
+            </div>
+
+            <div>
+              <FormSelect
                 label="Term"
                 placeholder="Select term"
                 options={termOptions}
@@ -101,17 +112,7 @@ const AttendanceSummariesPage: React.FC = () => {
                 error={errors.term?.message}
                 {...register("term")}
               />
-            </div>
 
-            <div>
-              <FormSelect
-                label="SelectSession"
-                placeholder="Select session"
-                options={termOptions}
-                isLoading={loadMutation.isPending}
-                error={errors.session?.message}
-                {...register("session")}
-              />
             </div>
           </div>
 

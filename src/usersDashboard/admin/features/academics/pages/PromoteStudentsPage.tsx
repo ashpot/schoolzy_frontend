@@ -71,7 +71,7 @@ const PromoteStudentsPage: React.FC = () => {
           <div className="grid md:grid-cols-2 gap-4 mb-5">
             <div>
               <FormSelect
-                label="Select Class"
+                label="Class"
                 placeholder="Select class"
                 options={termOptions}
                 isLoading={loadMutation.isPending}
@@ -82,7 +82,7 @@ const PromoteStudentsPage: React.FC = () => {
 
             <div>
               <FormSelect
-                label="Select Class Group"
+                label="Class Group"
                 placeholder="Select class group"
                 options={sessionOptions}
                 isLoading={loadMutation.isPending}

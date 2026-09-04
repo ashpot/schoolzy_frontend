@@ -26,3 +26,26 @@ export const assessmentTypeSchema = z.object({
   weekly:          z.boolean(),
 });
 export type AssessmentTypeFormValues = z.infer<typeof assessmentTypeSchema>;
+
+export const attendanceSchema = z.object({
+  timesSchoolOpened: z.number().min(0, "Must be 0 or more"),
+  timesPresent: z.number().min(0, "Must be 0 or more"),
+  timesEarly: z.number().min(0, "Must be 0 or more"),
+  timesLate: z.number().min(0, "Must be 0 or more"),
+  timesAbsent: z.number().min(0, "Must be 0 or more"),
+});
+export type AttendanceFormValues = z.infer<typeof attendanceSchema>;
+
+export const psychomotiveSchema = z.object({
+  scores: z.array(z.object({
+    skill: z.string(),
+    score: z.number().min(1).max(5),
+  })),
+});
+export type PsychomotiveFormValues = z.infer<typeof psychomotiveSchema>;
+
+export const resultCommentSchema = z.object({
+  classTeacherComment: z.string().optional(),
+  principalComment: z.string().optional(),
+});
+export type ResultCommentFormValues = z.infer<typeof resultCommentSchema>;

@@ -119,18 +119,6 @@ const ManageScoresPage: React.FC = () => {
 
             <div>
               <FormSelect
-                label="Term"
-                placeholder="Select term"
-                options={termOptions}
-                isLoading={loadMutation.isPending}
-                error={errors.term?.message}
-                {...register("term")}
-              />
-            </div>
-
-
-            <div>
-              <FormSelect
                 label="Session"
                 placeholder="Select session"
                 options={sessionOptions}
@@ -138,6 +126,19 @@ const ManageScoresPage: React.FC = () => {
                 error={errors.session?.message}
                 {...register("session")}
               />
+            </div>
+
+
+            <div>
+              <FormSelect
+                label="Term"
+                placeholder="Select term"
+                options={termOptions}
+                isLoading={loadMutation.isPending}
+                error={errors.term?.message}
+                {...register("term")}
+              />
+
             </div>
 
 

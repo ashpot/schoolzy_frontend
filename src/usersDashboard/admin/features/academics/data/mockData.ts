@@ -5,6 +5,8 @@ import type {
   Grade,
   PsychomotiveMetric,
 } from "../types";
+import type { StudentResultData } from "../types/studentResult";
+
 
 // ─── Subjects ─────────────────────────────────────────────────────────────────
 export const mockSubjects: Subject[] = [
@@ -154,3 +156,35 @@ export const mockPsychomotiveMetrics: PsychomotiveMetric[] = [
   { id: "PSY-019", title: "Balance & Posture", section: "Nursery" },
   { id: "PSY-020", title: "Rhythm & Movement", section: "Nursery" },
 ];
+
+export const PSYCHOMOTIVE_SKILLS = [
+  "Neatness", "Punctuality", "Attentiveness", "Cooperation", "Creativity",
+  "Sports", "Handling of Tools", "Drawing & Painting", "Music",
+] as const;
+
+export const mockStudentResult: StudentResultData = {
+  studentId: "3",
+  admissionNumber: "SCH/2024/001",
+  fullName: "Adaeze Okonkwo",
+  className: "JSS 3A",
+  section: "Junior Secondary",
+  term: "First Term",
+  session: "2025/2026",
+  positionInClass: "12th",
+  classSize: 54,
+  averageScore: 74,
+  overallGrade: "B",
+  attendancePercentage: 84,
+  subjects: [
+    { id: "1", subject: "Mathematics",       assignment: 5, assignmentMax: 10, test: 17, testMax: 20, exam: 42, examMax: 70, total: 64, totalMax: 100, grade: "C", subjectPosition: "7th" },
+    { id: "2", subject: "English Language",  assignment: 5, assignmentMax: 10, test: 15, testMax: 20, exam: 53, examMax: 70, total: 73, totalMax: 100, grade: "B", subjectPosition: "2nd" },
+    { id: "3", subject: "Basic Science",     assignment: 5, assignmentMax: 10, test: 13, testMax: 20, exam: 64, examMax: 70, total: 82, totalMax: 100, grade: "A", subjectPosition: "2nd" },
+    { id: "4", subject: "Social Studies",    assignment: 5, assignmentMax: 10, test: 20, testMax: 20, exam: 44, examMax: 70, total: 69, totalMax: 100, grade: "B", subjectPosition: "4th" },
+    { id: "5", subject: "French",            assignment: 5, assignmentMax: 10, test: 18, testMax: 20, exam: 55, examMax: 70, total: 78, totalMax: 100, grade: "B", subjectPosition: "3rd" },
+    { id: "6", subject: "CRS",               assignment: 5, assignmentMax: 10, test: 16, testMax: 20, exam: 66, examMax: 70, total: 87, totalMax: 100, grade: "A", subjectPosition: "1st" },
+    { id: "7", subject: "Agricultural Science", assignment: 5, assignmentMax: 10, test: 14, testMax: 20, exam: 46, examMax: 70, total: 65, totalMax: 100, grade: "B", subjectPosition: "2nd" },
+  ],
+  psychomotive: PSYCHOMOTIVE_SKILLS.map((skill) => ({ skill, score: 3, remark: "Good" })),
+  attendance: { timesSchoolOpened: 60, timesPresent: 55, timesEarly: 10, timesLate: 3, timesAbsent: 5 },
+  comments: { classTeacherComment: "", principalComment: "" },
+};

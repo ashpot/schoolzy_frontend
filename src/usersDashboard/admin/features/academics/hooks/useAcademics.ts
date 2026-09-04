@@ -11,7 +11,7 @@ import type {
   Subject, SubjectPayload, SubjectResponse,
   AssessmentType, AssessmentTypePayload, AssessmentTypeResponse,
 } from "../types";
-import type { GradeFormValues, SubjectFormValues, AssessmentTypeFormValues } from "../schemas";
+import type { GradeFormValues, SubjectFormValues, AssessmentTypeFormValues, ResultCommentFormValues, PsychomotiveFormValues, AttendanceFormValues } from "../schemas";
 import { apiRequest } from "@/shared/lib/apiClient";
 import { ACADEMICS_ENDPOINTS } from "../api";
 
@@ -406,5 +406,47 @@ export const useAttendanceSummary = () => {
       return { success: true, data: payload };
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["attendance-summary"] }),
+  });
+};
+
+export const useSaveAttendance = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: AttendanceFormValues) => {
+      // TODO: Replace with actual API call e.g. api.post(`/academics/attendance-summary/`, payload)
+      await new Promise((r) => setTimeout(r, 800));
+      return { success: true, data: payload };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["student-result"] });
+    },
+  });
+};
+
+export const useSavePsychomotive = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: PsychomotiveFormValues) => {
+      // TODO: Replace with actual API call e.g. api.post(`/academics/psychomotive-scores/`, payload)
+      await new Promise((r) => setTimeout(r, 800));
+      return { success: true, data: payload };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["student-result"] });
+    },
+  });
+};
+
+export const useSaveResultComment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: ResultCommentFormValues) => {
+      // TODO: Replace with actual API call e.g. api.post(`/academics/result-comments/`, payload)
+      await new Promise((r) => setTimeout(r, 800));
+      return { success: true, data: payload };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["student-result"] });
+    },
   });
 };
