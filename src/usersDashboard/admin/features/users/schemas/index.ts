@@ -69,11 +69,20 @@ export const adminSchema = z
   });
 export type AdminFormValues = z.infer<typeof adminSchema>;
 
+// ── Assigned Child (used in Parent form)
+export const assignedChildSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  classLabel: z.string(),
+});
+export type AssignedChild = z.infer<typeof assignedChildSchema>;
+
 // ── Parent
 export const parentSchema = z
   .object({
     ...basePersonFields,
     ...credentialFields,
+    assignedChildren: z.array(assignedChildSchema),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",

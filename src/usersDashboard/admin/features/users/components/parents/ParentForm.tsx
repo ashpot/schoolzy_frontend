@@ -9,6 +9,7 @@ import { staggerContainer, fieldFadeUp } from "../../animations/variants";
 import { useAddParent } from "../../hooks/useParents";
 import { generateUsername } from "@/shared/utils/generateUsername";
 import PhotoUpload from "../shared/PhotoUpload";
+import AssignChildField from "../shared/AssignChildField";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import UserCreatedModal from "../shared/UserCreatedModal";
 
@@ -18,7 +19,7 @@ const SEX_OPTIONS = [
 
 const ParentForm: React.FC = () => {
   const { mutate, isPending } = useAddParent();
-    const [createdUser, setCreatedUser] = useState<{ fullName: string; username: string; password: string } | null>(null);
+  const [createdUser, setCreatedUser] = useState<{ fullName: string; username: string; password: string } | null>(null);
 
   const {
     register,
@@ -33,6 +34,7 @@ const ParentForm: React.FC = () => {
       firstName: "", lastName: "", middleName: "", sex: undefined,
       dob: "", phone: "", address: "", city: "", state: "", country: "", email: "",
       username: "", password: "", confirmPassword: "",
+      assignedChildren: [],
     },
   });
 
@@ -44,6 +46,9 @@ const ParentForm: React.FC = () => {
   }, [firstName, lastName, setValue]);
 
   const onSubmit = (values: ParentFormValues) => {
+    // NOTE: values.assignedChildren is captured in form state but intentionally
+    // left out of the payload below — backend child-assignment endpoint
+    // (POST /student-parents/) isn't wired yet. Will loop-assign post-creation later.
     mutate(
       {
         first_name: values.firstName,
@@ -119,6 +124,10 @@ const ParentForm: React.FC = () => {
         <motion.div variants={fieldFadeUp}>
           <FormInput label="Email Address" type="email" placeholder="parent@example.com"
             isLoading={isPending} error={errors.email?.message} {...register("email")} />
+        </motion.div>
+
+        <motion.div variants={fieldFadeUp}>
+          <AssignChildField control={control} error={errors.assignedChildren?.message} />
         </motion.div>
 
         <motion.div variants={fieldFadeUp}>
