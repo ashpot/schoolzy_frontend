@@ -1,32 +1,37 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, Loader2, AlertCircle } from "lucide-react";
 import { fadeUp } from "../animations/variants";
-import { mockSessions } from "../data/mockData";
-import type { Session } from "../types";
+import { useSessionsList } from "../hooks/useSessions";
+import type { Session, SessionListItem } from "../types";
 import SplitLayout from "../components/shared/SplitLayout";
 import StatPill from "../components/shared/StatPill";
 import SessionForm from "../components/sessions-page/SessionForm";
 import SessionsTable from "../components/sessions-page/SessionsTable";
 import SessionCreatedModal from "../components/shared/SessionCreateModal";
 
+// API shape → UI shape
+function toSession(item: SessionListItem): Session {
+  return {
+    id: String(item.id),
+    name: item.name,
+    startDate: item.start_date,
+    endDate: item.end_date,
+    isActive: item.is_active,
+  };
+}
+
 export default function SessionsPage() {
-  const [sessions, setSessions] = useState<Session[]>(mockSessions);
+  const { data, isLoading, isError, error } = useSessionsList();
   const [createdSession, setCreatedSession] = useState<Session | null>(null);
 
+  const sessions = (data ?? []).map(toSession);
   const activeSession = sessions.find((s) => s.isActive);
 
+  // Query invalidation (see useCreateSession) refetches the list on success,
+  // so we only need this to drive the "created" confirmation modal.
   const handleCreate = (session: Session) => {
-    setSessions((prev) =>
-      session.isActive
-        ? [...prev.map((s) => ({ ...s, isActive: false })), session]
-        : [session, ...prev]
-    );
     setCreatedSession(session);
-  };
-
-  const handleDelete = (id: string) => {
-    setSessions((prev) => prev.filter((s) => s.id !== id));
   };
 
   return (
@@ -43,10 +48,22 @@ export default function SessionsPage() {
         )}
       </div>
 
-      <SplitLayout
-        left={<SessionForm onSuccess={handleCreate} />}
-        right={<SessionsTable sessions={sessions} onDelete={handleDelete} />}
-      />
+      {isLoading ? (
+        <div className="flex items-center justify-center gap-2 py-16 text-text-muted">
+          <Loader2 size={18} className="animate-spin" />
+          <span className="text-sm">Loading sessions…</span>
+        </div>
+      ) : isError ? (
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 text-danger text-sm">
+          <AlertCircle size={16} />
+          {error instanceof Error ? error.message : "Failed to load sessions."}
+        </div>
+      ) : (
+        <SplitLayout
+          left={<SessionForm onSuccess={handleCreate} />}
+          right={<SessionsTable sessions={sessions} onDelete={() => {}} />}
+        />
+      )}
 
       <SessionCreatedModal
         isOpen={!!createdSession}

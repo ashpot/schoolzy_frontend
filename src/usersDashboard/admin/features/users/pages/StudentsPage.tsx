@@ -10,7 +10,8 @@ import UserPageHeader from "../components/shared/UserPageHeader";
 import UserFormPanel from "../components/shared/UserFormPanel";
 import StudentForm from "../components/students/StudentsForm";
 import UserListPanel from "../components/shared/UserListPanel";
-
+import BulkUploadModal from "../components/shared/bulk-upload/BulkUploadModal";
+import { studentBulkUploadConfig } from "../data/mockData";
 
 const COLUMNS: ColumnDef<Student>[] = [
   {
@@ -49,6 +50,7 @@ const StudentsPage: React.FC = () => {
   const [search, setSearch] = useState("");
   const { data, isLoading } = useStudentsList(page, search);
   const { mutate: remove }  = useDeleteStudent();
+  const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
 
   const handleSearch = (q: string) => { setSearch(q); setPage(1); };
 
@@ -57,8 +59,14 @@ const StudentsPage: React.FC = () => {
       <UserPageHeader
         title="Students"
         subtitle="Manage all students enrolled in the school"
-        addLabel="Add Student"
         showBulkUpload
+        onBulkUpload={() => setIsBulkUploadOpen(true)}
+      />
+      <BulkUploadModal
+        isOpen={isBulkUploadOpen}
+        onClose={() => setIsBulkUploadOpen(false)}
+        config={studentBulkUploadConfig}
+        queryKey="students"
       />
       <div className="grid grid-cols-1 xl:grid-cols-[420px_1fr] gap-5 items-start">
         <UserFormPanel title="Add Student">

@@ -49,3 +49,28 @@ export interface ColumnDef<T> {
   className?: string;
   render: (row: T) => React.ReactNode;
 }
+
+export interface UserResponse {
+  id: number;
+  first_name: string;
+  last_name: string;
+  middle_name: string | null;
+  username: string;
+  email: string;
+  admission_number: string | null;
+  employment_number: string | null;
+  role: string;
+  phone: string | null;
+  sex: "Male" | "Female" | null;
+  status: string;
+  photo: string | null;
+  signature: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  date_of_birth: string | null;
+  date_of_admission: string | null;
+  date_of_employment: string | null;
+  class_group: number | null;
+}

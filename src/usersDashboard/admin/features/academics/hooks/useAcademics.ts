@@ -1,18 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  mockSubjects,
   mockSubjectTeachers,
-  mockAssessmentTypes,
-  mockGrades,
   mockPsychomotiveMetrics,
 } from "../data/mockData";
 import type {
   SubjectTeacherAssignment,
   PsychomotiveMetric,
   SectionListItem,
-  GradePayload, GradeResponse,
-  SubjectPayload, SubjectResponse,
-  AssessmentTypePayload, AssessmentTypeResponse,
+  Grade, GradePayload, GradeResponse,
+  Subject, SubjectPayload, SubjectResponse,
+  AssessmentType, AssessmentTypePayload, AssessmentTypeResponse,
 } from "../types";
 import type { GradeFormValues, SubjectFormValues, AssessmentTypeFormValues } from "../schemas";
 import { apiRequest } from "@/shared/lib/apiClient";
@@ -25,11 +22,17 @@ function paginate<T>(data: T[], page: number) {
   return { items: data.slice(start, start + PER_PAGE), total: data.length };
 }
 
+// `section` filter value is the id (string) from the dropdown (sectionOptions
+// is built as value: String(s.id)). Items carry the section *title* (for
+// SectionBadge), so translate id -> title before comparing.
 function filterBySection<T extends { section: string }>(
   data: T[],
-  section: string | "All"
+  section: string | "All",
+  sectionNameById: Map<number, string>
 ) {
-  return section === "All" ? data : data.filter((d) => d.section === section);
+  if (section === "All") return data;
+  const title = sectionNameById.get(Number(section));
+  return title ? data.filter((d) => d.section === title) : data;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -47,21 +50,31 @@ export function useSectionsList() {
 // ─────────────────────────────────────────────────────────────────────────────
 // SUBJECTS
 // ─────────────────────────────────────────────────────────────────────────────
-let subjectsStore = [...mockSubjects];
-
 export function useSubjectsList(page: number, search: string, section: string | "All") {
+  const sectionsQuery = useSectionsList();
+  const sectionNameById = new Map((sectionsQuery.data ?? []).map((s) => [s.id, s.title]));
+
   return useQuery({
-    queryKey: ["academics", "subjects", page, search, section],
+    queryKey: ["academics", "subjects", "list", page, search, section, sectionsQuery.data],
+    enabled: !sectionsQuery.isLoading,
     queryFn: async () => {
-      // TODO: replace with api.get(`/academics/subjects?page=${page}&search=${search}&section=${section}`)
-      await new Promise((r) => setTimeout(r, 200));
-      let filtered = filterBySection(subjectsStore, section);
-      if (search)
+      const raw = await apiRequest<SubjectResponse[]>(ACADEMICS_ENDPOINTS.LIST_SUBJECTS);
+      const mapped: Subject[] = raw.map((s) => ({
+        id: String(s.id),
+        subjectName: s.name,
+        code: s.code,
+        section: sectionNameById.get(s.section) ?? "Unknown",
+        elective: s.elective,
+      }));
+
+      let filtered = filterBySection(mapped, section, sectionNameById);
+      if (search) {
         filtered = filtered.filter(
           (s) =>
             s.subjectName.toLowerCase().includes(search.toLowerCase()) ||
             s.code.toLowerCase().includes(search.toLowerCase())
         );
+      }
       return paginate(filtered, page);
     },
   });
@@ -88,17 +101,18 @@ export function useAddSubject() {
 export function useDeleteSubject() {
   const qc = useQueryClient();
   return useMutation({
+    //@ts-ignore
     mutationFn: async (id: string) => {
-      // TODO: replace with api.delete(`/academics/subjects/${id}`)
+      // TODO: no delete endpoint for subjects in the API doc yet
       await new Promise((r) => setTimeout(r, 300));
-      subjectsStore = subjectsStore.filter((s) => s.id !== id);
+      return { success: true };
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["academics", "subjects"] }),
   });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SUBJECT TEACHERS
+// SUBJECT TEACHERS (unchanged — still mock)
 // ─────────────────────────────────────────────────────────────────────────────
 let subjectTeachersStore = [...mockSubjectTeachers];
 
@@ -106,7 +120,6 @@ export function useSubjectTeachersList(page: number, search: string, section: st
   return useQuery({
     queryKey: ["academics", "subject-teachers", page, search, section],
     queryFn: async () => {
-      // TODO: replace with api.get(`/academics/subject-teachers?page=${page}&search=${search}&section=${section}`)
       await new Promise((r) => setTimeout(r, 200));
       let filtered = subjectTeachersStore;
       if (search)
@@ -132,7 +145,6 @@ export function useAssignSubjectTeacher() {
       subjectIds: string[];
       subjectNames: string[];
     }) => {
-      // TODO: replace with api.post("/academics/subject-teachers", payload)
       await new Promise((r) => setTimeout(r, 600));
       const newItems: SubjectTeacherAssignment[] = payload.subjectNames.map((name, i) => ({
         id: `STA-${String(subjectTeachersStore.length + i + 1).padStart(3, "0")}`,
@@ -152,7 +164,6 @@ export function useDeleteSubjectTeacher() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      // TODO: replace with api.delete(`/academics/subject-teachers/${id}`)
       await new Promise((r) => setTimeout(r, 300));
       subjectTeachersStore = subjectTeachersStore.filter((s) => s.id !== id);
     },
@@ -163,21 +174,33 @@ export function useDeleteSubjectTeacher() {
 // ─────────────────────────────────────────────────────────────────────────────
 // ASSESSMENT TYPES
 // ─────────────────────────────────────────────────────────────────────────────
-let assessmentTypesStore = [...mockAssessmentTypes];
-
 export function useAssessmentTypesList(page: number, search: string, section: string | "All") {
+  const sectionsQuery = useSectionsList();
+  const sectionNameById = new Map((sectionsQuery.data ?? []).map((s) => [s.id, s.title]));
+
   return useQuery({
-    queryKey: ["academics", "assessment-types", page, search, section],
+    queryKey: ["academics", "assessment-types", "list", page, search, section, sectionsQuery.data],
+    enabled: !sectionsQuery.isLoading,
     queryFn: async () => {
-      // TODO: replace with api.get(`/academics/assessment-types?page=${page}&search=${search}&section=${section}`)
-      await new Promise((r) => setTimeout(r, 200));
-      let filtered = filterBySection(assessmentTypesStore, section);
-      if (search)
+      const raw = await apiRequest<AssessmentTypeResponse[]>(ACADEMICS_ENDPOINTS.LIST_ASSESSMENT_TYPES);
+      const mapped: AssessmentType[] = raw.map((a) => ({
+        id: String(a.id),
+        name: a.name,
+        section: a.section != null ? sectionNameById.get(a.section) ?? "Unknown" : "All Sections",
+        code: a.code ?? "",
+        baseMark: a.base_mark,
+        terminalPercent: a.terminal_percentage,
+        weekly: a.weeklable,
+      }));
+
+      let filtered = filterBySection(mapped, section, sectionNameById);
+      if (search) {
         filtered = filtered.filter(
           (a) =>
             a.name.toLowerCase().includes(search.toLowerCase()) ||
             a.code.toLowerCase().includes(search.toLowerCase())
         );
+      }
       return paginate(filtered, page);
     },
   });
@@ -207,10 +230,11 @@ export function useAddAssessmentType() {
 export function useDeleteAssessmentType() {
   const qc = useQueryClient();
   return useMutation({
+    //@ts-ignore
     mutationFn: async (id: string) => {
-      // TODO: replace with api.delete(`/academics/assessment-types/${id}`)
+      // TODO: no delete endpoint for assessment types in the API doc yet
       await new Promise((r) => setTimeout(r, 300));
-      assessmentTypesStore = assessmentTypesStore.filter((a) => a.id !== id);
+      return { success: true };
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["academics", "assessment-types"] }),
   });
@@ -219,21 +243,32 @@ export function useDeleteAssessmentType() {
 // ─────────────────────────────────────────────────────────────────────────────
 // GRADES
 // ─────────────────────────────────────────────────────────────────────────────
-let gradesStore = [...mockGrades];
-
 export function useGradesList(page: number, search: string, section: string | "All") {
+  const sectionsQuery = useSectionsList();
+  const sectionNameById = new Map((sectionsQuery.data ?? []).map((s) => [s.id, s.title]));
+
   return useQuery({
-    queryKey: ["academics", "grades", page, search, section],
+    queryKey: ["academics", "grades", "list", page, search, section, sectionsQuery.data],
+    enabled: !sectionsQuery.isLoading,
     queryFn: async () => {
-      // TODO: replace with api.get(`/academics/grades?page=${page}&search=${search}&section=${section}`)
-      await new Promise((r) => setTimeout(r, 200));
-      let filtered = filterBySection(gradesStore, section);
-      if (search)
+      const raw = await apiRequest<GradeResponse[]>(ACADEMICS_ENDPOINTS.LIST_GRADES);
+      const mapped: Grade[] = raw.map((g) => ({
+        id: String(g.id),
+        caption: g.caption,
+        minScore: g.minimum_score,
+        maxScore: g.maximum_score,
+        remark: g.remark ?? "Pass", // API sends null in practice
+        section: sectionNameById.get(g.section) ?? "Unknown",
+      }));
+
+      let filtered = filterBySection(mapped, section, sectionNameById);
+      if (search) {
         filtered = filtered.filter(
           (g) =>
             g.caption.toLowerCase().includes(search.toLowerCase()) ||
             g.remark.toLowerCase().includes(search.toLowerCase())
         );
+      }
       return paginate(filtered, page);
     },
   });
@@ -261,17 +296,18 @@ export function useAddGrade() {
 export function useDeleteGrade() {
   const qc = useQueryClient();
   return useMutation({
+    //@ts-ignore
     mutationFn: async (id: string) => {
-      // TODO: replace with api.delete(`/academics/grades/${id}`)
+      // TODO: no delete endpoint for grades in the API doc yet
       await new Promise((r) => setTimeout(r, 300));
-      gradesStore = gradesStore.filter((g) => g.id !== id);
+      return { success: true };
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["academics", "grades"] }),
   });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// PSYCHOMOTIVE
+// PSYCHOMOTIVE (unchanged — still mock)
 // ─────────────────────────────────────────────────────────────────────────────
 let psychomotiveStore = [...mockPsychomotiveMetrics];
 
@@ -279,13 +315,10 @@ export function usePsychomotiveList(page: number, search: string, section: strin
   return useQuery({
     queryKey: ["academics", "psychomotive", page, search, section],
     queryFn: async () => {
-      // TODO: replace with api.get(`/academics/psychomotive?page=${page}&search=${search}&section=${section}`)
       await new Promise((r) => setTimeout(r, 200));
-      let filtered = filterBySection(psychomotiveStore, section);
+      let filtered = section === "All" ? psychomotiveStore : psychomotiveStore.filter((d) => d.section === section);
       if (search)
-        filtered = filtered.filter((p) =>
-          p.title.toLowerCase().includes(search.toLowerCase())
-        );
+        filtered = filtered.filter((p) => p.title.toLowerCase().includes(search.toLowerCase()));
       return paginate(filtered, page);
     },
   });
@@ -295,7 +328,6 @@ export function useAddPsychomotive() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (payload: Omit<PsychomotiveMetric, "id">) => {
-      // TODO: replace with api.post("/academics/psychomotive", payload)
       await new Promise((r) => setTimeout(r, 500));
       const newItem: PsychomotiveMetric = {
         ...payload,
@@ -312,7 +344,6 @@ export function useDeletePsychomotive() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      // TODO: replace with api.delete(`/academics/psychomotive/${id}`)
       await new Promise((r) => setTimeout(r, 300));
       psychomotiveStore = psychomotiveStore.filter((p) => p.id !== id);
     },
@@ -325,101 +356,55 @@ export function useDeletePsychomotive() {
 // ─────────────────────────────────────────────────────────────────────────────
 export const useLoadStudentResult = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (payload: { studentName: string; term: string; session: string }) => {
-      // TODO: Replace with actual API call
-      // return api.post("/student-results/load", payload);
       await new Promise((resolve) => setTimeout(resolve, 500));
       return { success: true, data: payload };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["student-results"] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["student-results"] }),
   });
 };
 
 export const useLoadClassResult = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (payload: {
-      studentName: string;
-      term: string;
-      session: string,
-      class:string,
-      class_group: string
-    }) => {
-      // TODO: Replace with actual API call
-      // return api.post("/student-results/load", payload);
+    mutationFn: async (payload: { studentName: string; term: string; session: string; class: string; class_group: string }) => {
       await new Promise((resolve) => setTimeout(resolve, 500));
       return { success: true, data: payload };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["class-results"] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["class-results"] }),
   });
 };
 
 export const usePromoteClass = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (payload: {
-      class:string,
-      class_group: string
-    }) => {
-      // TODO: Replace with actual API call
-      // return api.post("/student-results/load", payload);
+    mutationFn: async (payload: { class: string; class_group: string }) => {
       await new Promise((resolve) => setTimeout(resolve, 500));
       return { success: true, data: payload };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["promote-class"] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["promote-class"] }),
   });
 };
 
 export const useManageScore = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (payload: {
-      subject: string,
-      assessment_type: string,
-      term: string,
-      session: string,
-      class:string,
-      class_group: string
-    }) => {
-      // TODO: Replace with actual API call
-      // return api.post("/student-results/load", payload);
+    mutationFn: async (payload: { subject: string; assessment_type: string; term: string; session: string; class: string; class_group: string }) => {
       await new Promise((resolve) => setTimeout(resolve, 500));
       return { success: true, data: payload };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["manage-score"] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["manage-score"] }),
   });
 };
 
 export const useAttendanceSummary = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (payload: {
-      term: string;
-      session: string,
-      class:string,
-      class_group: string
-    }) => {
-      // TODO: Replace with actual API call
-      // return api.post("/student-results/load", payload);
+    mutationFn: async (payload: { term: string; session: string; class: string; class_group: string }) => {
       await new Promise((resolve) => setTimeout(resolve, 500));
       return { success: true, data: payload };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["attendance-summary"] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["attendance-summary"] }),
   });
 };

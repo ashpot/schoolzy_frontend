@@ -9,6 +9,8 @@ import { pageFade } from "../animations/variants";
 import UserFormPanel from "../components/shared/UserFormPanel";
 import TeacherForm from "../components/teachers/TeacherForm";
 import UserListPanel from "../components/shared/UserListPanel";
+import { teacherBulkUploadConfig } from "../data/mockData";
+import BulkUploadModal from "../components/shared/bulk-upload/BulkUploadModal";
 
 
 const COLUMNS: ColumnDef<Teacher>[] = [
@@ -44,6 +46,7 @@ const TeachersPage: React.FC = () => {
   const [search, setSearch] = useState("");
   const { data, isLoading } = useTeachersList(page, search);
   const { mutate: remove }  = useDeleteTeacher();
+  const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false)
 
   const handleSearch = (q: string) => { setSearch(q); setPage(1); };
 
@@ -52,8 +55,14 @@ const TeachersPage: React.FC = () => {
       <UserPageHeader
         title="Teachers"
         subtitle="Manage all teaching staff in the school"
-        addLabel="Add Teacher"
         showBulkUpload
+        onBulkUpload={() => setIsBulkUploadOpen(true)}
+      />
+      <BulkUploadModal
+        isOpen={isBulkUploadOpen}
+        onClose={() => setIsBulkUploadOpen(false)}
+        config={teacherBulkUploadConfig}
+        queryKey="students"
       />
       <div className="grid grid-cols-1 xl:grid-cols-[420px_1fr] gap-5 items-start">
         <UserFormPanel title="Add Teacher">
