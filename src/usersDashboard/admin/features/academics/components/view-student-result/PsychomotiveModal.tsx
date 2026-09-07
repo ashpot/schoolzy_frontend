@@ -4,9 +4,9 @@ import { X } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/shared/ui/Button";
-import type { PsychomotiveSkillScore } from "../../../types/studentResult";
-import { useSavePsychomotive } from "../../../hooks/useAcademics";
-import { psychomotiveSchema, type PsychomotiveFormValues } from "../../../schemas";
+import type { PsychomotiveSkillScore } from "../../types/studentResult";
+import { useSavePsychomotive } from "../../hooks/useAcademics";
+import { psychomotiveSchema, type PsychomotiveFormValues } from "../../schemas";
 import { modalVariant } from "@/usersDashboard/admin/features/users/animations/variants";
 
 

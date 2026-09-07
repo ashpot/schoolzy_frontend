@@ -1,7 +1,7 @@
 import React from "react";
 import { CheckCircle2 } from "lucide-react";
 import { gradeRemarks } from "@/shared/utils/gradeUtils";
-import type { StudentResultData } from "../../../types/studentResult";
+import type { StudentResultData } from "../../types/studentResult";
 
 interface RemarkBannerProps {
   result: StudentResultData;

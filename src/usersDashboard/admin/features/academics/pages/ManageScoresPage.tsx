@@ -5,11 +5,15 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { slideFromLeft } from "../animations/variants";
-import { useManageScore } from "../hooks/useAcademics";
+import { useManageScore, useSaveAllScores, useSaveScore } from "../hooks/useAcademics";
 import PageHeader from "@/shared/ui/PageHeader";
 import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import FormHeader from "../components/shared/FormHeader";
+import { mockScoreRows } from "../data/mockData";
+import ActiveFiltersBar from "../components/manage-scores/ActiveFiltersBar";
+import type { ScoreRow } from "../types/manageScores";
+import ScoresTable from "../components/manage-scores/ScoresTable";
 
 const schema = z.object({
   class: z.string().min(1, "Please select a class"),
@@ -22,8 +26,11 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 const ManageScoresPage: React.FC = () => {
-  const [hasLoaded, setHasLoaded] = useState(false);
   const loadMutation = useManageScore();
+  const [scoreRows, setScoreRows] = useState<ScoreRow[] | null>(null);
+  const saveScoreMutation = useSaveScore();
+  const saveAllMutation = useSaveAllScores();
+
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -31,13 +38,29 @@ const ManageScoresPage: React.FC = () => {
   });
 
   const onSubmit = (values: FormValues) => {
-    loadMutation.mutate(values, {
-      onSuccess: () => {
-        setHasLoaded(true);
-        // TODO: Display the loaded student result data
-      },
-    });
-  };
+      loadMutation.mutate(values, {
+        onSuccess: () => {
+          setScoreRows(mockScoreRows);
+        },
+      });
+    };
+    const handleSaveRow = (id: string, score: number) => {
+  saveScoreMutation.mutate({ id, score }, {
+    onSuccess: () => {
+      setScoreRows((prev) => prev?.map((r) => (r.id === id ? { ...r, score, status: "saved" } : r)) ?? null);
+    },
+  });
+};
+
+const handleSaveAll = () => {
+  if (!scoreRows) return;
+  const payload = scoreRows.filter((r) => r.score !== null).map((r) => ({ id: r.id, score: r.score! }));
+  saveAllMutation.mutate(payload, {
+    onSuccess: () => {
+      setScoreRows((prev) => prev?.map((r) => (r.score !== null ? { ...r, status: "saved" as const } : r)) ?? null);
+    },
+  });
+};
 
   const termOptions = [
     { value: "First Term", label: "First Term" },
@@ -128,7 +151,6 @@ const ManageScoresPage: React.FC = () => {
               />
             </div>
 
-
             <div>
               <FormSelect
                 label="Term"
@@ -154,7 +176,7 @@ const ManageScoresPage: React.FC = () => {
       </motion.div>
 
       {/* Empty State */}
-      {!hasLoaded && (
+      {!scoreRows && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -175,7 +197,23 @@ const ManageScoresPage: React.FC = () => {
         </motion.div>
       )}
 
-      {/* TODO: Add result display section when hasLoaded is true */}
+      {scoreRows && (
+        <div className="flex flex-col gap-6 mt-6">
+          <ActiveFiltersBar
+            filters={[
+              { label: "SS 1 A" }, { label: "Mathematics" }, { label: "Exam (100 marks)" },
+              { label: "First Term" }, { label: "2025/2026" },
+            ]}
+          />
+          <ScoresTable
+            rows={scoreRows}
+            onSaveRow={handleSaveRow}
+            onSaveAll={handleSaveAll}
+            isSavingRow={saveScoreMutation.isPending}
+            isSavingAll={saveAllMutation.isPending}
+          />
+        </div>
+      )}
     </div>
   );
 };

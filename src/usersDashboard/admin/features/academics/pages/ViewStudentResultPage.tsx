@@ -13,15 +13,15 @@ import SubmitButton from "@/shared/ui/SubmitButton";
 import FormHeader from "../components/shared/FormHeader";
 import { mockStudentResult } from "../data/mockData";
 import type { StudentResultData } from "../types/studentResult";
-import StudentResultHeader from "../components/shared/view-student-result/StudentResultHeader";
-import ResultStatCards from "../components/shared/view-student-result/ResultStatCards";
-import RemarkBanner from "../components/shared/view-student-result/RemarkBanner";
-import ResultActionsBar from "../components/shared/view-student-result/ResultActionsBar";
-import AttendanceSummaryModal from "../components/shared/view-student-result/AttendanceSummaryModal";
-import PsychomotiveModal from "../components/shared/view-student-result/PsychomotiveModal";
-import ResultCommentModal from "../components/shared/view-student-result/ResultCommentModal";
-import PrintableResultModal from "../components/shared/view-student-result/PrintableResultModal";
-import SubjectResultsTable from "../components/shared/view-student-result/SubjectResultsTable";
+import StudentResultHeader from "../components/view-student-result/StudentResultHeader";
+import ResultStatCards from "../components/view-student-result/ResultStatCards";
+import RemarkBanner from "../components/view-student-result/RemarkBanner";
+import ResultActionsBar from "../components/view-student-result/ResultActionsBar";
+import AttendanceSummaryModal from "../components/view-student-result/AttendanceSummaryModal";
+import PsychomotiveModal from "../components/view-student-result/PsychomotiveModal";
+import ResultCommentModal from "../components/view-student-result/ResultCommentModal";
+import PrintableResultModal from "../components/view-student-result/PrintableResultModal";
+import SubjectResultsTable from "../components/view-student-result/SubjectResultsTable";
 
 
 const schema = z.object({

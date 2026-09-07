@@ -4,9 +4,9 @@ import { Calendar, Minus, Plus, X } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/shared/ui/Button";
-import type { AttendanceRecord } from "../../../types/studentResult";
-import { attendanceSchema, type AttendanceFormValues } from "../../../schemas";
-import { useSaveAttendance } from "../../../hooks/useAcademics";
+import type { AttendanceRecord } from "../../types/studentResult";
+import { attendanceSchema, type AttendanceFormValues } from "../../schemas";
+import { useSaveAttendance } from "../../hooks/useAcademics";
 import { modalVariant } from "@/usersDashboard/admin/features/users/animations/variants";
 
 

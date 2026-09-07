@@ -4,7 +4,7 @@ import { Eye, Printer, X } from "lucide-react";
 import { gradeStyles } from "@/shared/utils/gradeUtils";
 import PrintableResultLetterhead from "./PrintableResultLetterhead";
 import PrintableGradeScale from "./PrintableGradeScale";
-import type { StudentResultData } from "../../../types/studentResult";
+import type { StudentResultData } from "../../types/studentResult";
 import { modalVariant } from "@/usersDashboard/admin/features/users/animations/variants";
 
 interface PrintableResultModalProps {

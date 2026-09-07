@@ -188,3 +188,77 @@ export const mockStudentResult: StudentResultData = {
   attendance: { timesSchoolOpened: 60, timesPresent: 55, timesEarly: 10, timesLate: 3, timesAbsent: 5 },
   comments: { classTeacherComment: "", principalComment: "" },
 };
+
+import type { ClassResultData } from "../types/classResult";
+import type { ScoreRow } from "../types/manageScores";
+import type { PromoteStudentRow } from "../types/promoteStudents";
+
+const CLASS_STUDENT_NAMES = [
+  "Chidinma Harold", "Kelechi Igwe", "Femi Ade", "Emeka Okeke", "Zainab Yusuf",
+  "Chinedu Obi", "Ngozi Anthony", "Hassan Jibril", "Chidinma Lawrence", "James Ude",
+];
+
+export const mockClassResult: ClassResultData = {
+  className: "JSS 1A",
+  classGroup: "A",
+  term: "First Term",
+  session: "2025/2026",
+  totalStudents: 34,
+  classAverage: 65,
+  topStudent: "Chidinma",
+  passRate: 100,
+  subjects: ["English", "Mathematics", "Physics", "Biology"],
+  students: CLASS_STUDENT_NAMES.map((name, i) => ({
+    id: String(i + 1),
+    admissionNumber: `SCH/2025/${String(i + 1).padStart(3, "0")}`,
+    fullName: name,
+    scores: [
+      { subject: "English", score: 70 },
+      { subject: "Mathematics", score: 85 },
+      { subject: "Physics", score: 90 },
+      { subject: "Biology", score: 95 },
+    ],
+    totalSubjects: 4,
+    marksObtainable: 400,
+    cumulativeTotal: 340,
+  })),
+};
+
+const SCORE_ROW_NAMES = [
+  { name: "Chidinma Harold", subject: "Mathematics", assessment: "Classwork", score: 70 },
+  { name: "Kelechi Igwe", subject: "Mathematics", assessment: "Project", score: 83 },
+  { name: "Femi Ade", subject: "English", assessment: "Classwork", score: 65 },
+  { name: "Emeka Okeke", subject: "Mathematics", assessment: "Classwork", score: 45 },
+  { name: "Zainab Yusuf", subject: "Economics", assessment: "Classwork", score: 65 },
+  { name: "Chinedu Obi", subject: "Mathematics", assessment: "Classwork", score: 54 },
+  { name: "Ngozi Anthony", subject: "Mathematics", assessment: "Exam", score: null },
+  { name: "Hassan Jibril", subject: "Mathematics", assessment: "Classwork", score: null },
+  { name: "Chidinma Lawrence", subject: "Mathematics", assessment: "Classwork", score: null },
+  { name: "James Ude", subject: "Mathematics", assessment: "Classwork", score: null },
+];
+
+export const mockScoreRows: ScoreRow[] = SCORE_ROW_NAMES.map((row, i) => ({
+  id: String(i + 1),
+  dateUploaded: "Jul 14, 2026 8:55 AM",
+  term: "Second Term",
+  session: "2025/2026",
+  admissionNumber: `SCH/2025/${String(i + 1).padStart(3, "0")}`,
+  fullName: row.name,
+  subject: row.subject,
+  assessmentType: row.assessment,
+  score: row.score,
+  status: row.score !== null && i === 5 ? "saved" : "unsaved",
+}));
+
+const PROMOTE_STUDENT_STATUSES: Array<"pending" | "promoted" | "repeated"> = [
+  "pending", "promoted", "promoted", "repeated", "pending", "pending", "pending", "pending", "pending", "pending",
+];
+
+export const mockPromoteStudents: PromoteStudentRow[] = CLASS_STUDENT_NAMES.map((name, i) => ({
+  id: String(i + 1),
+  admissionNumber: `SCH/2025/${String(i + 1).padStart(3, "0")}`,
+  fullName: name,
+  currentClass: "JSS 1A",
+  nextClass: PROMOTE_STUDENT_STATUSES[i] === "repeated" ? "JSS 1A" : "JSS 2A",
+  status: PROMOTE_STUDENT_STATUSES[i],
+}));

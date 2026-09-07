@@ -1,6 +1,6 @@
 import React from "react";
 import { TrendingUp, Award, Hash, Calendar } from "lucide-react";
-import type { StudentResultData } from "../../../types/studentResult";
+import type { StudentResultData } from "../../types/studentResult";
 
 interface ResultStatCardsProps {
   result: StudentResultData;

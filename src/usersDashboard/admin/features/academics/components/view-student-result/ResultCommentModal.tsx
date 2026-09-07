@@ -4,9 +4,9 @@ import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/shared/ui/Button";
-import type { ResultComments } from "../../../types/studentResult";
-import { useSaveResultComment } from "../../../hooks/useAcademics";
-import { resultCommentSchema, type ResultCommentFormValues } from "../../../schemas";
+import type { ResultComments } from "../../types/studentResult";
+import { useSaveResultComment } from "../../hooks/useAcademics";
+import { resultCommentSchema, type ResultCommentFormValues } from "../../schemas";
 import { modalVariant } from "@/usersDashboard/admin/features/users/animations/variants";
 
 

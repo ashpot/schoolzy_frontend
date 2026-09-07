@@ -1,6 +1,6 @@
 import React from "react";
 import { Printer, Download, Calendar, Hash, BookOpen } from "lucide-react";
-import type { StudentResultData } from "../../../types/studentResult";
+import type { StudentResultData } from "../../types/studentResult";
 
 interface StudentResultHeaderProps {
   result: StudentResultData;

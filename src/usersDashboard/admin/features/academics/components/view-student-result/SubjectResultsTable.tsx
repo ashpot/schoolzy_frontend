@@ -1,6 +1,6 @@
 import React from "react";
 import { gradeStyles } from "@/shared/utils/gradeUtils";
-import type { StudentResultData } from "../../../types/studentResult";
+import type { StudentResultData } from "../../types/studentResult";
 
 interface SubjectResultsTableProps {
   result: StudentResultData;
