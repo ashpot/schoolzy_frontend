@@ -262,3 +262,66 @@ export const mockPromoteStudents: PromoteStudentRow[] = CLASS_STUDENT_NAMES.map(
   nextClass: PROMOTE_STUDENT_STATUSES[i] === "repeated" ? "JSS 1A" : "JSS 2A",
   status: PROMOTE_STUDENT_STATUSES[i],
 }));
+
+import type { AttendanceSummaryData, StudentAttendanceRow } from "../types/attendanceSummary";
+
+const ATTENDANCE_STUDENT_NAMES = [
+  "Chidinma Harold", "Kelechi Igwe", "Femi Ade", "Emeka Okeke", "Zainab Yusuf",
+  "Chinedu Obi", "Ngozi Anthony", "Hassan Jibril", "Chidinma Lawrence", "James Ude",
+];
+
+const ATTENDANCE_STATUS_BY_PERCENT = (pct: number) => {
+  if (pct >= 90) return "Excellent" as const;
+  if (pct >= 75) return "Good" as const;
+  if (pct >= 60) return "Fair" as const;
+  return "Poor" as const;
+};
+
+const attendancePercents = [72, 50, 80, 72, 80, 100, 80, 100, 65, 90];
+
+const mockAttendanceStudents: StudentAttendanceRow[] = ATTENDANCE_STUDENT_NAMES.map((name, i) => ({
+  id: String(i + 1),
+  admissionNumber: `SCH/2025/${String(i + 1).padStart(3, "0")}`,
+  fullName: name,
+  totalPresent: 45,
+  totalAbsent: 18,
+  lateEntries: 2,
+  attendancePercentage: attendancePercents[i],
+  status: ATTENDANCE_STATUS_BY_PERCENT(attendancePercents[i]),
+}));
+
+export const mockAttendanceSummary: AttendanceSummaryData = {
+  className: "JSS 1 A",
+  term: "First Term",
+  session: "2025/2026",
+  totalAttendanceRate: 77,
+  attendanceRateChange: 0,
+  presentDays: 556,
+  presentDaysStudentCount: 12,
+  presentDaysSpan: 65,
+  absentDays: 181,
+  absentDaysPercentage: 23,
+  lateEntries: 43,
+  lateEntriesPercentage: 6,
+  weeklyTrend: [
+    { week: "Wk 1", attendanceRate: 78, present: 32 },
+    { week: "Wk 2", attendanceRate: 76, present: 30 },
+    { week: "Wk 3", attendanceRate: 75, present: 29 },
+    { week: "Wk 4", attendanceRate: 83, present: 36 },
+    { week: "Wk 5", attendanceRate: 79, present: 33 },
+    { week: "Wk 6", attendanceRate: 88, present: 40 },
+    { week: "Wk 7", attendanceRate: 89, present: 41 },
+    { week: "Wk 8", attendanceRate: 76, present: 30 },
+    { week: "Wk 9", attendanceRate: 75, present: 29 },
+    { week: "Wk 10", attendanceRate: 85, present: 38 },
+    { week: "Wk 11", attendanceRate: 82, present: 35 },
+    { week: "Wk 12", attendanceRate: 74, present: 28 },
+    { week: "Wk 13", attendanceRate: 70, present: 25 },
+  ],
+  distribution: [
+    { label: "Present", percentage: 71, color: "#2563eb" },
+    { label: "Absent", percentage: 23, color: "#ef4444" },
+    { label: "Late", percentage: 6, color: "#f59e0b" },
+  ],
+  students: mockAttendanceStudents,
+};
