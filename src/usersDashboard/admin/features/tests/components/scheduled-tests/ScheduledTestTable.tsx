@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Search, ChevronDown, Pencil, Trash2 } from "lucide-react";
-import { mockScheduledTests, testTypeOptions, subjectOptions } from "../../data/mockData";
+import { testTypeOptions, subjectOptions } from "../../data/mockData";
 import { useDeleteScheduledTest } from "../../hooks/useTests";
 import { staggerContainer, rowVariant } from "../../animations/variants";
 import type { ScheduledTest } from "../../types";
+import type { ScheduledStatusFilter } from "./ScheduledTestStats";
 
 const ITEMS_PER_PAGE = 5;
 
 const SELECT_CLS =
-  "appearance-none pl-3 pr-7 py-1.5 rounded-lg border border-border-line02 bg-white text-xs text-text-nav focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-primary)]/20 cursor-pointer";
+  "appearance-none pl-3 pr-7 py-1.5 rounded-lg border border-border-line02 bg-white text-xs text-text-nav focus:outline-none focus:ring-2 focus:ring-brand-primary/20 cursor-pointer";
 
 const SUBJECT_COLORS: Record<string, string> = {
+  "General Studies":  "bg-indigo-50 text-indigo-700",
   "Civic Education":  "bg-purple-50 text-purple-700",
   "Mathematics":      "bg-blue-50   text-blue-700",
   "English Language": "bg-green-50  text-green-700",
@@ -23,10 +25,13 @@ function subjectColor(subject: string) {
   return SUBJECT_COLORS[subject] ?? "bg-gray-100 text-gray-600";
 }
 
-interface Props { refreshKey: number; }
+interface Props {
+  items: ScheduledTest[];
+  onDelete: (id: string) => void;
+  statusFilter: ScheduledStatusFilter;
+}
 
-export default function ScheduledTestsTable({ refreshKey }: Props) {
-  const [items,       setItems]       = useState<ScheduledTest[]>(mockScheduledTests);
+export default function ScheduledTestsTable({ items, onDelete, statusFilter }: Props) {
   const [search,      setSearch]      = useState("");
   const [filterType,  setFilterType]  = useState("");
   const [filterSubj,  setFilterSubj]  = useState("");
@@ -37,19 +42,20 @@ export default function ScheduledTestsTable({ refreshKey }: Props) {
   const handleDelete = (id: string) =>
     deleteMutation.mutate(id, {
       onSuccess: () => {
-        setItems((prev) => prev.filter((s) => s.id !== id));
+        onDelete(id);
         setCurrentPage(1);
       },
     });
 
   const filtered = items.filter((s) => {
+    const matchStatus = statusFilter === "all" || s.status === statusFilter;
     const matchSearch = search === "" ||
       s.testTitle.toLowerCase().includes(search.toLowerCase()) ||
       s.subject.toLowerCase().includes(search.toLowerCase());
     const matchType = filterType === "" || s.type === filterType;
     const matchSubj = filterSubj === "" ||
       s.subject === subjectOptions.find((o) => o.value === filterSubj)?.label;
-    return matchSearch && matchType && matchSubj;
+    return matchStatus && matchSearch && matchType && matchSubj;
   });
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
@@ -113,7 +119,7 @@ export default function ScheduledTestsTable({ refreshKey }: Props) {
           </thead>
 
           <motion.tbody
-            key={`${refreshKey}-${currentPage}`}
+            key={`${statusFilter}-${currentPage}`}
             variants={staggerContainer}
             initial="hidden"
             animate="show"
@@ -128,7 +134,6 @@ export default function ScheduledTestsTable({ refreshKey }: Props) {
                   {(currentPage - 1) * ITEMS_PER_PAGE + idx + 1}
                 </td>
 
-                {/* Test: title + subject pill + duration pill */}
                 <td className="px-4 py-4">
                   <p className="text-sm font-medium text-text-nav mb-1.5">
                     {item.testTitle}
@@ -144,10 +149,9 @@ export default function ScheduledTestsTable({ refreshKey }: Props) {
                 </td>
 
                 <td className="px-4 py-4 text-sm font-medium text-text-nav">
-                  {item.class}
+                  {item.class}{item.classGroup ? ` ${item.classGroup}` : ""}
                 </td>
 
-                {/* Date Scheduled + status badge */}
                 <td className="px-4 py-4">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm text-text-secondary">
@@ -168,8 +172,8 @@ export default function ScheduledTestsTable({ refreshKey }: Props) {
                 </td>
 
                 <td className="px-6 py-4">
-                  <div className="flex items-center gap-1">
-                    <button type="button" title="Edit" className="w-8 h-8 rounded-lg flex-center text-brand-primary hover:bg-blue-50 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <button type="button" title="Edit" className="w-8 h-8 rounded-lg flex-center text-brand-primary bg-blue-50 hover:bg-blue-100 transition-colors">
                       <Pencil className="w-4 h-4" />
                     </button>
                     <button
@@ -177,7 +181,7 @@ export default function ScheduledTestsTable({ refreshKey }: Props) {
                       title="Delete"
                       onClick={() => handleDelete(item.id)}
                       disabled={deleteMutation.isPending}
-                      className="w-8 h-8 rounded-lg flex-center text-danger hover:bg-red-50 transition-colors disabled:opacity-50"
+                      className="w-8 h-8 rounded-lg flex-center text-danger bg-red-50 hover:bg-red-100 transition-colors disabled:opacity-50"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

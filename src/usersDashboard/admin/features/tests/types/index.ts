@@ -28,7 +28,7 @@ export interface Test {
   subject: string;
   type: TestType;
   timeAllowed: number;
-  passcode: string;
+  format: TestFormat;
   dateCreated: string;
 }
 
@@ -39,11 +39,11 @@ export interface ScheduledTest {
   type: TestType;
   timeAllowed: number;
   class: string;
+  classGroup?: string;
   dateScheduled: string;
   dateCreated: string;
   status: ScheduledStatus;
 }
-
 // ─── Results ───────────────────────────────────────────────────────────────
 export interface QuestionResult {
   id: string;
@@ -71,3 +71,5 @@ export interface TestResult {
   grade: string;
   questions: QuestionResult[];
 }
+
+export type TestFormat = "Internal" | "External";

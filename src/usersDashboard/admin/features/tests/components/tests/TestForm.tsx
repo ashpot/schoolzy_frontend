@@ -1,13 +1,12 @@
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { createTestSchema, type CreateTestValues } from "../../schemas";
 import { useCreateTest } from "../../hooks/useTests";
-import { subjectOptions, classOptions, testTypeOptions } from "../../data/mockData";
+import { subjectOptions, classOptions, testTypeOptions, formatOptions } from "../../data/mockData";
 import FormInput from "@/shared/ui/FormInput";
 import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
-import PasscodeField, { generatePasscode } from "./PasscodeField";
 
 interface Props {
   onTestCreated: () => void;
@@ -19,7 +18,6 @@ export default function TestForm({ onTestCreated }: Props) {
   const {
     register,
     handleSubmit,
-    control,
     reset,
     formState: { errors },
   } = useForm<CreateTestValues>({
@@ -29,8 +27,8 @@ export default function TestForm({ onTestCreated }: Props) {
       subject:     "",
       class:       "",
       type:        "",
-      timeAllowed: "" as unknown as number,
-      passcode:    generatePasscode(),
+      timeAllowed: 0,
+      format:      "",
     },
   });
 
@@ -40,8 +38,8 @@ export default function TestForm({ onTestCreated }: Props) {
         onTestCreated();
         reset({
           title: "", subject: "", class: "", type: "",
-          timeAllowed: "" as unknown as number,
-          passcode: generatePasscode(),
+          timeAllowed: 0,
+          format: "",
         });
       },
     });
@@ -109,19 +107,16 @@ export default function TestForm({ onTestCreated }: Props) {
             required
             isLoading={isLoading}
             error={errors.timeAllowed?.message}
-            {...register("timeAllowed")}
+            {...register("timeAllowed", { valueAsNumber: true })}
           />
-          <Controller
-            name="passcode"
-            control={control}
-            render={({ field }) => (
-              <PasscodeField
-                value={field.value ?? ""}
-                onChange={field.onChange}
-                error={errors.passcode?.message}
-                isLoading={isLoading}
-              />
-            )}
+          <FormSelect
+            label="Format (internal or external)"
+            placeholder="Select Format"
+            options={formatOptions}
+            required
+            isLoading={isLoading}
+            error={errors.format?.message}
+            {...register("format")}
           />
         </div>
 

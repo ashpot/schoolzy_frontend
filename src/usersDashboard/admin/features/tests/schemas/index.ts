@@ -37,13 +37,14 @@ export const createTestSchema = z.object({
   class:       z.string().min(1, "Class is required"),
   type:        z.string().min(1, "Type is required"),
   timeAllowed: z.number().min(1, "Time must be at least 1 minute"),
-  passcode:    z.string().optional(),
+  format:      z.string().min(1, "Format is required"),
 });
 export type CreateTestValues = z.infer<typeof createTestSchema>;
 
 export const scheduleTestSchema = z.object({
   test:          z.string().min(1, "Test is required"),
   class:         z.string().min(1, "Class is required"),
+  classGroup:    z.string().optional(),
   dateScheduled: z.string().min(1, "Date is required"),
 });
 export type ScheduleTestValues = z.infer<typeof scheduleTestSchema>;

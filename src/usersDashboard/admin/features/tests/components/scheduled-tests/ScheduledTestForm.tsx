@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarClock } from "lucide-react";
 import { scheduleTestSchema, type ScheduleTestValues } from "../../schemas";
 import { useScheduleTest } from "../../hooks/useTests";
-import { classOptions, testSelectOptions } from "../../data/mockData";
+import { classOptions, classGroupOptions, testSelectOptions } from "../../data/mockData";
 import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
 
@@ -22,7 +22,7 @@ export default function ScheduledTestForm({ onScheduled }: Props) {
     formState: { errors },
   } = useForm<ScheduleTestValues>({
     resolver: zodResolver(scheduleTestSchema),
-    defaultValues: { test: "", class: "", dateScheduled: "" },
+    defaultValues: { test: "", class: "", classGroup: "", dateScheduled: "" },
   });
 
   const dateValue     = watch("dateScheduled");
@@ -36,7 +36,7 @@ export default function ScheduledTestForm({ onScheduled }: Props) {
     scheduleMutation.mutate(values, {
       onSuccess: () => {
         onScheduled();
-        reset({ test: "", class: "", dateScheduled: "" });
+        reset({ test: "", class: "", classGroup: "", dateScheduled: "" });
       },
     });
   };
@@ -55,7 +55,7 @@ export default function ScheduledTestForm({ onScheduled }: Props) {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-4 gap-4">
           <FormSelect
             label="Test"
             placeholder="Select Test"
@@ -73,6 +73,14 @@ export default function ScheduledTestForm({ onScheduled }: Props) {
             isLoading={isLoading}
             error={errors.class?.message}
             {...register("class")}
+          />
+          <FormSelect
+            label="Class Group (Optional)"
+            placeholder="Class Group"
+            options={classGroupOptions}
+            isLoading={isLoading}
+            error={errors.classGroup?.message}
+            {...register("classGroup")}
           />
 
           {/* Date Scheduled */}

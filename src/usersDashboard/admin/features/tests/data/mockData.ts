@@ -34,24 +34,24 @@ export const mockQuestions: Question[] = [
 
 // ─── Tests mock ────────────────────────────────────────────────────────────
 export const mockTests: Test[] = [
-  { id: "t-001", title: "Civic Education Exam",  class: "SS 1",  subject: "Civic Education",  type: "Exam", timeAllowed: 90, passcode: "qNwLGAYJ", dateCreated: "15 Jan 2026" },
-  { id: "t-002", title: "Mathematics Test",       class: "SS 2",  subject: "Mathematics",       type: "Test", timeAllowed: 45, passcode: "mB3xTk9P", dateCreated: "03 Feb 2026" },
-  { id: "t-003", title: "English Language Quiz",  class: "JSS 1", subject: "English Language",  type: "Quiz", timeAllowed: 30, passcode: "rZ7vCw2N", dateCreated: "18 Feb 2026" },
-  { id: "t-004", title: "Biology Exam",           class: "SS 3",  subject: "Biology",           type: "Exam", timeAllowed: 90, passcode: "hK5pLs8Q", dateCreated: "07 Mar 2026" },
-  { id: "t-005", title: "Economics Test",         class: "SS 2",  subject: "Economics",         type: "Test", timeAllowed: 45, passcode: "dY4jFn6R", dateCreated: "22 Mar 2026" },
+  { id: "t-001", title: "Entrance Test",       class: "JSS 1",  subject: "General Studies",   type: "Exam", timeAllowed: 60, format: "External", dateCreated: "15 Jan 2026" },
+  { id: "t-002", title: "Mathematics Test",     class: "SS 2",   subject: "Mathematics",       type: "Test", timeAllowed: 45, format: "Internal", dateCreated: "03 Feb 2026" },
+  { id: "t-003", title: "English Language Quiz", class: "JSS 1", subject: "English Language",  type: "Quiz", timeAllowed: 30, format: "Internal", dateCreated: "18 Feb 2026" },
+  { id: "t-004", title: "Biology Exam",         class: "SS 3",   subject: "Biology",           type: "Exam", timeAllowed: 90, format: "Internal", dateCreated: "07 Mar 2026" },
+  { id: "t-005", title: "Economics Test",       class: "SS 2",   subject: "Economics",         type: "Test", timeAllowed: 45, format: "Internal", dateCreated: "22 Mar 2026" },
 ];
 
 // ─── Scheduled tests mock ──────────────────────────────────────────────────
 export const mockScheduledTests: ScheduledTest[] = [
-  { id: "st-001", testTitle: "Civic Education Exam",  subject: "Civic Education",  type: "Exam", timeAllowed: 90, class: "SS 1",  dateScheduled: "15 Jan 2026", dateCreated: "06 Jan 2026", status: "past" },
-  { id: "st-002", testTitle: "Mathematics Test",       subject: "Mathematics",       type: "Test", timeAllowed: 45, class: "SS 2",  dateScheduled: "03 Feb 2026", dateCreated: "15 Jan 2026", status: "past" },
-  { id: "st-003", testTitle: "English Language Quiz",  subject: "English Language",  type: "Quiz", timeAllowed: 30, class: "JSS 1", dateScheduled: "18 Feb 2026", dateCreated: "28 Jan 2026", status: "past" },
-  { id: "st-004", testTitle: "Biology Exam",           subject: "Biology",           type: "Exam", timeAllowed: 90, class: "SS 2",  dateScheduled: "07 Mar 2026", dateCreated: "11 Feb 2026", status: "upcoming" },
-  { id: "st-005", testTitle: "Economics Test",         subject: "Economics",         type: "Test", timeAllowed: 45, class: "SS 2",  dateScheduled: "22 Mar 2026", dateCreated: "19 Feb 2026", status: "upcoming" },
-  { id: "st-006", testTitle: "Civic Education Exam",  subject: "Civic Education",  type: "Exam", timeAllowed: 90, class: "SS 2",  dateScheduled: "28 Mar 2026", dateCreated: "20 Feb 2026", status: "upcoming" },
-  { id: "st-007", testTitle: "Mathematics Test",       subject: "Mathematics",       type: "Test", timeAllowed: 45, class: "SS 1",  dateScheduled: "04 Apr 2026", dateCreated: "01 Mar 2026", status: "upcoming" },
-  { id: "st-008", testTitle: "Biology Exam",           subject: "Biology",           type: "Exam", timeAllowed: 90, class: "SS 3",  dateScheduled: "10 Apr 2026", dateCreated: "05 Mar 2026", status: "upcoming" },
-  { id: "st-009", testTitle: "English Language Quiz",  subject: "English Language",  type: "Quiz", timeAllowed: 30, class: "JSS 2", dateScheduled: "18 Apr 2026", dateCreated: "10 Mar 2026", status: "upcoming" },
+  { id: "st-001", testTitle: "Entrance Test",         subject: "General Studies",   type: "Exam", timeAllowed: 60, class: "JSS 1",  dateScheduled: "15 Jan 2026", dateCreated: "06 Jan 2026", status: "past" },
+  { id: "st-002", testTitle: "Mathematics Test",       subject: "Mathematics",       type: "Test", timeAllowed: 45, class: "SS 2A",  dateScheduled: "03 Feb 2026", dateCreated: "15 Jan 2026", status: "past" },
+  { id: "st-003", testTitle: "English Language Quiz",  subject: "English Language",  type: "Quiz", timeAllowed: 30, class: "JSS 1B", dateScheduled: "18 Feb 2026", dateCreated: "28 Jan 2026", status: "past" },
+  { id: "st-004", testTitle: "Biology Exam",           subject: "Biology",           type: "Exam", timeAllowed: 90, class: "SS 2A",  dateScheduled: "07 Mar 2026", dateCreated: "11 Feb 2026", status: "upcoming" },
+  { id: "st-005", testTitle: "Economics Test",         subject: "Economics",         type: "Test", timeAllowed: 45, class: "SS 2B",  dateScheduled: "22 Mar 2026", dateCreated: "19 Feb 2026", status: "upcoming" },
+  { id: "st-006", testTitle: "Civic Education Exam",   subject: "Civic Education",   type: "Exam", timeAllowed: 90, class: "SS 2",   dateScheduled: "28 Mar 2026", dateCreated: "20 Feb 2026", status: "upcoming" },
+  { id: "st-007", testTitle: "Mathematics Test",       subject: "Mathematics",       type: "Test", timeAllowed: 45, class: "SS 1",   dateScheduled: "04 Apr 2026", dateCreated: "01 Mar 2026", status: "upcoming" },
+  { id: "st-008", testTitle: "Biology Exam",           subject: "Biology",           type: "Exam", timeAllowed: 90, class: "SS 3",   dateScheduled: "10 Apr 2026", dateCreated: "05 Mar 2026", status: "upcoming" },
+  { id: "st-009", testTitle: "English Language Quiz",  subject: "English Language",  type: "Quiz", timeAllowed: 30, class: "JSS 2",  dateScheduled: "18 Apr 2026", dateCreated: "10 Mar 2026", status: "upcoming" },
 ];
 
 // ─── Results mock ──────────────────────────────────────────────────────────
@@ -200,6 +200,7 @@ export const mockResults: TestResult[] = [
 
 // ─── Select options ────────────────────────────────────────────────────────
 export const subjectOptions = [
+  { value: "general-studies",  label: "General Studies" },
   { value: "civic-education",  label: "Civic Education" },
   { value: "mathematics",      label: "Mathematics" },
   { value: "english-language", label: "English Language" },
@@ -208,6 +209,7 @@ export const subjectOptions = [
   { value: "physics",          label: "Physics" },
   { value: "chemistry",        label: "Chemistry" },
   { value: "government",       label: "Government" },
+
 ];
 
 export const classOptions = [
@@ -230,6 +232,18 @@ export const testTypeOptions = [
   { value: "Exam", label: "Exam" },
   { value: "Test", label: "Test" },
   { value: "Quiz", label: "Quiz" },
+];
+
+export const formatOptions = [
+  { value: "Internal", label: "Internal" },
+  { value: "External", label: "External" },
+];
+
+export const classGroupOptions = [
+  { value: "A", label: "A" },
+  { value: "B", label: "B" },
+  { value: "C", label: "C" },
+  { value: "D", label: "D" },
 ];
 
 export const testSelectOptions = mockTests.map((t) => ({
