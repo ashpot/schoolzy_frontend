@@ -11,6 +11,8 @@ export const mockLessonNotes: LessonNote[] = [
     teacher: { name: "Mr. Adebayo Oluwaseun" },
     dateUploaded: "01 Mar 2026",
     file: { type: "PDF", size: "1.2 MB", url: "#" },
+    description: "A comprehensive introduction to quadratic equations, covering factorisation, completing the square, and the quadratic formula. Includes worked examples and practice exercises for students.",
+    status: "pending",
   },
   {
     id: "ln-002",
@@ -22,6 +24,8 @@ export const mockLessonNotes: LessonNote[] = [
     teacher: { name: "Mrs. Chidinma Okonkwo" },
     dateUploaded: "03 Mar 2026",
     file: { type: "DOC", size: "890 KB", url: "#" },
+    description: "A structured lesson on comprehension strategies and summary writing techniques for junior secondary students.",
+    status: "pending",
   },
   {
     id: "ln-003",
@@ -33,6 +37,8 @@ export const mockLessonNotes: LessonNote[] = [
     teacher: { name: "Mr. Emeka Nwosu" },
     dateUploaded: "05 Mar 2026",
     file: { type: "PDF", size: "2.4 MB", url: "#" },
+    description: "An introduction to Newton's three laws of motion with real-world examples and diagrams.",
+    status: "pending",
   },
   {
     id: "ln-004",
@@ -44,6 +50,8 @@ export const mockLessonNotes: LessonNote[] = [
     teacher: { name: "Mrs. Fatima Bayo" },
     dateUploaded: "06 Mar 2026",
     file: { type: "DOC", size: "1.7 MB", url: "#" },
+    description: "Covers the structure, naming and properties of alkanes, alkenes and alkynes.",
+    status: "pending",
   },
   {
     id: "ln-005",
@@ -55,6 +63,8 @@ export const mockLessonNotes: LessonNote[] = [
     teacher: { name: "Mr. Tunde Adeyemi" },
     dateUploaded: "08 Mar 2026",
     file: { type: "PDF", size: "3.1 MB", url: "#" },
+    description: "Explains the process of photosynthesis and how plants obtain and use nutrients.",
+    status: "pending",
   },
   {
     id: "ln-006",
@@ -66,6 +76,8 @@ export const mockLessonNotes: LessonNote[] = [
     teacher: { name: "Mrs. Ngozi Eze" },
     dateUploaded: "10 Mar 2026",
     file: { type: "PPT", size: "5.8 MB", url: "#" },
+    description: "A breakdown of market equilibrium, price elasticity, and supply-demand curve shifts.",
+    status: "pending",
   },
   {
     id: "ln-007",
@@ -77,6 +89,8 @@ export const mockLessonNotes: LessonNote[] = [
     teacher: { name: "Mr. Ibrahim Mustafa" },
     dateUploaded: "12 Mar 2026",
     file: { type: "PDF", size: "1.9 MB", url: "#" },
+    description: "Traces the evolution of Nigeria's constitution from colonial rule to the present republic.",
+    status: "pending",
   },
   {
     id: "ln-008",
@@ -88,6 +102,8 @@ export const mockLessonNotes: LessonNote[] = [
     teacher: { name: "Mrs. Aisha Bello" },
     dateUploaded: "13 Mar 2026",
     file: { type: "DOC", size: "760 KB", url: "#" },
+    description: "A close reading of selected poems by Wole Soyinka, focusing on theme, tone and literary devices.",
+    status: "pending",
   },
 ];
 

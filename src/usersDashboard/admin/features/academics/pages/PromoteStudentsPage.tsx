@@ -5,11 +5,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { slideFromLeft } from "../animations/variants";
-import { usePromoteClass } from "../hooks/useAcademics";
+import { usePromoteClass, usePromoteStudent, useRepeatStudent, useUndoPromotion } from "../hooks/useAcademics";
 import PageHeader from "@/shared/ui/PageHeader";
 import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import FormHeader from "../components/shared/FormHeader";
+import type { PromoteStudentRow } from "../types/promoteStudents";
+import { mockPromoteStudents } from "../data/mockData";
+import PromoteStudentsTable from "../components/promote-students/PromoteStudentsTable";
 
 const schema = z.object({
   class: z.string().min(1, "Please select a class"),
@@ -18,7 +21,10 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 const PromoteStudentsPage: React.FC = () => {
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const [promoteRows, setPromoteRows] = useState<PromoteStudentRow[] | null>(null);
+  const promoteMutation = usePromoteStudent();
+  const repeatMutation = useRepeatStudent();
+  const undoMutation = useUndoPromotion();
   const loadMutation = usePromoteClass()
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
@@ -27,13 +33,41 @@ const PromoteStudentsPage: React.FC = () => {
   });
 
   const onSubmit = (values: FormValues) => {
-    loadMutation.mutate(values, {
-      onSuccess: () => {
-        setHasLoaded(true);
-        // TODO: Display the loaded student result data
-      },
-    });
-  };
+  loadMutation.mutate(values, {
+    onSuccess: () => {
+      setPromoteRows(mockPromoteStudents);
+        console.log("testing button")
+    },
+  });
+};
+
+const handlePromote = (id: string) => {
+  promoteMutation.mutate({ id, nextClass: "JSS 2A" }, {
+    onSuccess: () => {
+      setPromoteRows((prev) => prev?.map((r) => (r.id === id ? { ...r, status: "promoted" as const } : r)) ?? null);
+    },
+  });
+};
+
+const handleRepeat = (id: string) => {
+  repeatMutation.mutate({ id }, {
+    onSuccess: () => {
+      setPromoteRows((prev) => prev?.map((r) => (r.id === id ? { ...r, status: "repeated" as const, nextClass: r.currentClass } : r)) ?? null);
+    },
+  });
+};
+
+const handleUndo = (id: string) => {
+  undoMutation.mutate({ id }, {
+    onSuccess: () => {
+      setPromoteRows((prev) => prev?.map((r) => (r.id === id ? { ...r, status: "pending" as const } : r)) ?? null);
+    },
+  });
+};
+
+const handlePromoteSelected = (ids: string[]) => {
+  ids.forEach((id) => handlePromote(id));
+};
 
   const termOptions = [
     { value: "First Term", label: "First Term" },
@@ -71,7 +105,7 @@ const PromoteStudentsPage: React.FC = () => {
           <div className="grid md:grid-cols-2 gap-4 mb-5">
             <div>
               <FormSelect
-                label="Select Class"
+                label="Class"
                 placeholder="Select class"
                 options={termOptions}
                 isLoading={loadMutation.isPending}
@@ -82,7 +116,7 @@ const PromoteStudentsPage: React.FC = () => {
 
             <div>
               <FormSelect
-                label="Select Class Group"
+                label="Class Group"
                 placeholder="Select class group"
                 options={sessionOptions}
                 isLoading={loadMutation.isPending}
@@ -102,7 +136,7 @@ const PromoteStudentsPage: React.FC = () => {
       </motion.div>
 
       {/* Empty State */}
-      {!hasLoaded && (
+      {!promoteRows && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -122,7 +156,20 @@ const PromoteStudentsPage: React.FC = () => {
         </motion.div>
       )}
 
-      {/* TODO: Add result display section when hasLoaded is true */}
+      {promoteRows && (
+        <div className="mt-6">
+          <PromoteStudentsTable
+            className="JSS 1A"
+            promoteToOptions={[{ value: "JSS 2", label: "JSS 2" }, { value: "JSS 3", label: "JSS 3" }]}
+            rows={promoteRows}
+            onPromote={handlePromote}
+            onRepeat={handleRepeat}
+            onUndo={handleUndo}
+            onPromoteSelected={handlePromoteSelected}
+            isPending={promoteMutation.isPending || repeatMutation.isPending || undoMutation.isPending}
+          />
+        </div>
+      )}
     </div>
   );
 };

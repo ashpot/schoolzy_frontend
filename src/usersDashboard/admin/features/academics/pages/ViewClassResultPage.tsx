@@ -10,9 +10,13 @@ import PageHeader from "@/shared/ui/PageHeader";
 import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import FormHeader from "../components/shared/FormHeader";
+import type { ClassResultData } from "../types/classResult";
+import { mockClassResult } from "../data/mockData";
+import ClassResultStatCards from "../components/view-class-result/ClassResultStatCards";
+import ClassResultTable from "../components/view-class-result/ClassResultTable";
+import Button from "@/shared/ui/Button";
 
 const schema = z.object({
-  studentName: z.string().min(1, "Student name is required"),
   term: z.string().min(1, "Please select a term"),
   session: z.string().min(1, "Please select a session"),
   class: z.string().min(1, "Please select a class"),
@@ -21,7 +25,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 const ViewClassResultPage: React.FC = () => {
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const [classResult, setClassResult] = useState<ClassResultData | null>(null);
   const loadMutation = useLoadClassResult();
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
@@ -32,8 +36,8 @@ const ViewClassResultPage: React.FC = () => {
   const onSubmit = (values: FormValues) => {
     loadMutation.mutate(values, {
       onSuccess: () => {
-        setHasLoaded(true);
-        // TODO: Display the loaded student result data
+        setClassResult(mockClassResult);
+        console.log("testing button")
       },
     });
   };
@@ -73,7 +77,7 @@ const ViewClassResultPage: React.FC = () => {
           <div className="grid md:grid-cols-4 gap-4 mb-5">
             <div>
               <FormSelect
-                label="Select Class"
+                label="Class"
                 placeholder="Select class"
                 options={termOptions}
                 isLoading={loadMutation.isPending}
@@ -84,7 +88,7 @@ const ViewClassResultPage: React.FC = () => {
 
             <div>
               <FormSelect
-                label="Select Class Group"
+                label="Class Group"
                 placeholder="Select class group"
                 options={sessionOptions}
                 isLoading={loadMutation.isPending}
@@ -106,9 +110,9 @@ const ViewClassResultPage: React.FC = () => {
 
             <div>
               <FormSelect
-                label="SelectSession"
+                label="Session"
                 placeholder="Select session"
-                options={termOptions}
+                options={sessionOptions}
                 isLoading={loadMutation.isPending}
                 error={errors.session?.message}
                 {...register("session")}
@@ -126,7 +130,7 @@ const ViewClassResultPage: React.FC = () => {
       </motion.div>
 
       {/* Empty State */}
-      {!hasLoaded && (
+      {!classResult && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -146,7 +150,23 @@ const ViewClassResultPage: React.FC = () => {
         </motion.div>
       )}
 
-      {/* TODO: Add result display section when hasLoaded is true */}
+      {classResult && (
+        <div className="flex flex-col gap-6 mt-6">
+          <ClassResultStatCards result={classResult} />
+          <ClassResultTable result={classResult} />
+          <div className="flex justify-end">
+            <Button
+              variant="primary"
+              onClick={() => {
+                // TODO: Implement printable class result format (UI not provided yet)
+                console.log("View printable format for", classResult.className);
+              }}
+            >
+              View Printable Format
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

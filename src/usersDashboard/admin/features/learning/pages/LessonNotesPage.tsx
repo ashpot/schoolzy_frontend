@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, Plus, Search, Download, Trash2, Filter } from "lucide-react";
+import { BookOpen, Plus, Search, Filter, XCircle, CheckCircle2 } from "lucide-react";
 import type { LessonNote } from "../types";
-import { useDeleteLessonNote } from "../hooks/useLearning";
 import { fadeUp, rowVariant, staggerContainer } from "../animations/variants";
 import { classOptions, mockLessonNotes, subjectOptions, teacherOptions } from "../data/mockData";
 import Button from "@/shared/ui/Button";
@@ -10,10 +9,12 @@ import { FILE_TYPE_STYLES, ITEMS_PER_PAGE } from "../shared/utils/constants";
 import FilterPill from "../components/Lesson/FilterPill";
 import { avatarColor, getInitials } from "../shared/utils/helpers";
 import UploadModal from "../components/Lesson/UploadModal";
-
+import ViewLessonNoteModal from "../components/Lesson/ViewLessonNoteModal";
+import { useApproveLessonNote, useRejectLessonNote } from "../hooks/useLearning";
 
 export default function LessonNotesPage() {
   const [isModalOpen,   setIsModalOpen]   = useState(false);
+  const [selectedNote,  setSelectedNote]  = useState<LessonNote | null>(null);
   const [filterClass,   setFilterClass]   = useState("");
   const [filterSubject, setFilterSubject] = useState("");
   const [filterTeacher, setFilterTeacher] = useState("");
@@ -21,7 +22,8 @@ export default function LessonNotesPage() {
   const [currentPage,   setCurrentPage]   = useState(1);
   const [notes,         setNotes]         = useState<LessonNote[]>(mockLessonNotes);
 
-  const deleteMutation = useDeleteLessonNote();
+  const approveMutation = useApproveLessonNote();
+  const rejectMutation  = useRejectLessonNote();
 
   const filteredNotes = notes.filter((note) => {
     const matchClass   = filterClass   === "" || note.class        === classOptions.find((o) => o.value === filterClass)?.label;
@@ -37,10 +39,18 @@ export default function LessonNotesPage() {
     currentPage * ITEMS_PER_PAGE
   );
 
-  const handleDelete = (noteId: string) => {
-    deleteMutation.mutate(noteId, {
-      onSuccess: () => setNotes((prev) => prev.filter((n) => n.id !== noteId)),
-    });
+  const handleStatusChange = (noteId: string, status: "approved" | "rejected") => {
+    setNotes((prev) => prev.map((n) => (n.id === noteId ? { ...n, status } : n)));
+  };
+
+  const handleQuickApprove = (e: React.MouseEvent, noteId: string) => {
+    e.stopPropagation();
+    approveMutation.mutate({ noteId }, { onSuccess: () => handleStatusChange(noteId, "approved") });
+  };
+
+  const handleQuickReject = (e: React.MouseEvent, noteId: string) => {
+    e.stopPropagation();
+    rejectMutation.mutate({ noteId }, { onSuccess: () => handleStatusChange(noteId, "rejected") });
   };
 
   const resetPage = (setter: (v: string) => void) => (val: string) => {
@@ -120,7 +130,8 @@ export default function LessonNotesPage() {
                 <motion.tr
                   key={note.id}
                   variants={rowVariant}
-                  className="border-b border-border-line02 last:border-0 hover:bg-gray-50/50 transition-colors"
+                  onClick={() => setSelectedNote(note)}
+                  className="border-b border-border-line02 last:border-0 hover:bg-gray-50/50 transition-colors cursor-pointer"
                 >
                   <td className="px-6 py-4">
                     <p className="text-sm font-medium text-text-nav max-w-50 truncate">
@@ -150,18 +161,24 @@ export default function LessonNotesPage() {
                     <p className="text-xs text-text-muted mt-0.5">{note.file.size}</p>
                   </td>
                   <td className="px-4 py-4">
-                    <div className="flex items-center gap-1">
-                      <button type="button" title="Download" className="w-8 h-8 rounded-lg flex-center text-brand-primary hover:bg-blue-50 transition-colors">
-                        <Download className="w-4 h-4" />
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        title="Approve"
+                        onClick={(e) => handleQuickApprove(e, note.id)}
+                        disabled={approveMutation.isPending}
+                        className="w-8 h-8 rounded-lg flex-center text-white bg-success hover:bg-green-600 transition-colors disabled:opacity-50"
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
                       </button>
                       <button
                         type="button"
-                        title="Delete"
-                        onClick={() => handleDelete(note.id)}
-                        disabled={deleteMutation.isPending}
-                        className="w-8 h-8 rounded-lg flex-center text-danger hover:bg-red-50 transition-colors disabled:opacity-50"
+                        title="Reject"
+                        onClick={(e) => handleQuickReject(e, note.id)}
+                        disabled={rejectMutation.isPending}
+                        className="w-8 h-8 rounded-lg flex-center text-white bg-danger hover:bg-red-600 transition-colors disabled:opacity-50"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <XCircle className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
@@ -228,6 +245,16 @@ export default function LessonNotesPage() {
 
       <AnimatePresence>
         {isModalOpen && <UploadModal onClose={() => setIsModalOpen(false)} />}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {selectedNote && (
+          <ViewLessonNoteModal
+            note={selectedNote}
+            onClose={() => setSelectedNote(null)}
+            onStatusChange={handleStatusChange}
+          />
+        )}
       </AnimatePresence>
     </motion.div>
   );

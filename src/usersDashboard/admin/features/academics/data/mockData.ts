@@ -5,6 +5,8 @@ import type {
   Grade,
   PsychomotiveMetric,
 } from "../types";
+import type { StudentResultData } from "../types/studentResult";
+
 
 // ─── Subjects ─────────────────────────────────────────────────────────────────
 export const mockSubjects: Subject[] = [
@@ -154,3 +156,172 @@ export const mockPsychomotiveMetrics: PsychomotiveMetric[] = [
   { id: "PSY-019", title: "Balance & Posture", section: "Nursery" },
   { id: "PSY-020", title: "Rhythm & Movement", section: "Nursery" },
 ];
+
+export const PSYCHOMOTIVE_SKILLS = [
+  "Neatness", "Punctuality", "Attentiveness", "Cooperation", "Creativity",
+  "Sports", "Handling of Tools", "Drawing & Painting", "Music",
+] as const;
+
+export const mockStudentResult: StudentResultData = {
+  studentId: "3",
+  admissionNumber: "SCH/2024/001",
+  fullName: "Adaeze Okonkwo",
+  className: "JSS 3A",
+  section: "Junior Secondary",
+  term: "First Term",
+  session: "2025/2026",
+  positionInClass: "12th",
+  classSize: 54,
+  averageScore: 74,
+  overallGrade: "B",
+  attendancePercentage: 84,
+  subjects: [
+    { id: "1", subject: "Mathematics",       assignment: 5, assignmentMax: 10, test: 17, testMax: 20, exam: 42, examMax: 70, total: 64, totalMax: 100, grade: "C", subjectPosition: "7th" },
+    { id: "2", subject: "English Language",  assignment: 5, assignmentMax: 10, test: 15, testMax: 20, exam: 53, examMax: 70, total: 73, totalMax: 100, grade: "B", subjectPosition: "2nd" },
+    { id: "3", subject: "Basic Science",     assignment: 5, assignmentMax: 10, test: 13, testMax: 20, exam: 64, examMax: 70, total: 82, totalMax: 100, grade: "A", subjectPosition: "2nd" },
+    { id: "4", subject: "Social Studies",    assignment: 5, assignmentMax: 10, test: 20, testMax: 20, exam: 44, examMax: 70, total: 69, totalMax: 100, grade: "B", subjectPosition: "4th" },
+    { id: "5", subject: "French",            assignment: 5, assignmentMax: 10, test: 18, testMax: 20, exam: 55, examMax: 70, total: 78, totalMax: 100, grade: "B", subjectPosition: "3rd" },
+    { id: "6", subject: "CRS",               assignment: 5, assignmentMax: 10, test: 16, testMax: 20, exam: 66, examMax: 70, total: 87, totalMax: 100, grade: "A", subjectPosition: "1st" },
+    { id: "7", subject: "Agricultural Science", assignment: 5, assignmentMax: 10, test: 14, testMax: 20, exam: 46, examMax: 70, total: 65, totalMax: 100, grade: "B", subjectPosition: "2nd" },
+  ],
+  psychomotive: PSYCHOMOTIVE_SKILLS.map((skill) => ({ skill, score: 3, remark: "Good" })),
+  attendance: { timesSchoolOpened: 60, timesPresent: 55, timesEarly: 10, timesLate: 3, timesAbsent: 5 },
+  comments: { classTeacherComment: "", principalComment: "" },
+};
+
+import type { ClassResultData } from "../types/classResult";
+import type { ScoreRow } from "../types/manageScores";
+import type { PromoteStudentRow } from "../types/promoteStudents";
+
+const CLASS_STUDENT_NAMES = [
+  "Chidinma Harold", "Kelechi Igwe", "Femi Ade", "Emeka Okeke", "Zainab Yusuf",
+  "Chinedu Obi", "Ngozi Anthony", "Hassan Jibril", "Chidinma Lawrence", "James Ude",
+];
+
+export const mockClassResult: ClassResultData = {
+  className: "JSS 1A",
+  classGroup: "A",
+  term: "First Term",
+  session: "2025/2026",
+  totalStudents: 34,
+  classAverage: 65,
+  topStudent: "Chidinma",
+  passRate: 100,
+  subjects: ["English", "Mathematics", "Physics", "Biology"],
+  students: CLASS_STUDENT_NAMES.map((name, i) => ({
+    id: String(i + 1),
+    admissionNumber: `SCH/2025/${String(i + 1).padStart(3, "0")}`,
+    fullName: name,
+    scores: [
+      { subject: "English", score: 70 },
+      { subject: "Mathematics", score: 85 },
+      { subject: "Physics", score: 90 },
+      { subject: "Biology", score: 95 },
+    ],
+    totalSubjects: 4,
+    marksObtainable: 400,
+    cumulativeTotal: 340,
+  })),
+};
+
+const SCORE_ROW_NAMES = [
+  { name: "Chidinma Harold", subject: "Mathematics", assessment: "Classwork", score: 70 },
+  { name: "Kelechi Igwe", subject: "Mathematics", assessment: "Project", score: 83 },
+  { name: "Femi Ade", subject: "English", assessment: "Classwork", score: 65 },
+  { name: "Emeka Okeke", subject: "Mathematics", assessment: "Classwork", score: 45 },
+  { name: "Zainab Yusuf", subject: "Economics", assessment: "Classwork", score: 65 },
+  { name: "Chinedu Obi", subject: "Mathematics", assessment: "Classwork", score: 54 },
+  { name: "Ngozi Anthony", subject: "Mathematics", assessment: "Exam", score: null },
+  { name: "Hassan Jibril", subject: "Mathematics", assessment: "Classwork", score: null },
+  { name: "Chidinma Lawrence", subject: "Mathematics", assessment: "Classwork", score: null },
+  { name: "James Ude", subject: "Mathematics", assessment: "Classwork", score: null },
+];
+
+export const mockScoreRows: ScoreRow[] = SCORE_ROW_NAMES.map((row, i) => ({
+  id: String(i + 1),
+  dateUploaded: "Jul 14, 2026 8:55 AM",
+  term: "Second Term",
+  session: "2025/2026",
+  admissionNumber: `SCH/2025/${String(i + 1).padStart(3, "0")}`,
+  fullName: row.name,
+  subject: row.subject,
+  assessmentType: row.assessment,
+  score: row.score,
+  status: row.score !== null && i === 5 ? "saved" : "unsaved",
+}));
+
+const PROMOTE_STUDENT_STATUSES: Array<"pending" | "promoted" | "repeated"> = [
+  "pending", "promoted", "promoted", "repeated", "pending", "pending", "pending", "pending", "pending", "pending",
+];
+
+export const mockPromoteStudents: PromoteStudentRow[] = CLASS_STUDENT_NAMES.map((name, i) => ({
+  id: String(i + 1),
+  admissionNumber: `SCH/2025/${String(i + 1).padStart(3, "0")}`,
+  fullName: name,
+  currentClass: "JSS 1A",
+  nextClass: PROMOTE_STUDENT_STATUSES[i] === "repeated" ? "JSS 1A" : "JSS 2A",
+  status: PROMOTE_STUDENT_STATUSES[i],
+}));
+
+import type { AttendanceSummaryData, StudentAttendanceRow } from "../types/attendanceSummary";
+
+const ATTENDANCE_STUDENT_NAMES = [
+  "Chidinma Harold", "Kelechi Igwe", "Femi Ade", "Emeka Okeke", "Zainab Yusuf",
+  "Chinedu Obi", "Ngozi Anthony", "Hassan Jibril", "Chidinma Lawrence", "James Ude",
+];
+
+const ATTENDANCE_STATUS_BY_PERCENT = (pct: number) => {
+  if (pct >= 90) return "Excellent" as const;
+  if (pct >= 75) return "Good" as const;
+  if (pct >= 60) return "Fair" as const;
+  return "Poor" as const;
+};
+
+const attendancePercents = [72, 50, 80, 72, 80, 100, 80, 100, 65, 90];
+
+const mockAttendanceStudents: StudentAttendanceRow[] = ATTENDANCE_STUDENT_NAMES.map((name, i) => ({
+  id: String(i + 1),
+  admissionNumber: `SCH/2025/${String(i + 1).padStart(3, "0")}`,
+  fullName: name,
+  totalPresent: 45,
+  totalAbsent: 18,
+  lateEntries: 2,
+  attendancePercentage: attendancePercents[i],
+  status: ATTENDANCE_STATUS_BY_PERCENT(attendancePercents[i]),
+}));
+
+export const mockAttendanceSummary: AttendanceSummaryData = {
+  className: "JSS 1 A",
+  term: "First Term",
+  session: "2025/2026",
+  totalAttendanceRate: 77,
+  attendanceRateChange: 0,
+  presentDays: 556,
+  presentDaysStudentCount: 12,
+  presentDaysSpan: 65,
+  absentDays: 181,
+  absentDaysPercentage: 23,
+  lateEntries: 43,
+  lateEntriesPercentage: 6,
+  weeklyTrend: [
+    { week: "Wk 1", attendanceRate: 78, present: 32 },
+    { week: "Wk 2", attendanceRate: 76, present: 30 },
+    { week: "Wk 3", attendanceRate: 75, present: 29 },
+    { week: "Wk 4", attendanceRate: 83, present: 36 },
+    { week: "Wk 5", attendanceRate: 79, present: 33 },
+    { week: "Wk 6", attendanceRate: 88, present: 40 },
+    { week: "Wk 7", attendanceRate: 89, present: 41 },
+    { week: "Wk 8", attendanceRate: 76, present: 30 },
+    { week: "Wk 9", attendanceRate: 75, present: 29 },
+    { week: "Wk 10", attendanceRate: 85, present: 38 },
+    { week: "Wk 11", attendanceRate: 82, present: 35 },
+    { week: "Wk 12", attendanceRate: 74, present: 28 },
+    { week: "Wk 13", attendanceRate: 70, present: 25 },
+  ],
+  distribution: [
+    { label: "Present", percentage: 71, color: "#2563eb" },
+    { label: "Absent", percentage: 23, color: "#ef4444" },
+    { label: "Late", percentage: 6, color: "#f59e0b" },
+  ],
+  students: mockAttendanceStudents,
+};

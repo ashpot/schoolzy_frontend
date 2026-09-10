@@ -76,3 +76,33 @@ export const useSaveAttendance = () => {
     },
   });
 };
+
+export const useApproveLessonNote = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: { noteId: string; review?: string }) => {
+      // TODO: Replace with actual API call
+      // return api.post(`/lesson-notes/${payload.noteId}/approve`, { review: payload.review });
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      return { success: true, data: payload };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lesson-notes"] });
+    },
+  });
+};
+
+export const useRejectLessonNote = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: { noteId: string; review?: string }) => {
+      // TODO: Replace with actual API call
+      // return api.post(`/lesson-notes/${payload.noteId}/reject`, { review: payload.review });
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      return { success: true, data: payload };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lesson-notes"] });
+    },
+  });
+};

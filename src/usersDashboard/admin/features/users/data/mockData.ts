@@ -98,3 +98,20 @@ export const teacherBulkUploadConfig: BulkUploadConfig = {
   mockImportedCount: 40,
   mockSkippedCount: 2,
 };
+
+export interface SearchableStudent {
+  id: string;
+  name: string;
+  classLabel: string;
+}
+
+// TODO: Replace with real student list once GET /users/?role=Student is wired for parent-assignment search
+export const mockSearchableStudents: SearchableStudent[] = [
+  { id: "1", name: "Chidi Okafor", classLabel: "JSS 1A" },
+  { id: "2", name: "Halima Musa", classLabel: "JSS 2C" },
+  { id: "3", name: "Emeka Obi", classLabel: "SS 2B" },
+  { id: "4", name: "Fatima Sule", classLabel: "JSS 3A" },
+  { id: "5", name: "Ngozi Uche", classLabel: "SS 1C" },
+  { id: "6", name: "Tunde Fashola", classLabel: "JSS 1B" },
+  { id: "7", name: "Amina Yusuf", classLabel: "JSS 1A" },
+];
