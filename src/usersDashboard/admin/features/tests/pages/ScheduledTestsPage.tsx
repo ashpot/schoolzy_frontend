@@ -2,13 +2,22 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { fadeUp } from "../animations/variants";
 import { mockScheduledTests } from "../data/mockData";
-import ScheduledTestStats from "../components/scheduled-tests/ScheduledTestStats";
+import ScheduledTestStats, { type ScheduledStatusFilter } from "../components/scheduled-tests/ScheduledTestStats";
 import ScheduledTestForm from "../components/scheduled-tests/ScheduledTestForm";
 import ScheduledTestsTable from "../components/scheduled-tests/ScheduledTestTable";
-
+import type { ScheduledTest } from "../types";
 
 export default function ScheduledTestsPage() {
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [items, setItems] = useState<ScheduledTest[]>(mockScheduledTests);
+  const [statusFilter, setStatusFilter] = useState<ScheduledStatusFilter>("all");
+
+  const handleDelete = (id: string) => {
+    setItems((prev) => prev.filter((s) => s.id !== id));
+  };
+
+  const handleScheduled = () => {
+    // TODO: Once real API is wired, refetch/append the newly scheduled test to `items`
+  };
 
   return (
     <motion.div
@@ -24,9 +33,13 @@ export default function ScheduledTestsPage() {
         </p>
       </div>
 
-      <ScheduledTestStats scheduledTests={mockScheduledTests} />
-      <ScheduledTestForm onScheduled={() => setRefreshKey((k) => k + 1)} />
-      <ScheduledTestsTable refreshKey={refreshKey} />
+      <ScheduledTestStats
+        scheduledTests={items}
+        activeFilter={statusFilter}
+        onFilterChange={setStatusFilter}
+      />
+      <ScheduledTestForm onScheduled={handleScheduled} />
+      <ScheduledTestsTable items={items} onDelete={handleDelete} statusFilter={statusFilter} />
     </motion.div>
   );
 }

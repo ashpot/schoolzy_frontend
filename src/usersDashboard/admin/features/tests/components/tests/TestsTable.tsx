@@ -1,18 +1,24 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, ChevronDown, Eye, EyeOff, Copy, Pencil, Trash2 } from "lucide-react";
+import { Search, ChevronDown, Pencil, Trash2 } from "lucide-react";
 import { mockTests, subjectOptions, testTypeOptions } from "../../data/mockData";
 import { useDeleteTest } from "../../hooks/useTests";
 import { staggerContainer, rowVariant } from "../../animations/variants";
 import type { Test } from "../../types";
 
 const SELECT_CLS =
-  "appearance-none pl-3 pr-7 py-1.5 rounded-lg border border-border-line02 bg-white text-xs text-text-nav focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-primary)]/20 cursor-pointer";
+  "appearance-none pl-3 pr-7 py-1.5 rounded-lg border border-border-line02 bg-white text-xs text-text-nav focus:outline-none focus:ring-2 focus:ring-brand-primary/20 cursor-pointer";
 
 function getTimeBadge(mins: number): string {
   if (mins >= 90) return "bg-blue-50 text-blue-700 border-blue-100";
   if (mins >= 45) return "bg-amber-50 text-amber-700 border-amber-100";
   return "bg-green-50 text-green-700 border-green-100";
+}
+
+function getFormatBadge(format: string): string {
+  return format === "External"
+    ? "bg-purple-50 text-purple-700 border-purple-100"
+    : "bg-gray-100 text-gray-600 border-gray-200";
 }
 
 interface Props { refreshKey: number; }
@@ -22,23 +28,8 @@ export default function TestsTable({ refreshKey }: Props) {
   const [search,     setSearch]     = useState("");
   const [filterType, setFilterType] = useState("");
   const [filterSubj, setFilterSubj] = useState("");
-  const [revealed,   setRevealed]   = useState<Set<string>>(new Set());
-  const [copied,     setCopied]     = useState<string | null>(null);
 
   const deleteMutation = useDeleteTest();
-
-  const toggleReveal = (id: string) =>
-    setRevealed((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-
-  const handleCopy = (id: string, passcode: string) => {
-    navigator.clipboard.writeText(passcode);
-    setCopied(id);
-    setTimeout(() => setCopied(null), 2000);
-  };
 
   const handleDelete = (id: string) =>
     deleteMutation.mutate(id, {
@@ -74,7 +65,7 @@ export default function TestsTable({ refreshKey }: Props) {
               placeholder="Search tests..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-8 pr-4 py-1.5 rounded-lg border border-border-line02 bg-bg-input)] text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all w-44"
+              className="pl-8 pr-4 py-1.5 rounded-lg border border-border-line02 bg-bg-input text-xs text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all w-44"
             />
           </div>
 
@@ -110,83 +101,53 @@ export default function TestsTable({ refreshKey }: Props) {
           </thead>
 
           <motion.tbody key={refreshKey} variants={staggerContainer} initial="hidden" animate="show">
-            {filtered.map((test, idx) => {
-              const isRevealed  = revealed.has(test.id);
-              const isCopied    = copied === test.id;
-              return (
-                <motion.tr
-                  key={test.id}
-                  variants={rowVariant}
-                  className="border-b border-border-line02 last:border-0 hover:bg-gray-50/50 transition-colors"
-                >
-                  <td className="px-6 py-4 text-sm text-text-muted">{idx + 1}</td>
+            {filtered.map((test, idx) => (
+              <motion.tr
+                key={test.id}
+                variants={rowVariant}
+                className="border-b border-border-line02 last:border-0 hover:bg-gray-50/50 transition-colors"
+              >
+                <td className="px-6 py-4 text-sm text-text-muted">{idx + 1}</td>
 
-                  {/* Title & Class */}
-                  <td className="px-4 py-4">
-                    <p className="text-sm font-medium text-text-nav">{test.title}</p>
-                    <p className="text-xs text-text-muted mt-0.5">{test.class}</p>
-                  </td>
+                <td className="px-4 py-4">
+                  <p className="text-sm font-medium text-text-nav">{test.title}</p>
+                  <p className="text-xs text-text-muted mt-0.5">{test.class}</p>
+                </td>
 
-                  <td className="px-4 py-4 text-sm text-text-secondary">{test.subject}</td>
+                <td className="px-4 py-4 text-sm text-text-secondary">{test.subject}</td>
 
-                  {/* Passcode */}
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-mono tracking-widest text-text-secondary">
-                        {isRevealed ? test.passcode : "••••••••"}
-                      </span>
-                      <div className="flex items-center gap-0.5">
-                        <button
-                          type="button"
-                          onClick={() => toggleReveal(test.id)}
-                          className="w-6 h-6 rounded flex-center text-text-muted hover:text-text-nav hover:bg-gray-100 transition-colors"
-                        >
-                          {isRevealed ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleCopy(test.id, test.passcode)}
-                          title={isCopied ? "Copied!" : "Copy"}
-                          className={`w-6 h-6 rounded flex-center transition-colors ${
-                            isCopied
-                              ? "text-green-600 bg-green-50"
-                              : "text-text-muted hover:text-text-nav hover:bg-gray-100"
-                          }`}
-                        >
-                          <Copy className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  </td>
+                <td className="px-4 py-4">
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold ${getFormatBadge(test.format)}`}>
+                    {test.format}
+                  </span>
+                </td>
 
-                  {/* Time */}
-                  <td className="px-4 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold ${getTimeBadge(test.timeAllowed)}`}>
-                      {test.timeAllowed} Mins
-                    </span>
-                  </td>
+                <td className="px-4 py-4">
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full border text-xs font-semibold ${getTimeBadge(test.timeAllowed)}`}>
+                    {test.timeAllowed} Mins
+                  </span>
+                </td>
 
-                  <td className="px-4 py-4 text-sm text-text-muted">{test.dateCreated}</td>
+                <td className="px-4 py-4 text-sm text-text-muted">{test.dateCreated}</td>
 
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-1">
-                      <button type="button" title="Edit" className="w-8 h-8 rounded-lg flex-center text-brand-primary hover:bg-blue-50 transition-colors">
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        title="Delete"
-                        onClick={() => handleDelete(test.id)}
-                        disabled={deleteMutation.isPending}
-                        className="w-8 h-8 rounded-lg flex-center text-danger hover:bg-red-50 transition-colors disabled:opacity-50"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </motion.tr>
-              );
-            })}
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-2">
+                    <button type="button" title="Edit" className="w-8 h-8 rounded-lg flex-center text-brand-primary bg-blue-50 hover:bg-blue-100 transition-colors">
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      title="Delete"
+                      onClick={() => handleDelete(test.id)}
+                      disabled={deleteMutation.isPending}
+                      className="w-8 h-8 rounded-lg flex-center text-danger bg-red-50 hover:bg-red-100 transition-colors disabled:opacity-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
+              </motion.tr>
+            ))}
           </motion.tbody>
         </table>
       </div>
