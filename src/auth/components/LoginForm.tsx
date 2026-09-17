@@ -96,9 +96,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ tenant }) => {
           </motion.div>
 
           <motion.div variants={itemVariants} className="text-right">
-            <a href="/forgot-password" className="text-xs md:text-sm text-brand-primary hover:underline font-normal font-jakarta transition-colors">
+            <Link to="/auth/forgot-password" className="text-xs md:text-sm text-brand-primary hover:underline font-normal font-jakarta transition-colors">
               Forgot Password?
-            </a>
+            </Link>
           </motion.div>
 
           {mutation.isError && (

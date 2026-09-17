@@ -1,6 +1,6 @@
 import { AnimatePresence } from "framer-motion";
 import { Route, Routes, useLocation } from "react-router";
-import { RegistrationSuccessPage, SigninPage, SignupPage } from "@/auth";
+import { ForgotPasswordPage, RegistrationSuccessPage, SigninPage, SignupPage } from "@/auth";
 import { AdminDashboardLayout, AuthLayout, DashboardLayout, PublicLayout } from "./layouts";
 import { LandingPage } from "@/landing";
 import { DashboardHome } from "@/usersDashboard/admin/features/dashboard";
@@ -58,6 +58,7 @@ const AppRouter = () => {
         <Route element={<AuthLayout />}>
           <Route path="/auth/signup" element={<SignupPage />} />
           <Route path="/auth/signin" element={<SigninPage />} />
+          <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/auth/registration-success" element={<RegistrationSuccessPage />} />
         </Route>
 
