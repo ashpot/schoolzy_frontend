@@ -41,7 +41,7 @@ export default function HeroSection() {
             {/* CTAs */}
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
-                to="/signin"
+                to="/auth/signup"
               >
               <motion.button
                 whileHover={{ scale: 1.03 }}
@@ -52,7 +52,7 @@ export default function HeroSection() {
               </motion.button>
               </Link>
               <Link
-                to="/signin"
+                to="/auth/signup"
               >
                 <motion.button
                   whileHover={{ scale: 1.03 }}

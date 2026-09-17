@@ -1,4 +1,3 @@
-// src/auth/pages/RegistrationSuccessPage.tsx
 import { motion } from "framer-motion";
 import { CheckCircle2, ExternalLink } from "lucide-react";
 import { useLocation, Navigate } from "react-router-dom";

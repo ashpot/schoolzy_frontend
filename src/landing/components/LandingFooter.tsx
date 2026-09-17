@@ -33,16 +33,16 @@ const socialLinks = [
 
 const quickLinks = [
   { label: "Privacy Policy", href: "#" },
-  { label: "Referral Partnership Program", href: "#" },
+  { label: "Referral Partnership Program", href: "https://forms.gle/t3q2XmHAd6DzQKGW6" },
   { label: "Terms of Service", href: "#" },
 ];
 
 const resourceLinks = [
-  { label: "Ashpot Learn", href: "#" },
-  { label: "EarlyStart Coding Program for Kids", href: "#" },
-  { label: "Ashpot Community Facebook Group", href: "#" },
-  { label: "Ashpot Community Slack Workspace", href: "#" },
+  { label: "Earlystart App", href: "https://earlystart.app" },
+  { label: "Extralessons", href: "https://extralessons.online" },
+  { label: "Edtech Pulse Community", href: "https://chat.whatsapp.com/ElHpLgKQlYeHaQOKgHJYYh?s=cl&p=a&mlu=0&ilr=4" },
 ];
+
 
 const productLinks = [
   { label: "Features", href: "#features" },
@@ -65,9 +65,8 @@ export default function LandingFooter() {
             </a>
 
             <p className="mt-4 max-w-xs text-sm font-jakarta text-text-secondary leading-relaxed">
-              The all-in-one school management platform built for Nigerian
-              schools. Manage students, staff, results, fees, and CBT exams
-              from a single dashboard.
+              The all-in-one smart school management system built for African schools.
+              Manage students, staff, results, fees, and CBT exams from a single dashboard.
             </p>
           </div>
 
@@ -81,6 +80,7 @@ export default function LandingFooter() {
                 <li key={link.label}>
                   <a
                     href={link.href}
+                    target="_blank" rel="noopener noreferrer"
                     className="text-sm font-jakarta text-text-secondary hover:text-brand-primary transition-colors"
                   >
                     {link.label}
@@ -100,6 +100,7 @@ export default function LandingFooter() {
                 <li key={link.label}>
                   <a
                     href={link.href}
+                    target="_blank" rel="noopener noreferrer"
                     className="text-sm font-jakarta text-text-secondary hover:text-brand-primary transition-colors"
                   >
                     {link.label}
@@ -119,6 +120,7 @@ export default function LandingFooter() {
                 <li key={link.label}>
                   <a
                     href={link.href}
+                    target="_blank" rel="noopener noreferrer"
                     className="text-sm font-jakarta text-text-secondary hover:text-brand-primary transition-colors"
                   >
                     {link.label}
@@ -170,7 +172,7 @@ export default function LandingFooter() {
         {/* Bottom row */}
         <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-6 pt-8">
           <p className="text-sm font-jakarta text-text-secondary">
-            © 2026 Ashpot Micro Systems
+            © 2026 Ashpot
           </p>
 
           <div className="flex items-center gap-3">

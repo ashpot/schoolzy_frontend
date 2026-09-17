@@ -68,7 +68,7 @@ const TeacherForm: React.FC = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <UserCreatedModal
-        isOpen={false}
+        isOpen={!!createdUser}
         onClose={() => setCreatedUser(null)}
         fullName={createdUser?.fullName ?? ""}
         username={createdUser?.username ?? ""}
