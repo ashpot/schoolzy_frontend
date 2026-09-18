@@ -10,6 +10,7 @@ import Sponsor from '@/shared/ui/Sponsor';
 import { Link } from 'react-router';
 import { useLogin } from '../hooks/useLogin';
 import type { TenantInfo } from '@/shared/hooks/useTenantCheck';
+import { getRootDomainUrl } from '@/shared/utils/tenant';
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Username or email is required'),
@@ -128,9 +129,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ tenant }) => {
 
         <motion.p variants={itemVariants} className="text-body text-xs md:text-sm text-center mt-4 md:mt-6">
           Don't have an account?{' '}
-          <Link to="/auth/signup" className="text-brand-primary hover:underline font-normal transition-colors">
+          <a href={getRootDomainUrl('/auth/signup')} className="text-brand-primary hover:underline font-normal transition-colors">
             Signup
-          </Link>
+          </a>
         </motion.p>
 
         <motion.div variants={itemVariants}>

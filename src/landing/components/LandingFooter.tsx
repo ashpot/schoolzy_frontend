@@ -33,6 +33,7 @@ const socialLinks = [
 
 const quickLinks = [
   { label: "Privacy Policy", href: "#" },
+  { label: "Cookies Policy", href: "#" },
   { label: "Referral Partnership Program", href: "https://forms.gle/t3q2XmHAd6DzQKGW6" },
   { label: "Terms of Service", href: "#" },
 ];
@@ -158,9 +159,8 @@ export default function LandingFooter() {
                 +234 812 787 0201
               </li>
               <li className="text-sm font-jakarta text-text-secondary leading-relaxed">
-                11 Nicholas Street Aba, Abia State Nigeria.
+                11 Nicholas Street Aba, Abia State Nigeria. Postal Code: 450721.
                 <br />
-                Postal Code: 450721.
               </li>
             </ul>
           </div>
