@@ -5,6 +5,9 @@ import { staggerContainer, rowVariant } from "../../animations/variants";
 import { useDeleteSession } from "../../hooks/useSessions";
 import type { Session } from "../../types";
 import { dateFormat } from "../../utils/dateFormat";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
+import EditButton from "@/shared/ui/EditButton";
+import DeleteConfirmModal from "../../../users/components/shared/DeleteConfirmModal";
 
 interface Props {
   sessions: Session[];
@@ -13,9 +16,17 @@ interface Props {
 
 const ROWS_PER_PAGE = 8;
 
+const SESSION_EDIT_FIELDS: EditField<Session>[] = [
+  { key: "name", label: "Session Name" },
+  { key: "startDate", label: "Start Date", type: "date" },
+  { key: "endDate", label: "End Date", type: "date" },
+];
+
 export default function SessionsTable({ sessions, onDelete }: Props) {
   const [search, setSearch] = useState("");
   const [page, setPage]     = useState(1);
+  const [editingSession, setEditingSession] = useState<Session | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Session | null>(null);
   const deleteMutation      = useDeleteSession();
 
   const filtered = sessions.filter((s) =>
@@ -26,8 +37,21 @@ export default function SessionsTable({ sessions, onDelete }: Props) {
   const start     = (page - 1) * ROWS_PER_PAGE;
   const rows      = filtered.slice(start, start + ROWS_PER_PAGE);
 
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id, { onSuccess: () => onDelete(id) });
+  const handleConfirmDelete = () => {
+    if (pendingDelete) {
+      deleteMutation.mutate(pendingDelete.id, {
+        onSuccess: () => {
+          onDelete(pendingDelete.id);
+          setPendingDelete(null);
+        },
+      });
+    }
+  };
+
+  const handleSaveEdit = (updated: Session) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/academics/session/${updated.id}/`, updated)
+    console.log("Saving edited session:", updated);
+    setEditingSession(null);
   };
 
   return (
@@ -54,7 +78,7 @@ export default function SessionsTable({ sessions, onDelete }: Props) {
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm min-w-max">
           <thead>
             <tr className="border-b border-border-line02 bg-gray-50/60">
               {["ID", "NAME", "START DATE", "END DATE", "ACTIVE", "ACTIONS"].map((h) => (
@@ -114,14 +138,17 @@ export default function SessionsTable({ sessions, onDelete }: Props) {
                     <ActiveBadge active={session.isActive} />
                   </td>
                   <td className="px-6 py-4">
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(session.id)}
-                      disabled={deleteMutation.isPending}
-                      className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-red-50 transition-colors disabled:opacity-40"
-                    >
-                      <Trash2 size={15} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <EditButton onClick={() => setEditingSession(session)} />
+                      <button
+                        type="button"
+                        onClick={() => setPendingDelete(session)}
+                        disabled={deleteMutation.isPending}
+                        className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-red-50 transition-colors disabled:opacity-40"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
                   </td>
                 </motion.tr>
               ))
@@ -153,6 +180,23 @@ export default function SessionsTable({ sessions, onDelete }: Props) {
           </div>
         </div>
       )}
+
+      <EditModal<Session>
+        isOpen={editingSession !== null}
+        title="Session"
+        fields={SESSION_EDIT_FIELDS}
+        initialData={editingSession}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingSession(null)}
+      />
+
+      <DeleteConfirmModal
+        isOpen={pendingDelete !== null}
+        itemLabel={pendingDelete?.name ?? ""}
+        isDeleting={deleteMutation.isPending}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }

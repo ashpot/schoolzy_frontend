@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { UserCheck, Search } from "lucide-react";
+import { UserCheck, Search, Trash2 } from "lucide-react";
 import { staggerContainer, rowVariant } from "../../animations/variants";
 import { getClassBadgeColor } from "../../utils/colors";
 import type { FormTeacherAssignment } from "../../types";
+import { useDeleteAssignment } from "../../hooks/useSections";
 import NumberSpan from "../shared/NumberSpan";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
+import EditButton from "@/shared/ui/EditButton";
+import DeleteConfirmModal from "../../../users/components/shared/DeleteConfirmModal";
 
 interface Props { assignments: FormTeacherAssignment[]; onDelete: (id: string) => void; }
 
@@ -18,13 +22,40 @@ const AVATAR_COLORS = [
 const avatarColor = (name: string) => AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length];
 const getInitials = (name: string) => name.replace(/^(Mrs?|Ms)\.?\s/, "").split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase();
 
-export default function FormTeacherTable({ assignments }: Props) {
+const ASSIGNMENT_EDIT_FIELDS: EditField<FormTeacherAssignment>[] = [
+  { key: "className", label: "Class" },
+  { key: "teacherName", label: "Teacher Name" },
+  { key: "subject", label: "Subject" },
+];
+
+export default function FormTeacherTable({ assignments, onDelete }: Props) {
   const [search, setSearch] = useState("");
   const [page,   setPage]   = useState(1);
+  const [editingAssignment, setEditingAssignment] = useState<FormTeacherAssignment | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<FormTeacherAssignment | null>(null);
+
+  const deleteMutation = useDeleteAssignment();
 
   const filtered   = assignments.filter((a) => a.className.toLowerCase().includes(search.toLowerCase()) || a.teacherName.toLowerCase().includes(search.toLowerCase()));
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const handleConfirmDelete = () => {
+    if (pendingDelete) {
+      deleteMutation.mutate(pendingDelete.id, {
+        onSuccess: () => {
+          onDelete(pendingDelete.id);
+          setPendingDelete(null);
+        },
+      });
+    }
+  };
+
+  const handleSaveEdit = (updated: FormTeacherAssignment) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/academics/assigned-classes/${updated.id}/`, updated)
+    console.log("Saving edited form teacher assignment:", updated);
+    setEditingAssignment(null);
+  };
 
   return (
     <div className="bg-white rounded-2xl card-shadow overflow-hidden">
@@ -78,7 +109,17 @@ export default function FormTeacherTable({ assignments }: Props) {
                   <p className="text-xs text-text-muted">{a.assignedAt}</p>
                 </td>
                 <td className="py-3.5 px-4" onClick={(e) => e.stopPropagation()}>
-                  {/* <DeleteButton onDelete={() => deleteAssignment.mutate(a.id, { onSuccess: () => onDelete(a.id) })} /> */}
+                  <div className="flex items-center gap-1">
+                    <EditButton onClick={() => setEditingAssignment(a)} />
+                    <button
+                      type="button"
+                      onClick={() => setPendingDelete(a)}
+                      disabled={deleteMutation.isPending}
+                      className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-red-50 transition-colors disabled:opacity-40"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
                 </td>
               </motion.tr>
             ))}
@@ -98,6 +139,23 @@ export default function FormTeacherTable({ assignments }: Props) {
           </div>
         )}
       </div>
+
+      <EditModal<FormTeacherAssignment>
+        isOpen={editingAssignment !== null}
+        title="Assignment"
+        fields={ASSIGNMENT_EDIT_FIELDS}
+        initialData={editingAssignment}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingAssignment(null)}
+      />
+
+      <DeleteConfirmModal
+        isOpen={pendingDelete !== null}
+        itemLabel={pendingDelete ? `${pendingDelete.teacherName} — ${pendingDelete.className}` : ""}
+        isDeleting={deleteMutation.isPending}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }

@@ -28,7 +28,7 @@ const StudentForm: React.FC = () => {
     resolver: zodResolver(studentSchema),
     defaultValues: {
       firstName: "", lastName: "", email: "", classGroup: "" as unknown as number,
-      username: "", password: "", confirmPassword: "",
+      username: "", password: "", confirmPassword: "", admNo: "",
     },
   });
 
@@ -82,6 +82,11 @@ const StudentForm: React.FC = () => {
         animate="show"
         className="flex flex-col gap-3.5 mt-2"
       >
+        <motion.div variants={fieldFadeUp}>
+          <FormInput label="Admission Number" placeholder="e.g. ADM/2024/013"
+            isLoading={isPending} error={errors.admNo?.message} {...register("admNo")} />
+        </motion.div>
+
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
           <FormInput label="First Name" placeholder="First name"
             isLoading={isPending} error={errors.firstName?.message} {...register("firstName")} />
@@ -106,7 +111,7 @@ const StudentForm: React.FC = () => {
         </motion.div>
 
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Username" readOnly
+          <FormInput label="Username" placeholder="Create username"
             isLoading={isPending} {...register("username")} />
         </motion.div>
 

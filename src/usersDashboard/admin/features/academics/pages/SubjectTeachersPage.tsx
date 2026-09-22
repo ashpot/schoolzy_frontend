@@ -7,14 +7,22 @@ import { mockTeachers, mockClasses, mockSubjects } from "../data/mockData";
 import type { SubjectTeacherAssignment } from "../types";
 import AcademicsListPanel from "../components/shared/AcademicsListPanel";
 import DeleteButton from "../components/shared/DeleteButton";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
 import PageHeader from "@/shared/ui/PageHeader";
 import Button from "@/shared/ui/Button";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import FormSelect from "@/shared/ui/FormSelect";
 import { fieldFadeUp } from "@/shared/utils/animations";
 import FormHeader from "../components/shared/FormHeader";
+import EditButton from "@/shared/ui/EditButton";
 
 const AVAILABLE_SUBJECTS = mockSubjects.slice(0, 16);
+
+const ASSIGNMENT_EDIT_FIELDS: EditField<SubjectTeacherAssignment>[] = [
+  { key: "class", label: "Class" },
+  { key: "subjectName", label: "Subject Name" },
+  { key: "teacher", label: "Teacher" },
+];
 
 const SubjectTeachersPage: React.FC = () => {
   const [page, setPage] = useState(1);
@@ -27,6 +35,7 @@ const SubjectTeachersPage: React.FC = () => {
   const [teacherError, setTeacherError] = useState("");
   const [classError, setClassError] = useState("");
   const [subjectError, setSubjectError] = useState("");
+  const [editingAssignment, setEditingAssignment] = useState<SubjectTeacherAssignment | null>(null);
 
   const { data, isLoading } = useSubjectTeachersList(page, search, section);
   const assignMutation = useAssignSubjectTeacher();
@@ -68,6 +77,12 @@ const SubjectTeachersPage: React.FC = () => {
     );
   };
 
+  const handleSaveEdit = (updated: SubjectTeacherAssignment) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/academics/assigned-subjects/${updated.id}/`, updated)
+    console.log("Saving edited subject-teacher assignment:", updated);
+    setEditingAssignment(null);
+  };
+
   const columns = [
     {
       key: "num",
@@ -102,7 +117,8 @@ const SubjectTeachersPage: React.FC = () => {
       header: "Action",
       className: "text-right",
       render: (row: SubjectTeacherAssignment) => (
-        <div className="flex justify-end">
+        <div className="flex justify-end items-center gap-1">
+          <EditButton onClick={() => setEditingAssignment(row)} />
           <DeleteButton onConfirm={() => deleteMutation.mutate(row.id)} isLoading={deleteMutation.isPending} />
         </div>
       ),
@@ -243,6 +259,15 @@ const SubjectTeachersPage: React.FC = () => {
           />
         </motion.div>
       </div>
+
+      <EditModal<SubjectTeacherAssignment>
+        isOpen={editingAssignment !== null}
+        title="Assignment"
+        fields={ASSIGNMENT_EDIT_FIELDS}
+        initialData={editingAssignment}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingAssignment(null)}
+      />
     </div>
   );
 };

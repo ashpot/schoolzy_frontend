@@ -8,6 +8,9 @@ import FeeTypeBadge from "../shared/FeeTypeBadge";
 import SectionBadge from "../shared/SectionBadge";
 import type { AssignedFee } from "../../types";
 import Button from "@/shared/ui/Button";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
+import EditButton from "@/shared/ui/EditButton";
+import DeleteConfirmModal from "../../../users/components/shared/DeleteConfirmModal";
 
 interface AssignedFeesTableProps {
   items: AssignedFee[];
@@ -16,9 +19,16 @@ interface AssignedFeesTableProps {
 
 const PAGE_SIZE = 8;
 
+const ASSIGNED_FEE_EDIT_FIELDS: EditField<AssignedFee>[] = [
+  { key: "feeName", label: "Fee Name" },
+  { key: "amount", label: "Amount", type: "number" },
+];
+
 export default function AssignedFeesTable({ items, onDelete }: AssignedFeesTableProps) {
   const [search, setSearch] = useState("");
   const [page, setPage]     = useState(1);
+  const [editingFee, setEditingFee] = useState<AssignedFee | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<AssignedFee | null>(null);
   const deleteMutation = useDeleteAssignedFee();
 
   const filtered = useMemo(
@@ -31,8 +41,21 @@ export default function AssignedFeesTable({ items, onDelete }: AssignedFeesTable
   const start = filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const end   = Math.min(page * PAGE_SIZE, filtered.length);
 
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id, { onSuccess: () => onDelete(id) });
+  const handleConfirmDelete = () => {
+    if (pendingDelete) {
+      deleteMutation.mutate(pendingDelete.id, {
+        onSuccess: () => {
+          onDelete(pendingDelete.id);
+          setPendingDelete(null);
+        },
+      });
+    }
+  };
+
+  const handleSaveEdit = (updated: AssignedFee) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/finances/assign-fees/${updated.id}/`, updated)
+    console.log("Saving edited assigned fee:", updated);
+    setEditingFee(null);
   };
 
   return (
@@ -105,16 +128,17 @@ export default function AssignedFeesTable({ items, onDelete }: AssignedFeesTable
                     <SectionBadge label={item.sectionLabel} />
                   </td>
                   <td className="px-4 py-4 text-right">
-                    <div onClick={(e) => e.stopPropagation()}>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
-                          className="px-2! py-2!"
-                          leftIcon={<Trash2 size={15} />}
-                        >
-                          {""}
-                        </Button>
+                    <div className="flex justify-end items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                      <EditButton onClick={() => setEditingFee(item)} />
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={(e) => { e.stopPropagation(); setPendingDelete(item); }}
+                        className="px-2! py-2!"
+                        leftIcon={<Trash2 size={15} />}
+                      >
+                        {""}
+                      </Button>
                     </div>
                   </td>
                 </motion.tr>
@@ -144,6 +168,23 @@ export default function AssignedFeesTable({ items, onDelete }: AssignedFeesTable
             className="w-7 h-7 flex-center rounded-lg border border-border-line02 text-text-muted hover:border-brand-primary hover:text-brand-primary disabled:opacity-40 disabled:cursor-not-allowed transition-all text-sm">›</button>
         </div>
       </div>
+
+      <EditModal<AssignedFee>
+        isOpen={editingFee !== null}
+        title="Assigned Fee"
+        fields={ASSIGNED_FEE_EDIT_FIELDS}
+        initialData={editingFee}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingFee(null)}
+      />
+
+      <DeleteConfirmModal
+        isOpen={pendingDelete !== null}
+        itemLabel={pendingDelete?.feeName ?? ""}
+        isDeleting={deleteMutation.isPending}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }

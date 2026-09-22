@@ -60,16 +60,23 @@ export const useAttendance = () => {
   return { ...query, data };
 };
 
-// --- Live, but backend hasn't defined item shapes yet — these will just be empty arrays ---
-
 export const useRecentStudents = (page = 1, perPage = 6) => {
   const query = useAdminDashboard();
+  const students = query.data
+    ? query.data.recent_students.map((s) => ({
+        id: s.id,
+        name: `${s.first_name} ${s.last_name}`,
+        admNo: s.admission_number ?? "—",
+        photo: s.photo,
+      }))
+    : [];
+
   return {
     ...query,
     data: query.data
       ? {
-          data: query.data.recent_students.slice((page - 1) * perPage, page * perPage),
-          total: query.data.recent_students.length,
+          data: students.slice((page - 1) * perPage, page * perPage),
+          total: students.length,
           page,
           perPage,
         }

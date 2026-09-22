@@ -10,17 +10,25 @@ import type { Subject } from "../types";
 import AcademicsListPanel from "../components/shared/AcademicsListPanel";
 import SectionBadge from "../components/shared/SectionBadge";
 import DeleteButton from "../components/shared/DeleteButton";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
 import PageHeader from "@/shared/ui/PageHeader";
 import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import { fieldFadeUp } from "@/shared/utils/animations";
 import FormInput from "@/shared/ui/FormInput";
 import FormHeader from "../components/shared/FormHeader";
+import EditButton from "@/shared/ui/EditButton";
+
+const SUBJECT_EDIT_FIELDS: EditField<Subject>[] = [
+  { key: "subjectName", label: "Subject Name" },
+  { key: "code", label: "Subject Code" },
+];
 
 const SubjectsPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [section, setSection] = useState<string | "All">("All");
+  const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
 
   const { data, isLoading } = useSubjectsList(page, search, section);
   const { data: sections, isLoading: sectionsLoading } = useSectionsList();
@@ -39,6 +47,12 @@ const SubjectsPage: React.FC = () => {
 
   const onSubmit = (values: SubjectFormValues) => {
     addMutation.mutate(values, { onSuccess: () => reset() });
+  };
+
+  const handleSaveEdit = (updated: Subject) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/academics/subjects/${updated.id}/`, updated)
+    console.log("Saving edited subject:", updated);
+    setEditingSubject(null);
   };
 
   const columns = [
@@ -79,7 +93,8 @@ const SubjectsPage: React.FC = () => {
       header: "Action",
       className: "text-right",
       render: (row: Subject) => (
-        <div className="flex justify-end">
+        <div className="flex justify-end items-center gap-1">
+          <EditButton onClick={() => setEditingSubject(row)} />
           <DeleteButton onConfirm={() => deleteMutation.mutate(row.id)} isLoading={deleteMutation.isPending} />
         </div>
       ),
@@ -192,6 +207,15 @@ const SubjectsPage: React.FC = () => {
           />
         </motion.div>
       </div>
+
+      <EditModal<Subject>
+        isOpen={editingSubject !== null}
+        title="Subject"
+        fields={SUBJECT_EDIT_FIELDS}
+        initialData={editingSubject}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingSubject(null)}
+      />
     </div>
   );
 };

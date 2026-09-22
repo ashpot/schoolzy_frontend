@@ -6,6 +6,7 @@ import { TYPE_COLORS } from "../../data/mockData";
 import { formatNaira, formatDisplayDate, isToday } from "../../utils/inventoryUtils";
 import { useDeleteSale } from "../../hooks/useInventory";
 import { staggerContainer, rowVariant } from "../../animations/variants";
+import DeleteConfirmModal from "../../../users/components/shared/DeleteConfirmModal";
 
 const PAGE_SIZE = 8;
 
@@ -17,6 +18,7 @@ interface Props {
 export default function SalesTable({ sales, onDelete }: Props) {
   const [search, setSearch] = useState("");
   const [page, setPage]     = useState(1);
+  const [pendingDelete, setPendingDelete] = useState<SaleRecord | null>(null);
   const deleteMutation      = useDeleteSale();
 
   const filtered = sales.filter((s) =>
@@ -32,12 +34,19 @@ export default function SalesTable({ sales, onDelete }: Props) {
   const pageAmount = slice.reduce((s, r) => s + r.amount, 0);
   const grandTotal = sales.reduce((s, r) => s + r.amount, 0);
 
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id, { onSuccess: () => onDelete(id) });
+  const handleConfirmDelete = () => {
+    if (pendingDelete) {
+      deleteMutation.mutate(pendingDelete.id, {
+        onSuccess: () => {
+          onDelete(pendingDelete.id);
+          setPendingDelete(null);
+        },
+      });
+    }
   };
 
   return (
-    <div className="bg-white rounded-2xl card-shadow overflow-hidden">
+    <div className="bg-white rounded-2xl card-shadow overflow-x-auto">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-border-line02">
         <div className="flex items-center gap-2">
@@ -59,7 +68,7 @@ export default function SalesTable({ sales, onDelete }: Props) {
       </div>
 
       {/* Table */}
-      <table className="w-full text-sm">
+      <table className="w-full text-sm min-w-max">
         <thead>
           <tr className="border-b border-border-line02 bg-bg-input">
             <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wide px-5 py-3 w-10">#</th>
@@ -67,7 +76,7 @@ export default function SalesTable({ sales, onDelete }: Props) {
             <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wide px-4 py-3 w-16">Qty</th>
             <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wide px-4 py-3 w-32">Amount</th>
             <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wide px-4 py-3 w-32">Date</th>
-            <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wide px-5 py-3 w-16">Actions</th>
+            <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wide px-5 py-3 w-20">Actions</th>
           </tr>
         </thead>
         <motion.tbody key={safePage} variants={staggerContainer} initial="hidden" animate="show">
@@ -123,14 +132,16 @@ export default function SalesTable({ sales, onDelete }: Props) {
                     </div>
                   </td>
                   <td className="px-5 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(sale.id)}
-                      disabled={deleteMutation.isPending}
-                      className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-red-50 transition-colors disabled:opacity-40"
-                    >
-                      <Trash2 size={15} />
-                    </button>
+                    <div className="flex justify-end items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setPendingDelete(sale)}
+                        disabled={deleteMutation.isPending}
+                        className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-red-50 transition-colors disabled:opacity-40"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
                   </td>
                 </motion.tr>
               );
@@ -171,6 +182,14 @@ export default function SalesTable({ sales, onDelete }: Props) {
           </div>
         </div>
       )}
+
+      <DeleteConfirmModal
+        isOpen={pendingDelete !== null}
+        itemLabel={pendingDelete?.itemName ?? ""}
+        isDeleting={deleteMutation.isPending}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }

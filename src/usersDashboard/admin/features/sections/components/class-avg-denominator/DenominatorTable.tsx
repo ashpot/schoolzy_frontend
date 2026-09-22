@@ -1,23 +1,52 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Percent, Search } from "lucide-react";
+import { Percent, Search, Trash2 } from "lucide-react";
 import { staggerContainer, rowVariant } from "../../animations/variants";
 import { getClassBadgeColor } from "../../utils/colors";
 import type { Denominator } from "../../types";
+import { useDeleteDenominator } from "../../hooks/useSections";
 import NumberSpan from "../shared/NumberSpan";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
+import EditButton from "@/shared/ui/EditButton";
+import DeleteConfirmModal from "../../../users/components/shared/DeleteConfirmModal";
 
 interface Props { denominators: Denominator[]; onDelete: (id: string) => void; }
 
 const PAGE_SIZE = 10;
 
-export default function DenominatorTable({ denominators, /*onDelete*/ }: Props) {
+const DENOMINATOR_EDIT_FIELDS: EditField<Denominator>[] = [
+  { key: "denominator", label: "Denominator", type: "number" },
+  { key: "className", label: "Class" },
+];
+
+export default function DenominatorTable({ denominators, onDelete }: Props) {
   const [search, setSearch] = useState("");
   const [page,   setPage]   = useState(1);
-  // const deleteDenominator = useDeleteDenominator();
+  const [editingDenominator, setEditingDenominator] = useState<Denominator | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Denominator | null>(null);
+
+  const deleteMutation = useDeleteDenominator();
 
   const filtered   = denominators.filter((d) => d.className.toLowerCase().includes(search.toLowerCase()));
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const handleConfirmDelete = () => {
+    if (pendingDelete) {
+      deleteMutation.mutate(pendingDelete.id, {
+        onSuccess: () => {
+          onDelete(pendingDelete.id);
+          setPendingDelete(null);
+        },
+      });
+    }
+  };
+
+  const handleSaveEdit = (updated: Denominator) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/academics/denominators/${updated.id}/`, updated)
+    console.log("Saving edited denominator:", updated);
+    setEditingDenominator(null);
+  };
 
   return (
     <div className="bg-white rounded-2xl card-shadow overflow-hidden">
@@ -63,7 +92,17 @@ export default function DenominatorTable({ denominators, /*onDelete*/ }: Props) 
                   </span>
                 </td>
                 <td className="py-4 px-4" onClick={(e) => e.stopPropagation()}>
-                  {/* <DeleteButton onDelete={() => deleteDenominator.mutate(d.id, { onSuccess: () => onDelete(d.id) })} /> */}
+                  <div className="flex items-center gap-1">
+                    <EditButton onClick={() => setEditingDenominator(d)} />
+                    <button
+                      type="button"
+                      onClick={() => setPendingDelete(d)}
+                      disabled={deleteMutation.isPending}
+                      className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-red-50 transition-colors disabled:opacity-40"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
                 </td>
               </motion.tr>
             ))}
@@ -83,6 +122,23 @@ export default function DenominatorTable({ denominators, /*onDelete*/ }: Props) 
           </div>
         )}
       </div>
+
+      <EditModal<Denominator>
+        isOpen={editingDenominator !== null}
+        title="Denominator"
+        fields={DENOMINATOR_EDIT_FIELDS}
+        initialData={editingDenominator}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingDenominator(null)}
+      />
+
+      <DeleteConfirmModal
+        isOpen={pendingDelete !== null}
+        itemLabel={pendingDelete ? `${pendingDelete.className} denominator` : ""}
+        isDeleting={deleteMutation.isPending}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }

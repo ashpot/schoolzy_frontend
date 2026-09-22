@@ -9,6 +9,7 @@ import { assessmentTypeSchema, type AssessmentTypeFormValues } from "../schemas"
 import type { AssessmentType } from "../types";
 import AcademicsListPanel from "../components/shared/AcademicsListPanel";
 import DeleteButton from "../components/shared/DeleteButton";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
 import PageHeader from "@/shared/ui/PageHeader";
 import FormSelect from "@/shared/ui/FormSelect";
 import FormInput from "@/shared/ui/FormInput";
@@ -16,11 +17,20 @@ import { fieldFadeUp } from "@/shared/utils/animations";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import FormHeader from "../components/shared/FormHeader";
 import SectionBadge from "../components/shared/SectionBadge";
+import EditButton from "@/shared/ui/EditButton";
+
+const ASSESSMENT_TYPE_EDIT_FIELDS: EditField<AssessmentType>[] = [
+  { key: "name", label: "Name" },
+  { key: "code", label: "Code" },
+  { key: "terminalPercent", label: "Terminal %", type: "number" },
+  { key: "baseMark", label: "Base Mark", type: "number" },
+];
 
 const AssessmentTypesPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [section, setSection] = useState<string | "All">("All");
+  const [editingType, setEditingType] = useState<AssessmentType | null>(null);
 
   const { data, isLoading } = useAssessmentTypesList(page, search, section);
   const { data: sections, isLoading: sectionsLoading } = useSectionsList();
@@ -41,6 +51,12 @@ const AssessmentTypesPage: React.FC = () => {
     addMutation.mutate(values, { onSuccess: () => reset() });
   };
 
+  const handleSaveEdit = (updated: AssessmentType) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/academics/assessment-types/${updated.id}/`, updated)
+    console.log("Saving edited assessment type:", updated);
+    setEditingType(null);
+  };
+
   const columns = [
     {
       key: "num",
@@ -53,7 +69,7 @@ const AssessmentTypesPage: React.FC = () => {
     {
       key: "name",
       header: "Name",
-      render: (row: AssessmentType) => <span className="font-medium">{row.name}</span>,
+      render: (row: AssessmentType) => <span className="font-medium whitespace-nowrap">{row.name}</span>,
     },
     {
       key: "section",
@@ -89,7 +105,8 @@ const AssessmentTypesPage: React.FC = () => {
       header: "Action",
       className: "text-right",
       render: (row: AssessmentType) => (
-        <div className="flex justify-end">
+        <div className="flex justify-end items-center gap-1">
+          <EditButton onClick={() => setEditingType(row)} />
           <DeleteButton onConfirm={() => deleteMutation.mutate(row.id)} isLoading={deleteMutation.isPending} />
         </div>
       ),
@@ -216,6 +233,15 @@ const AssessmentTypesPage: React.FC = () => {
           />
         </motion.div>
       </div>
+
+      <EditModal<AssessmentType>
+        isOpen={editingType !== null}
+        title="Assessment Type"
+        fields={ASSESSMENT_TYPE_EDIT_FIELDS}
+        initialData={editingType}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingType(null)}
+      />
     </div>
   );
 };

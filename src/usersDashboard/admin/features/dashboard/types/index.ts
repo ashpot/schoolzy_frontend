@@ -3,15 +3,12 @@ export interface DashboardCardValue {
   subtext: number;
 }
  export interface RecentStudent {
-   id: string;
-   name: string;
-   admNo: string;
-   classLabel: string;
-   status: string;
-   fees: string;
-   gpa: number;
-   avatar: string;
- }
+  id: number;
+  first_name: string;
+  last_name: string;
+  admission_number: string | null;
+  photo: string;
+}
 export interface AdminDashboardResponse {
   cards: {
     term_earning: DashboardCardValue;

@@ -79,7 +79,7 @@ function AcademicsListPanel<T extends { id: string }>({
 
       {/* Table */}
       <div className="flex-1 overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full ">
           <thead>
             <tr className="border-b border-border-line02 bg-border-line02/40">
               {columns.map((col) => (

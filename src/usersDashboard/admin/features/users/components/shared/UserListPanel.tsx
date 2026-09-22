@@ -1,11 +1,15 @@
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { Search, SlidersHorizontal, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import type { FieldValues } from "react-hook-form";
 import { cn } from "@/shared/utils/cn";
 import { slideFromRight, listStagger, rowFadeUp } from "../../animations/variants";
 import type { ColumnDef } from "../../types";
+import DeleteConfirmModal from "./DeleteConfirmModal";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
+import EditButton from "@/shared/ui/EditButton";
 
-interface UserListPanelProps<T extends { id: string }> {
+interface UserListPanelProps<T extends FieldValues & { id: string }> {
   title: string;
   count: number;
   searchPlaceholder: string;
@@ -15,17 +19,26 @@ interface UserListPanelProps<T extends { id: string }> {
   page: number;
   perPage: number;
   isLoading?: boolean;
+  isDeleting?: boolean;
+  isSaving?: boolean;
+  getRowLabel?: (row: T) => string;
+  editFields?: EditField<T>[];
+  editTitle?: string;
   onSearch: (q: string) => void;
   onPageChange: (p: number) => void;
   onDelete: (id: string) => void;
+  onEdit?: (updated: T) => void;
 }
 
-function UserListPanel<T extends { id: string }>({
+function UserListPanel<T extends FieldValues & { id: string }>({
   title, count, searchPlaceholder, columns,
-  data, total, page, perPage, isLoading,
-  onSearch, onPageChange, onDelete,
+  data, total, page, perPage, isLoading, isDeleting, isSaving,
+  getRowLabel, editFields, editTitle,
+  onSearch, onPageChange, onDelete, onEdit,
 }: UserListPanelProps<T>) {
   const [search, setSearch] = useState("");
+  const [pendingDelete, setPendingDelete] = useState<T | null>(null);
+  const [editingRow, setEditingRow] = useState<T | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
   const totalPages = Math.max(1, Math.ceil(total / perPage));
@@ -34,6 +47,23 @@ function UserListPanel<T extends { id: string }>({
     setSearch(e.target.value);
     onSearch(e.target.value);
   };
+
+  const handleConfirmDelete = () => {
+    if (pendingDelete) {
+      onDelete(pendingDelete.id);
+      setPendingDelete(null);
+    }
+  };
+
+  const handleSaveEdit = (updated: T) => {
+    onEdit?.(updated);
+    setEditingRow(null);
+  };
+
+  const resolveLabel = (row: T) =>
+    getRowLabel ? getRowLabel(row) : "this record";
+
+  const canEdit = Boolean(editFields && editFields.length > 0 && onEdit);
 
   return (
     <motion.div
@@ -57,7 +87,6 @@ function UserListPanel<T extends { id: string }>({
           </motion.span>
         </div>
         <div className="flex items-center gap-2 flex-1 justify-end">
-          {/* Search */}
           <div className="relative max-w-48 w-full">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
             <input
@@ -67,7 +96,6 @@ function UserListPanel<T extends { id: string }>({
               className="w-full pl-8 pr-3 py-2 text-xs font-lato rounded-lg border border-border-line02 bg-bg-input text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-brand-primary/20 focus:border-brand-primary transition-all"
             />
           </div>
-          {/* Filter */}
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
@@ -82,18 +110,18 @@ function UserListPanel<T extends { id: string }>({
 
       {/* Table */}
       <div className="overflow-x-auto flex-1">
-        <table className="w-full text-sm font-lato">
+        <table className="w-full min-w-max text-sm font-lato">
           <thead>
             <tr className="bg-bg-soft border-b border-border-line02">
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={cn("text-left px-5 py-3 text-xs font-medium text-text-muted uppercase tracking-wide", col.className)}
+                  className={cn("text-left px-5 py-3 text-xs font-medium text-text-muted uppercase tracking-wide whitespace-nowrap", col.className)}
                 >
                   {col.header}
                 </th>
               ))}
-              <th className="text-left px-5 py-3 text-xs font-medium text-text-muted uppercase tracking-wide">Action</th>
+              <th className="text-left px-5 py-3 text-xs font-medium text-text-muted uppercase tracking-wide whitespace-nowrap">Action</th>
             </tr>
           </thead>
           <AnimatePresence mode="wait">
@@ -123,19 +151,24 @@ function UserListPanel<T extends { id: string }>({
                       className="cursor-default transition-colors"
                     >
                       {columns.map((col) => (
-                        <td key={col.key} className={cn("px-5 py-3.5", col.className)}>
+                        <td key={col.key} className={cn("px-5 py-3.5 whitespace-nowrap", col.className)}>
                           {col.render(row)}
                         </td>
                       ))}
                       <td className="px-5 py-3.5">
-                        <motion.button
-                          whileHover={{ scale: 1.18 }}
-                          whileTap={{ scale: 0.88 }}
-                          onClick={() => onDelete(row.id)}
-                          className="p-1.5 rounded-lg text-danger hover:bg-danger/10 transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </motion.button>
+                        <div className="flex items-center gap-1">
+                          {canEdit && (
+                            <EditButton onClick={() => setEditingRow(row)} />
+                          )}
+                          <motion.button
+                            whileHover={{ scale: 1.18 }}
+                            whileTap={{ scale: 0.88 }}
+                            onClick={() => setPendingDelete(row)}
+                            className="p-1.5 rounded-lg text-danger hover:bg-danger/10 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </motion.button>
+                        </div>
                       </td>
                     </motion.tr>
                   ))}
@@ -187,6 +220,26 @@ function UserListPanel<T extends { id: string }>({
           </motion.button>
         </div>
       </div>
+
+      <DeleteConfirmModal
+        isOpen={pendingDelete !== null}
+        itemLabel={pendingDelete ? resolveLabel(pendingDelete) : ""}
+        isDeleting={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
+
+      {canEdit && (
+        <EditModal<T>
+          isOpen={editingRow !== null}
+          title={editTitle ?? title}
+          fields={editFields!}
+          initialData={editingRow}
+          isSaving={isSaving}
+          onSave={handleSaveEdit}
+          onCancel={() => setEditingRow(null)}
+        />
+      )}
     </motion.div>
   );
 }

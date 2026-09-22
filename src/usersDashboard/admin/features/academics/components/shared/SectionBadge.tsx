@@ -20,7 +20,7 @@ function sectionColor(section: string) {
 
 const SectionBadge: React.FC<SectionBadgeProps> = ({ section }) => (
   <span
-    className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold font-lato ${sectionColor(section)}`}
+    className={`whitespace-nowrap inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold font-lato ${sectionColor(section)}`}
   >
     {section}
   </span>

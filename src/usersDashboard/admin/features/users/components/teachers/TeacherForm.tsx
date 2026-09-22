@@ -136,7 +136,7 @@ const TeacherForm: React.FC = () => {
         </motion.div>
 
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Username" readOnly
+          <FormInput label="Username" placeholder="Create username"
             isLoading={isPending} {...register("username")} />
         </motion.div>
 

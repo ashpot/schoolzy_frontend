@@ -11,7 +11,7 @@ import Button from "@/shared/ui/Button";
 
 interface Props { onSuccess: (d: Denominator) => void; }
 
-const QUICK_VALUES = [50, 100, 200, 300];
+const QUICK_VALUES = [7, 9, 15, 20];
 
 export default function DenominatorForm({ onSuccess }: Props) {
   const addDenominator = useAddDenominator();
@@ -40,11 +40,11 @@ export default function DenominatorForm({ onSuccess }: Props) {
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label className="text-sm font-medium text-label">Denominator *</label>
-            <span className="text-xs text-text-muted">Whole number, max 1000</span>
+            <span className="text-xs text-text-muted">Whole number, max 30</span>
           </div>
           <div className="relative">
             <Hash size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
-            <input type="number" min={1} max={1000} placeholder="e.g. 100" disabled={addDenominator.isPending}
+            <input type="number" min={1} max={30} placeholder="e.g. 30" disabled={addDenominator.isPending}
               className="w-full pl-8 pr-12 py-2.5 text-sm rounded-lg border border-border-line02 bg-bg-input outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all"
               {...register("denominator")} />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-text-muted font-medium">pts</span>

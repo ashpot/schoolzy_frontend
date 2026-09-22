@@ -10,6 +10,7 @@ import { SECTION_OPTIONS } from "../types";
 import type { PsychomotiveMetric } from "../types";
 import AcademicsListPanel from "../components/shared/AcademicsListPanel";
 import DeleteButton from "../components/shared/DeleteButton";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
 import PageHeader from "@/shared/ui/PageHeader";
 import FormHeader from "../components/shared/FormHeader";
 import FormInput from "@/shared/ui/FormInput";
@@ -17,8 +18,7 @@ import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import SectionBadge from "../components/shared/SectionBadge";
 import { fieldFadeUp } from "@/shared/utils/animations";
-
-
+import EditButton from "@/shared/ui/EditButton";
 
 const schema = z.object({
   title: z.string().min(2, "Title is required"),
@@ -26,10 +26,15 @@ const schema = z.object({
 });
 type FormValues = z.infer<typeof schema>;
 
+const PSYCH_EDIT_FIELDS: EditField<PsychomotiveMetric>[] = [
+  { key: "title", label: "Title" },
+];
+
 const PsychomotivePage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [section, setSection] = useState<string | "All">("All");
+  const [editingMetric, setEditingMetric] = useState<PsychomotiveMetric | null>(null);
 
   const { data, isLoading } = usePsychomotiveList(page, search, section);
   const addMutation = useAddPsychomotive();
@@ -42,6 +47,12 @@ const PsychomotivePage: React.FC = () => {
 
   const onSubmit = (values: FormValues) => {
     addMutation.mutate(values, { onSuccess: () => reset() });
+  };
+
+  const handleSaveEdit = (updated: PsychomotiveMetric) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/academics/psychomotive/${updated.id}/`, updated)
+    console.log("Saving edited psychomotive metric:", updated);
+    setEditingMetric(null);
   };
 
   const columns = [
@@ -66,7 +77,8 @@ const PsychomotivePage: React.FC = () => {
       header: "Action",
       className: "text-right",
       render: (row: PsychomotiveMetric) => (
-        <div className="flex justify-end">
+        <div className="flex justify-end items-center gap-1">
+          <EditButton onClick={() => setEditingMetric(row)} />
           <DeleteButton onConfirm={() => deleteMutation.mutate(row.id)} isLoading={deleteMutation.isPending} />
         </div>
       ),
@@ -139,6 +151,15 @@ const PsychomotivePage: React.FC = () => {
           />
         </motion.div>
       </div>
+
+      <EditModal<PsychomotiveMetric>
+        isOpen={editingMetric !== null}
+        title="Psychomotive Metric"
+        fields={PSYCH_EDIT_FIELDS}
+        initialData={editingMetric}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingMetric(null)}
+      />
     </div>
   );
 };

@@ -67,6 +67,19 @@ const ParentsPage: React.FC = () => {
           onSearch={handleSearch}
           onPageChange={setPage}
           onDelete={(id) => remove(id)}
+          getRowLabel={(p) => `${p.firstName} ${p.lastName}`}
+          editTitle="Parent"
+          editFields={[
+            { key: "firstName", label: "First Name" },
+            { key: "lastName", label: "Last Name" },
+            { key: "username", label: "Username" },
+            { key: "phone", label: "Phone" },
+            { key: "email", label: "Email" },
+          ]}
+          onEdit={(updated) => {
+            // TODO: Replace with actual API call e.g. api.patch(`/users/${updated.id}/`, updated)
+            console.log("Saving edited parent:", updated);
+          }}
         />
       </div>
     </motion.div>

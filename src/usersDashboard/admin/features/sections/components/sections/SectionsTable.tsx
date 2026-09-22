@@ -3,21 +3,48 @@ import { motion } from "framer-motion";
 import { Layers, Search, CheckCircle, EyeOff, Trash2 } from "lucide-react";
 import { staggerContainer, rowVariant } from "../../animations/variants";
 import type { SectionListItem } from "../../types";
+import { useDeleteSection } from "../../hooks/useSections";
 import NumberSpan from "../shared/NumberSpan";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
+import EditButton from "@/shared/ui/EditButton";
+import DeleteConfirmModal from "../../../users/components/shared/DeleteConfirmModal";
 
 interface Props { sections: SectionListItem[]; }
 
 const PAGE_SIZE = 8;
 
+const SECTION_EDIT_FIELDS: EditField<SectionListItem>[] = [
+  { key: "title", label: "Title" },
+  { key: "code", label: "Code" },
+];
+
 export default function SectionsTable({ sections }: Props) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [editingSection, setEditingSection] = useState<SectionListItem | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<SectionListItem | null>(null);
+
+  const deleteMutation = useDeleteSection();
 
   const filtered = sections.filter((s) =>
     s.title.toLowerCase().includes(search.toLowerCase()) || s.code.toLowerCase().includes(search.toLowerCase())
   );
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const handleConfirmDelete = () => {
+    if (pendingDelete) {
+      deleteMutation.mutate(String(pendingDelete.id), {
+        onSuccess: () => setPendingDelete(null),
+      });
+    }
+  };
+
+  const handleSaveEdit = (updated: SectionListItem) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/sections/sections/${updated.id}/`, updated)
+    console.log("Saving edited section:", updated);
+    setEditingSection(null);
+  };
 
   return (
     <div className="bg-white rounded-2xl card-shadow overflow-hidden">
@@ -65,9 +92,17 @@ export default function SectionsTable({ sections }: Props) {
                     : <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 text-gray-500 text-xs font-medium border border-gray-200"><EyeOff size={12} />No</span>}
                 </td>
                 <td className="py-3.5 px-4">
-                  <button type="button" disabled className="p-1.5 rounded-lg text-text-muted opacity-40 cursor-not-allowed" title="Delete not available yet">
-                    <Trash2 size={15} />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <EditButton onClick={() => setEditingSection(s)} />
+                    <button
+                      type="button"
+                      onClick={() => setPendingDelete(s)}
+                      disabled={deleteMutation.isPending}
+                      className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-red-50 transition-colors disabled:opacity-40"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
                 </td>
               </motion.tr>
             ))}
@@ -93,6 +128,23 @@ export default function SectionsTable({ sections }: Props) {
           </div>
         )}
       </div>
+
+      <EditModal<SectionListItem>
+        isOpen={editingSection !== null}
+        title="Section"
+        fields={SECTION_EDIT_FIELDS}
+        initialData={editingSection}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingSection(null)}
+      />
+
+      <DeleteConfirmModal
+        isOpen={pendingDelete !== null}
+        itemLabel={pendingDelete?.title ?? ""}
+        isDeleting={deleteMutation.isPending}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }

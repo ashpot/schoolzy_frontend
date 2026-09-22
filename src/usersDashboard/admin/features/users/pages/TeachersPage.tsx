@@ -81,6 +81,20 @@ const TeachersPage: React.FC = () => {
           onSearch={handleSearch}
           onPageChange={setPage}
           onDelete={(id) => remove(id)}
+          getRowLabel={(t) => `${t.firstName} ${t.lastName}`}
+          editTitle="Teacher"
+          editFields={[
+            { key: "firstName", label: "First Name" },
+            { key: "lastName", label: "Last Name" },
+            { key: "username", label: "Username" },
+            { key: "phone", label: "Phone" },
+            { key: "email", label: "Email" },
+            { key: "classLabel", label: "Class" },
+          ]}
+          onEdit={(updated) => {
+            // TODO: Replace with actual API call e.g. api.patch(`/users/${updated.id}/`, updated)
+            console.log("Saving edited teacher:", updated);
+          }}
         />
       </div>
     </motion.div>
