@@ -6,6 +6,9 @@ import { TYPE_COLORS } from "../../data/mockData";
 import { useDeleteItemType } from "../../hooks/useInventory";
 import { staggerContainer, rowVariant } from "../../animations/variants";
 import Button from "@/shared/ui/Button";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
+import EditButton from "@/shared/ui/EditButton";
+import DeleteConfirmModal from "../../../users/components/shared/DeleteConfirmModal";
 
 const PAGE_SIZE = 8;
 
@@ -14,9 +17,16 @@ interface Props {
   onDelete: (id: string) => void;
 }
 
+const ITEM_TYPE_EDIT_FIELDS: EditField<ItemType>[] = [
+  { key: "name", label: "Name" },
+  { key: "description", label: "Description" },
+];
+
 export default function ItemTypesTable({ types, onDelete }: Props) {
   const [search, setSearch]   = useState("");
   const [page, setPage]       = useState(1);
+  const [editingType, setEditingType] = useState<ItemType | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<ItemType | null>(null);
   const deleteMutation        = useDeleteItemType();
 
   const filtered = types.filter((t) =>
@@ -28,8 +38,21 @@ export default function ItemTypesTable({ types, onDelete }: Props) {
   const safePage  = Math.min(page, totalPages);
   const slice     = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id, { onSuccess: () => onDelete(id) });
+  const handleConfirmDelete = () => {
+    if (pendingDelete) {
+      deleteMutation.mutate(pendingDelete.id, {
+        onSuccess: () => {
+          onDelete(pendingDelete.id);
+          setPendingDelete(null);
+        },
+      });
+    }
+  };
+
+  const handleSaveEdit = (updated: ItemType) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/inventory/item-types/${updated.id}/`, updated)
+    console.log("Saving edited item type:", updated);
+    setEditingType(null);
   };
 
   return (
@@ -95,15 +118,18 @@ export default function ItemTypesTable({ types, onDelete }: Props) {
                   {type.description}
                 </td>
                 <td className="px-5 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex justify-end items-center gap-1">
+                    <EditButton onClick={() => setEditingType(type)} />
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={(e) => { e.stopPropagation(); handleDelete(type.id); }}
+                      onClick={(e) => { e.stopPropagation(); setPendingDelete(type); }}
                       className="px-2! py-2!"
                       leftIcon={<Trash2 size={15} />}
                     >
                       {""}
                     </Button>
+                  </div>
                 </td>
               </motion.tr>
             ))
@@ -142,6 +168,23 @@ export default function ItemTypesTable({ types, onDelete }: Props) {
           </div>
         </div>
       )}
+
+      <EditModal<ItemType>
+        isOpen={editingType !== null}
+        title="Item Type"
+        fields={ITEM_TYPE_EDIT_FIELDS}
+        initialData={editingType}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingType(null)}
+      />
+
+      <DeleteConfirmModal
+        isOpen={pendingDelete !== null}
+        itemLabel={pendingDelete?.name ?? ""}
+        isDeleting={deleteMutation.isPending}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { gradeSchema, type GradeFormValues } from "../schemas";
 import type { Grade, GradeRemark } from "../types";
 import AcademicsListPanel from "../components/shared/AcademicsListPanel";
 import DeleteButton from "../components/shared/DeleteButton";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
 import PageHeader from "@/shared/ui/PageHeader";
 import FormHeader from "../components/shared/FormHeader";
 import FormInput from "@/shared/ui/FormInput";
@@ -16,6 +17,7 @@ import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import { fieldFadeUp } from "@/shared/utils/animations";
 import SectionBadge from "../components/shared/SectionBadge";
+import EditButton from "@/shared/ui/EditButton";
 
 const PRESET_REMARKS: GradeRemark[] = ["Excellent", "Very Good", "Good", "Average", "Pass", "Fail"];
 
@@ -31,11 +33,19 @@ const remarkBadgeColor = (remark: string) => {
   return map[remark] ?? "text-text-secondary bg-gray-50 border-border-line02";
 };
 
+const GRADE_EDIT_FIELDS: EditField<Grade>[] = [
+  { key: "caption", label: "Caption" },
+  { key: "minScore", label: "Min Score", type: "number" },
+  { key: "maxScore", label: "Max Score", type: "number" },
+  { key: "remark", label: "Remark" },
+];
+
 const GradePage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [section, setSection] = useState<string | "All">("All");
   const [customRemark, setCustomRemark] = useState("");
+  const [editingGrade, setEditingGrade] = useState<Grade | null>(null);
 
   const { data, isLoading } = useGradesList(page, search, section);
   const { data: sections, isLoading: sectionsLoading } = useSectionsList();
@@ -56,6 +66,12 @@ const GradePage: React.FC = () => {
     addMutation.mutate(values, {
       onSuccess: () => { reset(); setCustomRemark(""); },
     });
+  };
+
+  const handleSaveEdit = (updated: Grade) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/academics/grade/${updated.id}/`, updated)
+    console.log("Saving edited grade:", updated);
+    setEditingGrade(null);
   };
 
   const columns = [
@@ -106,7 +122,8 @@ const GradePage: React.FC = () => {
       header: "Action",
       className: "text-right",
       render: (row: Grade) => (
-        <div className="flex justify-end">
+        <div className="flex justify-end items-center gap-1">
+          <EditButton onClick={() => setEditingGrade(row)} />
           <DeleteButton onConfirm={() => deleteMutation.mutate(row.id)} isLoading={deleteMutation.isPending} />
         </div>
       ),
@@ -243,6 +260,15 @@ const GradePage: React.FC = () => {
           />
         </motion.div>
       </div>
+
+      <EditModal<Grade>
+        isOpen={editingGrade !== null}
+        title="Grade"
+        fields={GRADE_EDIT_FIELDS}
+        initialData={editingGrade}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingGrade(null)}
+      />
     </div>
   );
 };

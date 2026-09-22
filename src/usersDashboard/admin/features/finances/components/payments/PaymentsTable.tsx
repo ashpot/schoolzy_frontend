@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Users, Search, Clock, Trash2, } from "lucide-react";
+import { Users, Search, Clock, Trash2 } from "lucide-react";
 import { staggerContainer, rowVariant } from "../../animations/variants";
 import { useDeletePayment } from "../../hooks/useFinances";
 import { formatNaira, formatDisplayDate } from "../../utils/feeUtils";
@@ -10,6 +10,9 @@ import SectionBadge from "../shared/SectionBadge";
 import BalanceBadge from "./BalanceBadge";
 import type { Payment } from "../../types";
 import Button from "@/shared/ui/Button";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
+import EditButton from "@/shared/ui/EditButton";
+import DeleteConfirmModal from "../../../users/components/shared/DeleteConfirmModal";
 
 interface PaymentsTableProps {
   items: Payment[];
@@ -18,9 +21,15 @@ interface PaymentsTableProps {
 
 const PAGE_SIZE = 8;
 
+const PAYMENT_EDIT_FIELDS: EditField<Payment>[] = [
+  { key: "amount", label: "Amount Paid", type: "number" },
+];
+
 export default function PaymentsTable({ items, onDelete }: PaymentsTableProps) {
   const [search, setSearch] = useState("");
   const [page, setPage]     = useState(1);
+  const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Payment | null>(null);
   const deleteMutation = useDeletePayment();
 
   const filtered = useMemo(
@@ -37,8 +46,21 @@ export default function PaymentsTable({ items, onDelete }: PaymentsTableProps) {
   const start = filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const end   = Math.min(page * PAGE_SIZE, filtered.length);
 
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id, { onSuccess: () => onDelete(id) });
+  const handleConfirmDelete = () => {
+    if (pendingDelete) {
+      deleteMutation.mutate(pendingDelete.id, {
+        onSuccess: () => {
+          onDelete(pendingDelete.id);
+          setPendingDelete(null);
+        },
+      });
+    }
+  };
+
+  const handleSaveEdit = (updated: Payment) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/finances/payments/${updated.id}/`, updated)
+    console.log("Saving edited payment:", updated);
+    setEditingPayment(null);
   };
 
   return (
@@ -66,7 +88,7 @@ export default function PaymentsTable({ items, onDelete }: PaymentsTableProps) {
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm min-w-max">
           <thead>
             <tr className="border-b border-border-line02 bg-gray-50/60">
               <th className="px-6 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wide w-12">#</th>
@@ -155,16 +177,17 @@ export default function PaymentsTable({ items, onDelete }: PaymentsTableProps) {
                     <BalanceBadge amount={payment.amount} totalFeeAmount={payment.totalFeeAmount} />
                   </td>
                   <td className="px-4 py-4 text-right">
-                    <div onClick={(e) => e.stopPropagation()}>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={(e) => { e.stopPropagation(); handleDelete(payment.id); }}
-                          className="px-2! py-2!"
-                          leftIcon={<Trash2 size={15} />}
-                        >
-                          {""}
-                        </Button>
+                    <div className="flex justify-end items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                      <EditButton onClick={() => setEditingPayment(payment)} />
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={(e) => { e.stopPropagation(); setPendingDelete(payment); }}
+                        className="px-2! py-2!"
+                        leftIcon={<Trash2 size={15} />}
+                      >
+                        {""}
+                      </Button>
                     </div>
                   </td>
                 </motion.tr>
@@ -194,6 +217,23 @@ export default function PaymentsTable({ items, onDelete }: PaymentsTableProps) {
             className="w-7 h-7 flex-center rounded-lg border border-border-line02 text-text-muted hover:border-brand-primary hover:text-brand-primary disabled:opacity-40 disabled:cursor-not-allowed transition-all text-sm">›</button>
         </div>
       </div>
+
+      <EditModal<Payment>
+        isOpen={editingPayment !== null}
+        title="Payment"
+        fields={PAYMENT_EDIT_FIELDS}
+        initialData={editingPayment}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingPayment(null)}
+      />
+
+      <DeleteConfirmModal
+        isOpen={pendingDelete !== null}
+        itemLabel={pendingDelete?.studentName ?? ""}
+        isDeleting={deleteMutation.isPending}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }

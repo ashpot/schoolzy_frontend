@@ -4,9 +4,11 @@ import { Tag, Search, TagsIcon, Trash2 } from "lucide-react";
 import { staggerContainer, rowVariant } from "../../animations/variants";
 import { useDeleteFeeType } from "../../hooks/useFinances";
 import FeeTypeBadge from "../shared/FeeTypeBadge";
-// import DeleteButton from "@/shared/ui/DeleteButton";
 import type { FeeType } from "../../types";
 import Button from "@/shared/ui/Button";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
+import EditButton from "@/shared/ui/EditButton";
+import DeleteConfirmModal from "../../../users/components/shared/DeleteConfirmModal";
 
 interface FeeTypeTableProps {
   items: FeeType[];
@@ -15,9 +17,16 @@ interface FeeTypeTableProps {
 
 const PAGE_SIZE = 8;
 
+const FEE_TYPE_EDIT_FIELDS: EditField<FeeType>[] = [
+  { key: "name", label: "Name" },
+  { key: "description", label: "Description" },
+];
+
 export default function FeeTypeTable({ items, onDelete }: FeeTypeTableProps) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [editingType, setEditingType] = useState<FeeType | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<FeeType | null>(null);
   const deleteMutation = useDeleteFeeType();
 
   const filtered = useMemo(
@@ -36,8 +45,21 @@ export default function FeeTypeTable({ items, onDelete }: FeeTypeTableProps) {
     return map;
   }, [items]);
 
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id, { onSuccess: () => onDelete(id) });
+  const handleConfirmDelete = () => {
+    if (pendingDelete) {
+      deleteMutation.mutate(pendingDelete.id, {
+        onSuccess: () => {
+          onDelete(pendingDelete.id);
+          setPendingDelete(null);
+        },
+      });
+    }
+  };
+
+  const handleSaveEdit = (updated: FeeType) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/finances/fee-type/${updated.id}/`, updated)
+    console.log("Saving edited fee type:", updated);
+    setEditingType(null);
   };
 
   return (
@@ -102,16 +124,17 @@ export default function FeeTypeTable({ items, onDelete }: FeeTypeTableProps) {
                     {item.description}
                   </td>
                   <td className="px-4 py-4 text-right">
-                    <div onClick={(e) => e.stopPropagation()}>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
-                          className="px-2! py-2!"
-                          leftIcon={<Trash2 size={15} />}
-                        >
-                          {""}
-                        </Button>
+                    <div className="flex justify-end items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                      <EditButton onClick={() => setEditingType(item)} />
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={(e) => { e.stopPropagation(); setPendingDelete(item); }}
+                        className="px-2! py-2!"
+                        leftIcon={<Trash2 size={15} />}
+                      >
+                        {""}
+                      </Button>
                     </div>
                   </td>
                 </motion.tr>
@@ -139,6 +162,23 @@ export default function FeeTypeTable({ items, onDelete }: FeeTypeTableProps) {
             className="w-7 h-7 flex-center rounded-lg border border-border-line02 text-text-muted hover:border-brand-primary hover:text-brand-primary disabled:opacity-40 disabled:cursor-not-allowed transition-all text-sm">›</button>
         </div>
       </div>
+
+      <EditModal<FeeType>
+        isOpen={editingType !== null}
+        title="Fee Type"
+        fields={FEE_TYPE_EDIT_FIELDS}
+        initialData={editingType}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingType(null)}
+      />
+
+      <DeleteConfirmModal
+        isOpen={pendingDelete !== null}
+        itemLabel={pendingDelete?.name ?? ""}
+        isDeleting={deleteMutation.isPending}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }

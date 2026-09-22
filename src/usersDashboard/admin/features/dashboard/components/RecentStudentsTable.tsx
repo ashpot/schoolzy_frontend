@@ -1,37 +1,21 @@
 import React, { useState, useRef } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
-import { Trash2, ChevronLeft, ChevronRight, Plus, Users } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Users } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 import { useRecentStudents } from "../hooks/useDashboardStats";
 import { listContainer, fadeUpFast, fadeUp } from "../animation/variant";
 
-const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
-  const styles: Record<string, string> = {
-    Active:    "bg-success/10 text-success",
-    Suspended: "bg-danger/10 text-danger",
-    Inactive:  "bg-text-muted/10 text-text-muted",
-  };
-  return (
-    <span className={cn("px-2.5 py-1 rounded-full text-xs font-lato font-medium", styles[status] ?? styles.Inactive)}>
-      {status}
-    </span>
-  );
-};
+const AvatarInitials: React.FC<{ name: string; photo?: string }> = ({ name, photo }) => {
+  if (photo) {
+    return (
+      <img
+        src={photo}
+        alt={name}
+        className="w-8 h-8 rounded-full object-cover shrink-0"
+      />
+    );
+  }
 
-const FeesBadge: React.FC<{ fees: string }> = ({ fees }) => {
-  const styles: Record<string, string> = {
-    Paid:    "bg-success/10 text-success",
-    Partial: "bg-warning/10 text-warning",
-    Unpaid:  "bg-danger/10 text-danger",
-  };
-  return (
-    <span className={cn("px-2.5 py-1 rounded-full text-xs font-lato font-medium", styles[fees] ?? "")}>
-      {fees}
-    </span>
-  );
-};
-
-const AvatarInitials: React.FC<{ name: string }> = ({ name }) => {
   const initials = name?.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
   const colors = ["bg-brand-primary", "bg-success", "bg-warning", "bg-purple-500", "bg-pink-500"];
   const color  = colors[name?.charCodeAt(0) % colors.length];
@@ -89,7 +73,7 @@ const RecentStudentsTable: React.FC = () => {
         <table className="w-full text-sm font-lato">
           <thead>
             <tr className="bg-bg-soft text-text-muted text-xs uppercase tracking-wide">
-              {["Student Name", "Adm. No.", "Class", "Status", "Fees", "GPA", "Action"].map((h) => (
+              {["Student Name", "Adm. No."].map((h) => (
                 <th key={h} className="text-left px-5 py-3 font-medium">{h}</th>
               ))}
             </tr>
@@ -106,7 +90,7 @@ const RecentStudentsTable: React.FC = () => {
               {isLoading
                 ? Array.from({ length: 6 }).map((_, i) => (
                     <motion.tr key={i} variants={fadeUpFast}>
-                      {Array.from({ length: 7 }).map((_, j) => (
+                      {Array.from({ length: 2 }).map((_, j) => (
                         <td key={j} className="px-5 py-3.5">
                           <div className="h-4 bg-border-line02 rounded animate-pulse" />
                         </td>
@@ -116,7 +100,7 @@ const RecentStudentsTable: React.FC = () => {
                 : data && data.data.length === 0
                 ? (
                     <motion.tr variants={fadeUpFast}>
-                      <td colSpan={7} className="px-5 py-12 text-center">
+                      <td colSpan={2} className="px-5 py-12 text-center">
                         <div className="flex flex-col items-center gap-2">
                           <div className="w-10 h-10 rounded-full bg-bg-soft flex-center">
                             <Users className="w-5 h-5 text-text-muted" />
@@ -136,24 +120,11 @@ const RecentStudentsTable: React.FC = () => {
                     >
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
-                          <AvatarInitials name={student.name} />
+                          <AvatarInitials name={student.name} photo={student.photo} />
                           <span className="font-medium text-text-primary">{student.name}</span>
                         </div>
                       </td>
                       <td className="px-4 py-3.5 text-text-muted">{student.admNo}</td>
-                      <td className="px-4 py-3.5 text-text-secondary">{student.classLabel}</td>
-                      <td className="px-4 py-3.5"><StatusBadge status={student.status} /></td>
-                      <td className="px-4 py-3.5"><FeesBadge fees={student.fees} /></td>
-                      <td className="px-4 py-3.5 font-semibold text-text-primary">{student.gpa}</td>
-                      <td className="px-4 py-3.5">
-                        <motion.button
-                          whileHover={{ scale: 1.15 }}
-                          whileTap={{ scale: 0.9 }}
-                          className="p-1.5 rounded-lg text-danger hover:bg-danger/10 transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </motion.button>
-                      </td>
                     </motion.tr>
                   ))}
             </motion.tbody>

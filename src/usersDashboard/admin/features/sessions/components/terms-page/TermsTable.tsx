@@ -5,6 +5,9 @@ import { staggerContainer, rowVariant } from "../../animations/variants";
 import { useDeleteTerm } from "../../hooks/useSessions";
 import type { Term } from "../../types";
 import { dateFormat } from "../../utils/dateFormat";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
+import EditButton from "@/shared/ui/EditButton";
+import DeleteConfirmModal from "../../../users/components/shared/DeleteConfirmModal";
 
 interface Props {
   terms: Term[];
@@ -13,9 +16,18 @@ interface Props {
 
 const ROWS_PER_PAGE = 8;
 
+const TERM_EDIT_FIELDS: EditField<Term>[] = [
+  { key: "name", label: "Term Name" },
+  { key: "tag", label: "Tag" },
+  { key: "startDate", label: "Start Date", type: "date" },
+  { key: "endDate", label: "End Date", type: "date" },
+];
+
 export default function TermsTable({ terms, onDelete }: Props) {
   const [search, setSearch] = useState("");
   const [page, setPage]     = useState(1);
+  const [editingTerm, setEditingTerm] = useState<Term | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Term | null>(null);
   const deleteMutation      = useDeleteTerm();
 
   const filtered = terms.filter(
@@ -28,8 +40,21 @@ export default function TermsTable({ terms, onDelete }: Props) {
   const start     = (page - 1) * ROWS_PER_PAGE;
   const rows      = filtered.slice(start, start + ROWS_PER_PAGE);
 
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id, { onSuccess: () => onDelete(id) });
+  const handleConfirmDelete = () => {
+    if (pendingDelete) {
+      deleteMutation.mutate(pendingDelete.id, {
+        onSuccess: () => {
+          onDelete(pendingDelete.id);
+          setPendingDelete(null);
+        },
+      });
+    }
+  };
+
+  const handleSaveEdit = (updated: Term) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/academics/terms/${updated.id}/`, updated)
+    console.log("Saving edited term:", updated);
+    setEditingTerm(null);
   };
 
   return (
@@ -56,10 +81,10 @@ export default function TermsTable({ terms, onDelete }: Props) {
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm min-w-max">
           <thead>
             <tr className="border-b border-border-line02 bg-gray-50/60">
-              {["ID", "NAME", "SESSION", "START DATE", "END DATE", "ACTIVE", "RESULT PUB.", ""].map((h, i) => (
+              {["ID", "NAME", "SESSION", "START DATE", "END DATE", "ACTIVE", "RESULT PUB.", "ACTIONS"].map((h, i) => (
                 <th key={i} className="px-4 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wide">
                   {h}
                 </th>
@@ -127,14 +152,17 @@ export default function TermsTable({ terms, onDelete }: Props) {
                     <ResultBadge published={term.resultPublished} />
                   </td>
                   <td className="px-4 py-4">
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(term.id)}
-                      disabled={deleteMutation.isPending}
-                      className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-red-50 transition-colors disabled:opacity-40"
-                    >
-                      <Trash2 size={15} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <EditButton onClick={() => setEditingTerm(term)} />
+                      <button
+                        type="button"
+                        onClick={() => setPendingDelete(term)}
+                        disabled={deleteMutation.isPending}
+                        className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-red-50 transition-colors disabled:opacity-40"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
                   </td>
                 </motion.tr>
               ))
@@ -166,6 +194,23 @@ export default function TermsTable({ terms, onDelete }: Props) {
           </div>
         </div>
       )}
+
+      <EditModal<Term>
+        isOpen={editingTerm !== null}
+        title="Term"
+        fields={TERM_EDIT_FIELDS}
+        initialData={editingTerm}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingTerm(null)}
+      />
+
+      <DeleteConfirmModal
+        isOpen={pendingDelete !== null}
+        itemLabel={pendingDelete?.name ?? ""}
+        isDeleting={deleteMutation.isPending}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }

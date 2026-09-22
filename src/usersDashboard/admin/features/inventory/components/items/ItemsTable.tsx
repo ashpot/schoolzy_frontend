@@ -8,6 +8,9 @@ import { formatNaira } from "../../utils/inventoryUtils";
 import { useDeleteInventoryItem } from "../../hooks/useInventory";
 import { staggerContainer, rowVariant } from "../../animations/variants";
 import Button from "@/shared/ui/Button";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
+import EditButton from "@/shared/ui/EditButton";
+import DeleteConfirmModal from "../../../users/components/shared/DeleteConfirmModal";
 
 const PAGE_SIZE = 8;
 
@@ -17,10 +20,18 @@ interface Props {
   onDelete: (id: string) => void;
 }
 
+const ITEM_EDIT_FIELDS: EditField<InventoryItem>[] = [
+  { key: "name", label: "Item Name" },
+  { key: "quantity", label: "Quantity Available", type: "number" },
+  { key: "unitPrice", label: "Unit Price", type: "number" },
+];
+
 export default function ItemsTable({ items, itemTypes, onDelete }: Props) {
   const [search, setSearch]     = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [page, setPage]         = useState(1);
+  const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<InventoryItem | null>(null);
   const deleteMutation          = useDeleteInventoryItem();
 
   const lowStockCount = items.filter((i) => i.quantity < LOW_STOCK_THRESHOLD).length;
@@ -37,12 +48,24 @@ export default function ItemsTable({ items, itemTypes, onDelete }: Props) {
   const safePage   = Math.min(page, totalPages);
   const slice      = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
-  // Page footer totals
   const pageUnits  = slice.reduce((s, i) => s + i.quantity, 0);
   const pageValue  = slice.reduce((s, i) => s + i.quantity * i.unitPrice, 0);
 
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id, { onSuccess: () => onDelete(id) });
+  const handleConfirmDelete = () => {
+    if (pendingDelete) {
+      deleteMutation.mutate(pendingDelete.id, {
+        onSuccess: () => {
+          onDelete(pendingDelete.id);
+          setPendingDelete(null);
+        },
+      });
+    }
+  };
+
+  const handleSaveEdit = (updated: InventoryItem) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/inventory/items/${updated.id}/`, updated)
+    console.log("Saving edited inventory item:", updated);
+    setEditingItem(null);
   };
 
   return (
@@ -95,8 +118,8 @@ export default function ItemsTable({ items, itemTypes, onDelete }: Props) {
       )}
 
       {/* Table */}
-      <div className="mt-2">
-        <table className="w-full text-sm">
+      <div className="mt-2 overflow-x-auto">
+        <table className="w-full text-sm min-w-max">
           <thead>
             <tr className="border-b border-border-line02 bg-bg-input">
               <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wide px-5 py-3 w-10">#</th>
@@ -161,15 +184,18 @@ export default function ItemsTable({ items, itemTypes, onDelete }: Props) {
                       {formatNaira(item.unitPrice)}
                     </td>
                     <td className="px-5 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex justify-end items-center gap-1">
+                        <EditButton onClick={() => setEditingItem(item)} />
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+                          onClick={(e) => { e.stopPropagation(); setPendingDelete(item); }}
                           className="px-2! py-2!"
                           leftIcon={<Trash2 size={15} />}
                         >
                           {""}
                         </Button>
+                      </div>
                     </td>
                   </motion.tr>
                 );
@@ -221,6 +247,23 @@ export default function ItemsTable({ items, itemTypes, onDelete }: Props) {
           </div>
         </div>
       )}
+
+      <EditModal<InventoryItem>
+        isOpen={editingItem !== null}
+        title="Inventory Item"
+        fields={ITEM_EDIT_FIELDS}
+        initialData={editingItem}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingItem(null)}
+      />
+
+      <DeleteConfirmModal
+        isOpen={pendingDelete !== null}
+        itemLabel={pendingDelete?.name ?? ""}
+        isDeleting={deleteMutation.isPending}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }

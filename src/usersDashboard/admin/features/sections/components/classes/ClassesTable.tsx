@@ -4,21 +4,48 @@ import { School, Search, Trash2 } from "lucide-react";
 import { staggerContainer, rowVariant } from "../../animations/variants";
 import { getSectionBadgeColor } from "../../utils/colors";
 import type { ClassListItem } from "../../types";
+import { useDeleteClass } from "../../hooks/useSections";
 import NumberSpan from "../shared/NumberSpan";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
+import EditButton from "@/shared/ui/EditButton";
+import DeleteConfirmModal from "../../../users/components/shared/DeleteConfirmModal";
 
 interface Props { classes: ClassListItem[]; }
 
 const PAGE_SIZE = 8;
 
+const CLASS_EDIT_FIELDS: EditField<ClassListItem>[] = [
+  { key: "name", label: "Class Name" },
+  { key: "code", label: "Class Code" },
+];
+
 export default function ClassesTable({ classes }: Props) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [editingClass, setEditingClass] = useState<ClassListItem | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<ClassListItem | null>(null);
+
+  const deleteMutation = useDeleteClass();
 
   const filtered = classes.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase()) || c.code.toLowerCase().includes(search.toLowerCase())
   );
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const handleConfirmDelete = () => {
+    if (pendingDelete) {
+      deleteMutation.mutate(String(pendingDelete.id), {
+        onSuccess: () => setPendingDelete(null),
+      });
+    }
+  };
+
+  const handleSaveEdit = (updated: ClassListItem) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/sections/classes/${updated.id}/`, updated)
+    console.log("Saving edited class:", updated);
+    setEditingClass(null);
+  };
 
   return (
     <div className="bg-white rounded-2xl card-shadow overflow-hidden uppercase">
@@ -61,12 +88,23 @@ export default function ClassesTable({ classes }: Props) {
                   <span className="px-2.5 py-1 rounded-md bg-gray-100 text-gray-600 text-xs font-mono font-semibold">{c.code}</span>
                 </td>
                 <td className="py-3.5 px-4">
-                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getSectionBadgeColor(c.section_title)}`}>{c.section_title}</span>
+                  <span
+                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border whitespace-nowrap ${getSectionBadgeColor(c.section_title)}`}>
+                      {c.section_title}
+                    </span>
                 </td>
                 <td className="py-3.5 px-4">
-                  <button type="button" disabled className="p-1.5 rounded-lg text-text-muted opacity-40 cursor-not-allowed" title="Delete not available yet">
-                    <Trash2 size={15} />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <EditButton onClick={() => setEditingClass(c)} />
+                    <button
+                      type="button"
+                      onClick={() => setPendingDelete(c)}
+                      disabled={deleteMutation.isPending}
+                      className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-red-50 transition-colors disabled:opacity-40"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
                 </td>
               </motion.tr>
             ))}
@@ -92,6 +130,23 @@ export default function ClassesTable({ classes }: Props) {
           </div>
         )}
       </div>
+
+      <EditModal<ClassListItem>
+        isOpen={editingClass !== null}
+        title="Class"
+        fields={CLASS_EDIT_FIELDS}
+        initialData={editingClass}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingClass(null)}
+      />
+
+      <DeleteConfirmModal
+        isOpen={pendingDelete !== null}
+        itemLabel={pendingDelete?.name ?? ""}
+        isDeleting={deleteMutation.isPending}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }

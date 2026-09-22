@@ -25,12 +25,16 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   roleLabel = "Admin",
   className,
 }) => {
-  const initials = userName
-    .split(" ")
-    .slice(0, 2)
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase();
+  const user = JSON.parse(localStorage.getItem("schoolzy_user") || "{}");
+const name = user.fullname?.trim() || userName?.trim() || "User";
+const role = user.role || roleLabel
+const initials = name
+  .split(" ")
+  .filter(Boolean)
+  .slice(0, 2)
+  .map((n: string) => n[0])
+  .join("")
+  .toUpperCase();
 
   return (
     <aside
@@ -58,10 +62,10 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
         <div className="flex items-center gap-3 px-2 py-1">
           <UserAvatar initials={initials} />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-text-primary truncate">
-              {userName}
+            <p className="text-sm font-medium text-text-primary truncate capitalize">
+              {name}
             </p>
-            <p className="text-xs text-text-muted">{roleLabel}</p>
+            <p className="text-xs text-text-muted">{role}</p>
           </div>
           <ChevronRight className="w-4 h-4 text-text-muted shrink-0" />
         </div>

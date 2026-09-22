@@ -8,6 +8,9 @@ import FeeTypeBadge from "../shared/FeeTypeBadge";
 import FeeStatusBadge from "./FeeStatusBadge";
 import type { Fee } from "../../types";
 import Button from "@/shared/ui/Button";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
+import EditButton from "@/shared/ui/EditButton";
+import DeleteConfirmModal from "../../../users/components/shared/DeleteConfirmModal";
 
 interface FeesTableProps {
   items: Fee[];
@@ -16,10 +19,18 @@ interface FeesTableProps {
 
 const PAGE_SIZE = 8;
 
+const FEE_EDIT_FIELDS: EditField<Fee>[] = [
+  { key: "name", label: "Fee Name" },
+  { key: "amount", label: "Amount", type: "number" },
+  { key: "dateDue", label: "Date Due", type: "date" },
+];
+
 export default function FeesTable({ items, onDelete }: FeesTableProps) {
   const [search, setSearch] = useState("");
   const [feeTypeFilter, setFeeTypeFilter] = useState("");
   const [page, setPage] = useState(1);
+  const [editingFee, setEditingFee] = useState<Fee | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Fee | null>(null);
   const deleteMutation = useDeleteFee();
 
   const feeTypeNames = useMemo(
@@ -49,8 +60,21 @@ export default function FeesTable({ items, onDelete }: FeesTableProps) {
   const start = filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const end = Math.min(page * PAGE_SIZE, filtered.length);
 
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id, { onSuccess: () => onDelete(id) });
+  const handleConfirmDelete = () => {
+    if (pendingDelete) {
+      deleteMutation.mutate(pendingDelete.id, {
+        onSuccess: () => {
+          onDelete(pendingDelete.id);
+          setPendingDelete(null);
+        },
+      });
+    }
+  };
+
+  const handleSaveEdit = (updated: Fee) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/finances/fees/${updated.id}/`, updated)
+    console.log("Saving edited fee:", updated);
+    setEditingFee(null);
   };
 
   return (
@@ -91,7 +115,7 @@ export default function FeesTable({ items, onDelete }: FeesTableProps) {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full min-w-max text-sm">
           <thead>
             <tr className="border-b border-border-line02 bg-gray-50/60">
               <th className="px-6 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wide w-12">#</th>
@@ -144,16 +168,17 @@ export default function FeesTable({ items, onDelete }: FeesTableProps) {
                     <FeeStatusBadge dateDue={fee.dateDue} />
                   </td>
                   <td className="px-4 py-4 text-right">
-                    <div onClick={(e) => e.stopPropagation()}>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={(e) => { e.stopPropagation(); handleDelete(fee.id); }}
-                          className="px-2! py-2!"
-                          leftIcon={<Trash2 size={15} />}
-                        >
-                          {""}
-                        </Button>
+                    <div className="flex justify-end items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                      <EditButton onClick={() => setEditingFee(fee)} />
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={(e) => { e.stopPropagation(); setPendingDelete(fee); }}
+                        className="px-2! py-2!"
+                        leftIcon={<Trash2 size={15} />}
+                      >
+                        {""}
+                      </Button>
                     </div>
                   </td>
                 </motion.tr>
@@ -194,6 +219,23 @@ export default function FeesTable({ items, onDelete }: FeesTableProps) {
             className="w-7 h-7 flex-center rounded-lg border border-border-line02 text-text-muted hover:border-brand-primary hover:text-brand-primary disabled:opacity-40 disabled:cursor-not-allowed transition-all text-sm">›</button>
         </div>
       </div>
+
+      <EditModal<Fee>
+        isOpen={editingFee !== null}
+        title="Fee"
+        fields={FEE_EDIT_FIELDS}
+        initialData={editingFee}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingFee(null)}
+      />
+
+      <DeleteConfirmModal
+        isOpen={pendingDelete !== null}
+        itemLabel={pendingDelete?.name ?? ""}
+        isDeleting={deleteMutation.isPending}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }

@@ -1,13 +1,15 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { ShoppingCart, Search, Calendar, Clock } from "lucide-react";
-import { Trash2 } from "lucide-react";
+import { ShoppingCart, Search, Calendar, Clock, Trash2 } from "lucide-react";
 import { staggerContainer, rowVariant } from "../../animations/variants";
 import { useDeleteExpense } from "../../hooks/useFinances";
 import { formatNaira, formatDisplayDate } from "../../utils/feeUtils";
 import { expenseCategoryColor } from "../../data/mockData";
 import Button from "@/shared/ui/Button";
 import type { Expense } from "../../types";
+import EditModal, { type EditField } from "@/shared/modal/EditModal";
+import EditButton from "@/shared/ui/EditButton";
+import DeleteConfirmModal from "../../../users/components/shared/DeleteConfirmModal";
 
 interface ExpenseTableProps {
   items: Expense[];
@@ -16,9 +18,16 @@ interface ExpenseTableProps {
 
 const PAGE_SIZE = 8;
 
+const EXPENSE_EDIT_FIELDS: EditField<Expense>[] = [
+  { key: "description", label: "Description" },
+  { key: "amount", label: "Amount", type: "number" },
+];
+
 export default function ExpenseTable({ items, onDelete }: ExpenseTableProps) {
   const [search, setSearch] = useState("");
   const [page, setPage]     = useState(1);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Expense | null>(null);
   const deleteMutation = useDeleteExpense();
 
   const filtered = useMemo(
@@ -40,8 +49,21 @@ export default function ExpenseTable({ items, onDelete }: ExpenseTableProps) {
   const start = filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const end   = Math.min(page * PAGE_SIZE, filtered.length);
 
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id, { onSuccess: () => onDelete(id) });
+  const handleConfirmDelete = () => {
+    if (pendingDelete) {
+      deleteMutation.mutate(pendingDelete.id, {
+        onSuccess: () => {
+          onDelete(pendingDelete.id);
+          setPendingDelete(null);
+        },
+      });
+    }
+  };
+
+  const handleSaveEdit = (updated: Expense) => {
+    // TODO: Replace with actual API call e.g. api.patch(`/finances/expenses/${updated.id}/`, updated)
+    console.log("Saving edited expense:", updated);
+    setEditingExpense(null);
   };
 
   return (
@@ -69,7 +91,7 @@ export default function ExpenseTable({ items, onDelete }: ExpenseTableProps) {
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm min-w-max">
           <thead>
             <tr className="border-b border-border-line02 bg-gray-50/60">
               <th className="px-6 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wide w-12">#</th>
@@ -132,13 +154,14 @@ export default function ExpenseTable({ items, onDelete }: ExpenseTableProps) {
                     </div>
                   </td>
                   <td className="px-4 py-4 text-right">
-                    <div onClick={(e) => e.stopPropagation()}>
+                    <div className="flex justify-end items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                      <EditButton onClick={() => setEditingExpense(expense)} />
                       <Button
                         variant="destructive"
                         size="sm"
                         className="px-2! py-2!"
                         leftIcon={<Trash2 size={14} />}
-                        onClick={() => handleDelete(expense.id)}
+                        onClick={() => setPendingDelete(expense)}
                       >
                         {""}
                       </Button>
@@ -189,6 +212,23 @@ export default function ExpenseTable({ items, onDelete }: ExpenseTableProps) {
             className="w-7 h-7 flex-center rounded-lg border border-border-line02 text-text-muted hover:border-brand-primary hover:text-brand-primary disabled:opacity-40 disabled:cursor-not-allowed transition-all text-sm">›</button>
         </div>
       </div>
+
+      <EditModal<Expense>
+        isOpen={editingExpense !== null}
+        title="Expense"
+        fields={EXPENSE_EDIT_FIELDS}
+        initialData={editingExpense}
+        onSave={handleSaveEdit}
+        onCancel={() => setEditingExpense(null)}
+      />
+
+      <DeleteConfirmModal
+        isOpen={pendingDelete !== null}
+        itemLabel={pendingDelete?.description ?? ""}
+        isDeleting={deleteMutation.isPending}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 }
