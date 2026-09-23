@@ -2,7 +2,7 @@ import { AnimatePresence } from "framer-motion";
 import { Route, Routes, useLocation } from "react-router";
 import { ForgotPasswordPage, RegistrationSuccessPage, SigninPage, SignupPage } from "@/auth";
 import { AdminDashboardLayout, AuthLayout, DashboardLayout, PublicLayout } from "./layouts";
-import { LandingPage } from "@/landing";
+import { CookiePolicyPage, LandingPage, PrivacyPolicyPage, TermsOfServicePage } from "@/landing";
 import { DashboardHome } from "@/usersDashboard/admin/features/dashboard";
 import { AdminsPage, ParentsPage, StudentsPage, TeachersPage } from "@/usersDashboard/admin/features/users";
 import { AssessmentTypesPage, AttendanceSummariesPage, GradePage, ManageScoresPage, PromoteStudentsPage, PsychomotivePage, SubjectsPage, SubjectTeachersPage, ViewClassResultPage, ViewStudentResultPage } from "@/usersDashboard/admin/features/academics";
@@ -35,6 +35,7 @@ import {
 } from "@/usersDashboard/teacher/features/results";
 import NotFoundPage from "@/shared/components/NotFoundPage";
 import { CheckResultsPage } from "@/usersDashboard/parent/features/results";
+import ScrollToTop from "./ScrollToTop";
 
 
 
@@ -47,11 +48,16 @@ const AppRouter = () => {
 
 
   return (
+    <>
+    <ScrollToTop />
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         {/* Public ~ Landing page*/}
         <Route path="/" element={<PublicLayout />}>
           <Route index element={<LandingPage />} />
+          <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="terms-of-service" element={<TermsOfServicePage />} />
+          <Route path="cookie-policy" element={<CookiePolicyPage />} />
         </Route>
 
         {/* Auth */}
@@ -209,6 +215,7 @@ const AppRouter = () => {
       <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </AnimatePresence>
+    </>
   );
 };
 

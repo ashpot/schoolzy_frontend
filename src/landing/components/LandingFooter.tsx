@@ -1,4 +1,5 @@
 import brand_logo from "@/assets/brand/schoolzy_brand_name.svg";
+import { Link } from "react-router";
 
 
 function XIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -32,10 +33,10 @@ const socialLinks = [
 ];
 
 const quickLinks = [
-  { label: "Privacy Policy", href: "#" },
-  { label: "Cookies Policy", href: "#" },
-  { label: "Referral Partnership Program", href: "https://forms.gle/t3q2XmHAd6DzQKGW6" },
-  { label: "Terms of Service", href: "#" },
+  { label: "Privacy Policy", href: "/privacy-policy", external: false },
+  { label: "Cookies Policy", href: "/cookie-policy", external: false },
+  { label: "Referral Partnership Program", href: "https://forms.gle/t3q2XmHAd6DzQKGW6", external: true },
+  { label: "Terms of Service", href: "/terms-of-service", external: false },
 ];
 
 const resourceLinks = [
@@ -77,17 +78,29 @@ export default function LandingFooter() {
               Quick Links
             </h4>
             <ul className="mt-5 flex flex-col gap-3.5">
-              {quickLinks.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    target="_blank" rel="noopener noreferrer"
-                    className="text-sm font-jakarta text-text-secondary hover:text-brand-primary transition-colors"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
+              {quickLinks.map((link) =>
+                link.external ? (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-jakarta text-text-secondary hover:text-brand-primary transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ) : (
+                  <li key={link.label}>
+                    <Link
+                      to={link.href}
+                      className="text-sm font-jakarta text-text-secondary hover:text-brand-primary transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                )
+              )}
             </ul>
           </div>
 
