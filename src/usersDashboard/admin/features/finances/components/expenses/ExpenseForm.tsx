@@ -3,12 +3,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Info } from "lucide-react";
 import { expenseSchema, type ExpenseValues } from "../../schemas";
 import { useCreateExpense } from "../../hooks/useFinances";
-import type { Expense } from "../../types";
+import type { Expense, ExpensePayload } from "../../types";
 import FormHeader from "@/shared/ui/FormHeader";
 import SubmitButton from "@/shared/ui/SubmitButton";
-import type {z} from "zod";
-
-const STAFF = ["Mrs. Okafor", "Mr. Adebayo", "Miss Lawal", "Mr. Nwosu", "Mr. Chukwu"];
+import type { z } from "zod";
 
 interface ExpenseFormProps {
   onSuccess: (expense: Expense) => void;
@@ -32,18 +30,20 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
   const descLen = (watch("description") ?? "").length;
 
   const onSubmit = (values: ExpenseValues) => {
-    const recordedBy = STAFF[Math.floor(Math.random() * STAFF.length)];
-    mutation.mutate(values, {
-      onSuccess: () => {
-        const newExpense: Expense = {
-          id: Date.now().toString(),
-          description: values.description,
-          category: "Utilities",
-          amount: values.amount,
-          date: new Date().toISOString().split("T")[0],
-          recordedBy,
-        };
-        onSuccess(newExpense);
+    const payload: ExpensePayload = {
+      description: values.description,
+      amount: values.amount,
+    };
+
+    mutation.mutate(payload, {
+      onSuccess: (response) => {
+        onSuccess({
+          id: String(response.id),
+          description: response.description,
+          amount: Number(response.amount),
+          date: response.date_created,
+          recordedByLabel: "", // resolved via useUsersLookup at render time
+        });
         reset();
       },
     });
@@ -53,8 +53,6 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
     <div className="bg-white rounded-2xl card-shadow p-6">
       <FormHeader icon={Plus} title="Add Expense" />
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4 mt-4">
-
-        {/* Description textarea with char counter */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label className="text-sm font-medium text-label">Description *</label>
@@ -66,16 +64,12 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
             disabled={mutation.isPending}
             className={`w-full px-3 py-2.5 rounded-xl border text-sm bg-bg-input text-text-primary placeholder:text-text-muted resize-none transition-all outline-none
               focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20
-              ${errors.description ? "border-danger" : "border-border-line02"}
-              ${mutation.isPending ? "opacity-50 cursor-not-allowed" : ""}`}
+              ${errors.description ? "border-danger" : "border-border-line02"}`}
             {...register("description")}
           />
-          {errors.description && (
-            <p className="mt-1 text-xs text-danger">{errors.description.message}</p>
-          )}
+          {errors.description && <p className="mt-1 text-xs text-danger">{errors.description.message}</p>}
         </div>
 
-        {/* Amount */}
         <div>
           <label className="text-sm font-medium text-label block mb-1.5">Amount *</label>
           <Controller
@@ -94,18 +88,14 @@ export default function ExpenseForm({ onSuccess }: ExpenseFormProps) {
                   onChange={(e) => field.onChange(e.target.value === "" ? ("" as unknown as number) : Number(e.target.value))}
                   className={`w-full pl-7 pr-3 py-2.5 rounded-xl border text-sm bg-bg-input text-text-primary placeholder:text-text-muted outline-none transition-all
                     focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20
-                    ${errors.amount ? "border-danger" : "border-border-line02"}
-                    ${mutation.isPending ? "opacity-50 cursor-not-allowed" : ""}`}
+                    ${errors.amount ? "border-danger" : "border-border-line02"}`}
                 />
               </div>
             )}
           />
-          {errors.amount && (
-            <p className="mt-1 text-xs text-danger">{errors.amount.message}</p>
-          )}
+          {errors.amount && <p className="mt-1 text-xs text-danger">{errors.amount.message}</p>}
         </div>
 
-        {/* Recorded by hint */}
         <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-border-line02 bg-bg-input">
           <Info size={13} className="text-text-muted shrink-0" />
           <p className="text-xs text-text-muted">Recorded by will be assigned automatically</p>

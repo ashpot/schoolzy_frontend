@@ -134,7 +134,7 @@ const AppRouter = () => {
 
           {/* Finances */}
           <Route path={`/${ADMIN_ROOT_ROUTE}/finances`}>
-            <Route index element={<FeesPage />} />
+            <Route index element={<FeeTypePage />} />
             <Route path="fees" element={<FeesPage />} />
             <Route path="fee-type" element={<FeeTypePage />} />
             <Route path="assign-fees" element={<AssignFeesPage />} />

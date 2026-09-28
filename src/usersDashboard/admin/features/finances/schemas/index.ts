@@ -24,6 +24,7 @@ export type AssignFeeValues = z.infer<typeof assignFeeSchema>;
 export const paymentSchema = z.object({
   studentId: z.string().min(1, "Student is required"),
   feeId: z.string().min(1, "Fee is required"),
+  description: z.string().min(1, "Description is required"),
   amount: z.coerce.number().min(1, "Amount must be greater than 0"),
 });
 export type PaymentValues = z.infer<typeof paymentSchema>;

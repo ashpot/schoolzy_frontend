@@ -6,6 +6,10 @@ import type {
   PsychomotiveMetric,
 } from "../types";
 import type { StudentResultData } from "../types/studentResult";
+import type { ScoreRow } from "../types/manageScores";
+import type { PromoteStudentRow } from "../types/promoteStudents";
+import type { AttendanceSummaryData, StudentAttendanceRow } from "../types/attendanceSummary";
+
 
 
 // ─── Subjects ─────────────────────────────────────────────────────────────────
@@ -189,16 +193,12 @@ export const mockStudentResult: StudentResultData = {
   comments: { classTeacherComment: "", principalComment: "" },
 };
 
-import type { ClassResultData } from "../types/classResult";
-import type { ScoreRow } from "../types/manageScores";
-import type { PromoteStudentRow } from "../types/promoteStudents";
-
 const CLASS_STUDENT_NAMES = [
   "Chidinma Harold", "Kelechi Igwe", "Femi Ade", "Emeka Okeke", "Zainab Yusuf",
   "Chinedu Obi", "Ngozi Anthony", "Hassan Jibril", "Chidinma Lawrence", "James Ude",
 ];
 
-export const mockClassResult: ClassResultData = {
+export const mockClassResult = {
   className: "JSS 1A",
   classGroup: "A",
   term: "First Term",
@@ -263,7 +263,6 @@ export const mockPromoteStudents: PromoteStudentRow[] = CLASS_STUDENT_NAMES.map(
   status: PROMOTE_STUDENT_STATUSES[i],
 }));
 
-import type { AttendanceSummaryData, StudentAttendanceRow } from "../types/attendanceSummary";
 
 const ATTENDANCE_STUDENT_NAMES = [
   "Chidinma Harold", "Kelechi Igwe", "Femi Ade", "Emeka Okeke", "Zainab Yusuf",

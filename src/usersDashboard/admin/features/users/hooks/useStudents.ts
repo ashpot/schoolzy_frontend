@@ -53,3 +53,19 @@ export const useClassGroupsList = () => {
     },
   });
 };
+
+export const useStudentOptionsList = () => {
+  return useQuery({
+    queryKey: ["users", "students", "options"],
+    queryFn: async () => {
+      const raw = await apiRequest<UserResponse[]>(USERS_ENDPOINTS.LIST_ALL);
+      return raw
+        .filter((u) => u.role === "Student")
+        .map((u) => ({
+          id: String(u.id),
+          name: `${u.first_name} ${u.last_name}`,
+          admissionNo: u.admission_number ?? "—",
+        }));
+    },
+  });
+};

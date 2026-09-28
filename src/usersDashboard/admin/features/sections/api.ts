@@ -7,4 +7,5 @@ export const SECTIONS_ENDPOINTS = {
   LIST_SECTIONS: `${API_BASE_URL}/sections/sections/`,
   LIST_CLASSES: `${API_BASE_URL}/sections/classes/`,
   LIST_CLASS_GROUPS: `${API_BASE_URL}/sections/class-groups/`,
+  ASSIGN_CLASS_TEACHER: `${API_BASE_URL}/academics/assigned-classes/`,
 } as const;

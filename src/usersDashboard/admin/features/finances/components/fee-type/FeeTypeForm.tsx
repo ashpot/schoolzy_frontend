@@ -30,14 +30,13 @@ export default function FeeTypeForm({ onSuccess }: FeeTypeFormProps) {
 
   const onSubmit = (values: FeeTypeValues) => {
     mutation.mutate(values, {
-      onSuccess: () => {
-        const newItem: FeeType = {
-          id: Date.now().toString(),
-          name: values.name,
-          description: values.description,
-          createdAt: new Date().toISOString().split("T")[0],
-        };
-        onSuccess(newItem);
+      onSuccess: (response) => {
+        // response is the real FeeTypeResponse — id comes from the backend, not generated
+        onSuccess({
+          id: String(response.id),
+          name: response.name,
+          description: response.description,
+        });
         reset();
       },
     });

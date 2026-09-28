@@ -39,3 +39,36 @@ export default function AssignFormTeacherPage() {
     </motion.div>
   );
 }
+
+// TEMP DEBUG
+// import { useEffect } from "react";
+
+// export default function AssignFormTeacherPage() {
+//   useEffect(() => {
+//     async function debugAssign() {
+//       const token = localStorage.getItem("schoolzy_token");
+//       const tenant = "etihad"; // TODO: your real tenant slug
+
+//       const res = await fetch("https://api.schoolzy.com.ng/api/v1/academics/assigned-classes/", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//           "Authorization": `Token ${token}`,
+//           "X-Tenant-Domain": `${tenant}.schoolzy.com.ng`,
+//         },
+//         body: JSON.stringify({
+//           class_group: 1, // TODO: replace with a real class_group id
+//           teacher: 2,     // TODO: replace with a real teacher USER id (from /users/?role check — the numeric id field, not username)
+//         }),
+//       });
+
+//       console.log("status:", res.status);
+//       const text = await res.text(); // raw text first — don't assume it's valid JSON
+//       console.log("raw body:", text);
+//     }
+//     debugAssign();
+//   }, []);
+
+//   return <div className="p-6">Check console for assign-class-teacher response…</div>;
+// }
+

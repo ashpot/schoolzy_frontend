@@ -2,8 +2,8 @@ import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, Receipt, CheckCircle } from "lucide-react";
 import { fadeUp } from "../animations/variants";
-import { mockPayments } from "../data/mockData";
 import { formatNaira } from "../utils/feeUtils";
+import { useUsersLookup } from "../hooks/useFinances";
 import PaymentsForm from "../components/payments/PaymentsForm";
 import PaymentsTable from "../components/payments/PaymentsTable";
 import SplitLayout from "../components/shared/SplitLayout";
@@ -11,12 +11,22 @@ import StatPill from "../components/shared/StatPill";
 import type { Payment } from "../types";
 
 export default function PaymentsPage() {
-  const [payments, setPayments] = useState<Payment[]>(mockPayments);
+  // No GET /finances/payments/ endpoint exists — this list is session-only
+  // and resets on refresh, same limitation as assigned-classes/assigned-fees.
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const { data: usersLookup } = useUsersLookup();
 
-  const collected   = useMemo(() => payments.reduce((s, p) => s + p.amount, 0), [payments]);
-  const outstanding = useMemo(() => payments.reduce((s, p) => s + Math.max(0, p.totalFeeAmount - p.amount), 0), [payments]);
-  const fullyPaid   = useMemo(() => payments.filter((p) => p.amount >= p.totalFeeAmount).length, [payments]);
+  const collected = useMemo(() => payments.reduce((s, p) => s + p.amount, 0), [payments]);
+  const outstanding = useMemo(() => payments.reduce((s, p) => s + Math.max(0, p.balance), 0), [payments]);
+  const fullyPaid = useMemo(() => payments.filter((p) => p.balance <= 0).length, [payments]);
 
+  const handleAdd = (payment: Payment) => {
+  const resolvedName = usersLookup?.get(Number(payment.studentId));
+    setPayments((prev) => [
+      resolvedName ? { ...payment, studentName: resolvedName } : payment,
+      ...prev,
+    ]);
+  };
   return (
     <motion.div variants={fadeUp} initial="hidden" animate="show" className="dashboard-p space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -27,24 +37,15 @@ export default function PaymentsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <StatPill icon={TrendingUp}   value={`${formatNaira(collected)} collected`}   variant="green" />
-          <StatPill icon={Receipt}      value={`${formatNaira(outstanding)} outstanding`} variant="red"   />
-          <StatPill icon={CheckCircle}  value={`${fullyPaid} fully paid`}               variant="blue"  />
+          <StatPill icon={TrendingUp}  value={`${formatNaira(collected)} collected this session`}    variant="green" />
+          <StatPill icon={Receipt}     value={`${formatNaira(outstanding)} outstanding this session`} variant="red"   />
+          <StatPill icon={CheckCircle} value={`${fullyPaid} fully paid`}                              variant="blue"  />
         </div>
       </div>
 
       <SplitLayout
-        left={
-          <PaymentsForm
-            onSuccess={(payment) => setPayments((prev) => [payment, ...prev])}
-          />
-        }
-        right={
-          <PaymentsTable
-            items={payments}
-            onDelete={(id) => setPayments((prev) => prev.filter((p) => p.id !== id))}
-          />
-        }
+        left={<PaymentsForm onSuccess={handleAdd} />}
+        right={<PaymentsTable items={payments} onDelete={(id) => setPayments((prev) => prev.filter((p) => p.id !== id))} />}
       />
     </motion.div>
   );

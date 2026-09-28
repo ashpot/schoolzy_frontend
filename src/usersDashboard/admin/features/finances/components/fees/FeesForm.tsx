@@ -2,14 +2,14 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { feeSchema, type FeeValues } from "../../schemas";
-import { useCreateFee } from "../../hooks/useFinances";
-import { termOptions, QUICK_AMOUNTS } from "../../data/mockData";
+import { useCreateFee, useTermsList } from "../../hooks/useFinances";
+import { QUICK_AMOUNTS } from "../../data/mockData";
 import type { Fee } from "../../types";
 import FormInput from "@/shared/ui/FormInput";
 import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import FormHeader from "@/shared/ui/FormHeader";
-import  { z } from "zod";
+import { z } from "zod";
 
 interface FeesFormProps {
   onSuccess: (newFee: Fee) => void;
@@ -18,7 +18,10 @@ interface FeesFormProps {
 
 export default function FeesForm({ onSuccess, feeTypes }: FeesFormProps) {
   const mutation = useCreateFee();
+  const { data: terms, isLoading: termsLoading } = useTermsList();
+
   const feeTypeOptions = feeTypes.map((ft) => ({ value: ft.id, label: ft.name }));
+  const termOptions = (terms ?? []).map((t) => ({ value: String(t.id), label: t.name }));
 
   const {
     register,
@@ -42,19 +45,20 @@ export default function FeesForm({ onSuccess, feeTypes }: FeesFormProps) {
   const amountVal = watch("amount");
 
   const onSubmit = (values: FeeValues) => {
-    const feeTypeName = feeTypes.find((ft) => ft.id === values.feeTypeId)?.name ?? "";
     mutation.mutate(values, {
-      onSuccess: () => {
-        const newFee: Fee = {
-          id: Date.now().toString(),
-          name: values.name,
-          feeTypeId: values.feeTypeId,
-          feeTypeName,
-          term: values.term as Fee["term"],
-          amount: values.amount,
-          dateDue: values.dateDue,
-        };
-        onSuccess(newFee);
+      onSuccess: (response) => {
+        // Build the row from the real backend response, not fabricated values
+        onSuccess({
+          id: String(response.id),
+          name: response.name,
+          feeTypeId: String(response.fee_type),
+          feeTypeName: response.fee_type_name,
+          termId: String(response.term),
+          termName: response.term_name,
+          amount: Number(response.amount),
+          dateDue: response.date_due,
+          dateCreated: response.date_created,
+        });
         reset();
       },
     });
@@ -82,13 +86,13 @@ export default function FeesForm({ onSuccess, feeTypes }: FeesFormProps) {
 
         <FormSelect
           label="Term"
-          placeholder="Select term"
+          placeholder={termsLoading ? "Loading terms..." : "Select term"}
           options={termOptions}
+          isLoading={termsLoading}
           error={errors.term?.message}
           {...register("term")}
         />
 
-        {/* Amount — custom ₦ prefix + quick buttons */}
         <div>
           <label className="text-sm font-medium text-label block mb-1.5">Amount *</label>
           <Controller

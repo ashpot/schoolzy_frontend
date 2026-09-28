@@ -9,7 +9,10 @@ import RecentStudentsTable from "../components/RecentStudentsTable";
 import ItemsSold from "../components/ItemsSold";
 import RecentSales from "../components/RecentSales";
 
+
+
 const DashboardPage: React.FC = () => {
+
   const name = JSON.parse(localStorage.getItem("schoolzy_user") || '{"fullname":"Ben Uche"}').fullname.split(" ")[0];
   return (
     <motion.div
