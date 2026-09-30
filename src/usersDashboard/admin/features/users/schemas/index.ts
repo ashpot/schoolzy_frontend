@@ -32,7 +32,7 @@ const credentialFields = {
 export const studentSchema = z
   .object({
     ...credentialFields,
-    admNo:     z.string().min(1, "Admission number is required"),
+    admission_number:     z.string().min(1, "Admission number is required"),
     firstName:  z.string().min(1, "First name is required"),
     lastName:   z.string().min(1, "Last name is required"),
     email:      z.string().email("Enter a valid email address"),
@@ -49,7 +49,7 @@ export const teacherSchema = z
   .object({
     ...basePersonFields,
     ...credentialFields,
-    empNo:            z.string().min(1, "Employment number is required"),
+    employment_number:            z.string().min(1, "Employment number is required"),
     dateOfEmployment: z.string().min(1, "Date of employment is required"),
   })
   .refine((data) => data.password === data.confirmPassword, {

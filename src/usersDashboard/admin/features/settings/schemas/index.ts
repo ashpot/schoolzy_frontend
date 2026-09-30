@@ -1,16 +1,19 @@
 import { z } from "zod";
 
 export const schoolSettingsSchema = z.object({
-  name:      z.string().min(1, "School name is required"),
-  motto:     z.string().optional(),
-  address:   z.string().optional(),
-  about:     z.string().optional(),
-  phone:     z.string().optional(),
-  email:     z.string().email("Invalid email").min(1, "Email is required"),
-  facebook:  z.string().optional(),
-  twitter:   z.string().optional(),
-  whatsapp:  z.string().optional(),
-  logo: z.instanceof(File).optional()
+  motto: z.string().optional(),
+  timezone: z.string().optional(),
+  email: z.string().email("Invalid email").min(1, "Email is required"),
+  phone: z.string().optional(),
+  alternate_phone: z.string().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  website: z.string().optional(),
+  primary_color: z.string().optional(),
+  secondary_color: z.string().optional(),
+  logo: z.instanceof(File).optional(),
+  favicon: z.instanceof(File).optional(),
 });
 export type SchoolSettingsValues = z.infer<typeof schoolSettingsSchema>;
 

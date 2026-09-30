@@ -1,5 +1,5 @@
 import { type UseFormRegister, type FieldErrors } from "react-hook-form";
-import { Phone, Mail } from "lucide-react";
+import { Phone, Mail, Globe } from "lucide-react";
 import IconInput from "../shared/IconInput";
 import type { SchoolSettingsValues } from "../../schemas";
 
@@ -20,6 +20,13 @@ export default function ContactSection({ register, errors, isPending }: Props) {
         {...register("phone")}
       />
       <IconInput
+        label="Alternate Phone"
+        placeholder="+234 809 876 5432"
+        icon={<Phone size={15} />}
+        isLoading={isPending}
+        {...register("alternate_phone")}
+      />
+      <IconInput
         label="Email Address *"
         type="email"
         placeholder="info@myschool.edu.ng"
@@ -27,6 +34,13 @@ export default function ContactSection({ register, errors, isPending }: Props) {
         error={errors.email?.message}
         isLoading={isPending}
         {...register("email")}
+      />
+      <IconInput
+        label="Website"
+        placeholder="https://myschool.edu.ng"
+        icon={<Globe size={15} />}
+        isLoading={isPending}
+        {...register("website")}
       />
     </div>
   );

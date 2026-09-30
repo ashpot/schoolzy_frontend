@@ -5,21 +5,21 @@ interface RequestOptions extends RequestInit {
 }
 
 export async function apiRequest<T>(url: string, options: RequestOptions = {}): Promise<T> {
-  const { skipAuth, headers, ...rest } = options;
+  const { skipAuth, headers, body, ...rest } = options;
 
   const tenant = getTenant();
   const token = localStorage.getItem("schoolzy_token");
+  const isFormData = body instanceof FormData;
 
   const finalHeaders: HeadersInit = {
-    "Content-Type": "application/json",
+    // Never set Content-Type for FormData — the browser must add its own multipart boundary
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
     ...(tenant ? { "X-Tenant-Domain": `${tenant}.schoolzy.com.ng` } : {}),
     ...(token && !skipAuth ? { Authorization: `Token ${token}` } : {}),
     ...headers,
   };
 
-  const res = await fetch(url, { ...rest, headers: finalHeaders });
-  // console.log(url, { ...rest, headers: finalHeaders });
-  // console.log(res.text().then(n=>n));
+  const res = await fetch(url, { ...rest, body, headers: finalHeaders });
 
   if (res.status === 401) {
     localStorage.removeItem("schoolzy_token");
@@ -29,7 +29,7 @@ export async function apiRequest<T>(url: string, options: RequestOptions = {}): 
 
   if (!res.ok) {
     const errorBody = await res.json().catch(() => ({}));
-    throw new Error(errorBody.message || errorBody.error || "Request failed");
+    throw new Error(errorBody.message || errorBody.error || errorBody.detail || "Request failed");
   }
 
   return res.json();

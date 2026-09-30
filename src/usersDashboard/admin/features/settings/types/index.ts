@@ -34,3 +34,18 @@ export interface SchoolSettings {
   twitter: string;
   whatsapp: string;
 }
+export interface SchoolSettingsResponse {
+  motto: string | null;
+  timezone: string;
+  logo: string | null;
+  favicon: string | null;
+  email: string;
+  phone: string | null;
+  primary_color: string | null;
+  secondary_color: string | null;
+  alternate_phone: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  website: string | null;
+}

@@ -4,7 +4,6 @@ import {
   mockPsychomotiveMetrics,
 } from "../data/mockData";
 import type {
-  SubjectTeacherAssignment,
   PsychomotiveMetric,
   SectionListItem,
   Grade, GradePayload, GradeResponse,
@@ -15,6 +14,9 @@ import type { GradeFormValues, SubjectFormValues, AssessmentTypeFormValues, Resu
 import { apiRequest } from "@/shared/lib/apiClient";
 import { ACADEMICS_ENDPOINTS } from "../api";
 import type { ClassResultFilters, ClassResultResponse } from "../types/classResult";
+import type { AssignSubjectsPayload, AssignSubjectsResponse } from "../types";
+import { useClassGroupsList } from "@/usersDashboard/admin/features/sections/hooks/useSections";
+import { useTeacherOptionsList } from "@/usersDashboard/admin/features/sections/hooks/useSections";
 
 const PER_PAGE = 8;
 
@@ -135,27 +137,34 @@ export function useSubjectTeachersList(page: number, search: string, section: st
   });
 }
 
+export { useClassGroupsList, useTeacherOptionsList };
+export function useSubjectsBySection(sectionId: number | null) {
+
+  return useQuery({
+    queryKey: ["academics", "subjects", "by-section", sectionId],
+    enabled: sectionId !== null,
+    queryFn: async () => {
+      const raw = await apiRequest<SubjectResponse[]>(ACADEMICS_ENDPOINTS.LIST_SUBJECTS);
+      return raw
+        .filter((s) => s.section === sectionId)
+        .map((s) => ({
+          id: String(s.id),
+          subjectName: s.name,
+          code: s.code,
+          elective: s.elective,
+        }));
+    },
+  });
+}
+
 export function useAssignSubjectTeacher() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: {
-      teacherId: string;
-      teacherName: string;
-      classId: string;
-      className: string;
-      subjectIds: string[];
-      subjectNames: string[];
-    }) => {
-      await new Promise((r) => setTimeout(r, 600));
-      const newItems: SubjectTeacherAssignment[] = payload.subjectNames.map((name, i) => ({
-        id: `STA-${String(subjectTeachersStore.length + i + 1).padStart(3, "0")}`,
-        class: payload.className,
-        subjectName: name,
-        teacher: payload.teacherName,
-        elective: "Admin Seun",
-      }));
-      subjectTeachersStore = [...newItems, ...subjectTeachersStore];
-      return newItems;
+    mutationFn: async ({ teacherId, ...payload }: AssignSubjectsPayload & { teacherId: string }) => {
+      return apiRequest<AssignSubjectsResponse>(
+        ACADEMICS_ENDPOINTS.ASSIGN_SUBJECTS_TO_TEACHER(teacherId),
+        { method: "POST", body: JSON.stringify(payload) }
+      );
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["academics", "subject-teachers"] }),
   });
@@ -509,3 +518,5 @@ export const useUndoPromotion = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["promote-students"] }),
   });
 };
+
+

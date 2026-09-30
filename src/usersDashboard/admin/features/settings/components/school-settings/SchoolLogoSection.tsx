@@ -6,21 +6,23 @@ import type { SchoolSettingsValues } from "../../schemas";
 
 interface Props {
   control: Control<SchoolSettingsValues>;
+  fieldName: "logo" | "favicon";
+  label: string;
+  hint: string;
 }
 
-export default function SchoolLogoSection({ control }: Props) {
+export default function SchoolLogoSection({ control, fieldName, label, hint }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
 
   function handleFile(file: File) {
-    const url = URL.createObjectURL(file);
-    setPreview(url);
+    setPreview(URL.createObjectURL(file));
   }
 
   return (
     <Controller
-      name="logo"
+      name={fieldName}
       control={control}
       render={({ field }) => (
         <div className="grid grid-cols-[1fr_auto] gap-4 items-start">
@@ -41,8 +43,8 @@ export default function SchoolLogoSection({ control }: Props) {
               <Upload size={18} className="text-brand-primary" />
             </div>
             <div className="text-center">
-              <p className="text-sm font-medium text-text-primary">Click or drag to upload</p>
-              <p className="text-xs text-text-muted mt-0.5">PNG, JPG, SVG — max 5 MB</p>
+              <p className="text-sm font-medium text-text-primary">{label}</p>
+              <p className="text-xs text-text-muted mt-0.5">{hint}</p>
             </div>
             <input
               ref={inputRef}
@@ -59,7 +61,7 @@ export default function SchoolLogoSection({ control }: Props) {
             <p className="text-xs text-text-muted font-medium uppercase tracking-wide">Preview</p>
             <div className="w-24 h-24 rounded-xl border border-border-line02 bg-bg-input flex-center">
               {preview
-                ? <img src={preview} alt="Logo preview" className="w-full h-full object-contain rounded-xl" />
+                ? <img src={preview} alt="Preview" className="w-full h-full object-contain rounded-xl" />
                 : <School size={28} className="text-text-muted/40" />
               }
             </div>
