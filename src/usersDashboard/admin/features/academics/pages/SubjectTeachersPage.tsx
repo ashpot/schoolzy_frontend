@@ -169,8 +169,8 @@ const SubjectTeachersPage: React.FC = () => {
 
             {/* Class */}
             <FormSelect
-              label="Class"
-              name="class"
+              label="Class group"
+              name="class group"
               value={classId}
               onChange={(e) => { setClassId(e.target.value); setClassError(""); }}
               error={classError}

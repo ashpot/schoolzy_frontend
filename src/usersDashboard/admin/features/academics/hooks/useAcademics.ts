@@ -14,6 +14,7 @@ import type {
 import type { GradeFormValues, SubjectFormValues, AssessmentTypeFormValues, ResultCommentFormValues, PsychomotiveFormValues, AttendanceFormValues } from "../schemas";
 import { apiRequest } from "@/shared/lib/apiClient";
 import { ACADEMICS_ENDPOINTS } from "../api";
+import type { ClassResultFilters, ClassResultResponse } from "../types/classResult";
 
 const PER_PAGE = 8;
 
@@ -365,16 +366,15 @@ export const useLoadStudentResult = () => {
   });
 };
 
-export const useLoadClassResult = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: { term: string; session: string; class: string; class_group: string }) => {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      return { success: true, data: payload };
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["class-results"] }),
+export const useClassResult = (filters: ClassResultFilters | null) =>
+  useQuery({
+    queryKey: ["class-results", filters?.classGroupId, filters?.termId],
+    enabled: filters !== null,
+    queryFn: () =>
+      apiRequest<ClassResultResponse>(
+        ACADEMICS_ENDPOINTS.CLASS_RESULT(filters!.classGroupId, filters!.termId)
+      ),
   });
-};
 
 export const usePromoteClass = () => {
   const queryClient = useQueryClient();

@@ -15,7 +15,6 @@ export interface SectionResponse {
   show_position_in_result: boolean;
 }
 
-
 export interface Class {
   id:      string;
   name:    string;

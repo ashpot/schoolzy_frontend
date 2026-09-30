@@ -3,9 +3,8 @@ export interface NavItem {
   label: string;
   path: string;
   icon: React.FC<{ className?: string }>;
-  children?: NavItem[];
+  children?: Omit<NavItem, 'icon'>[];
 }
-
 export type DashboardRole = "parent" | "teacher" | "student";
 
 export interface RoleConfig {

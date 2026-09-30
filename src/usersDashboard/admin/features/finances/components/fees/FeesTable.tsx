@@ -156,8 +156,8 @@ export default function FeesTable({ items, onDelete }: FeesTableProps) {
                     </div>
                   </td>
                   <td className="px-4 py-4">
-                    <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${termColor(fee.term)}`}>
-                      {fee.term}
+                    <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${termColor(fee.termName)}`}>
+                      {fee.termName}
                     </span>
                   </td>
                   <td className="px-4 py-4 font-semibold text-text-primary">

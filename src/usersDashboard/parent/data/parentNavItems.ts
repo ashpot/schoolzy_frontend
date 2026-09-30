@@ -12,8 +12,8 @@ export const parentNavItems: NavItem[] = [
     path: `/${PARENT_ROOT_ROUTE}/fees`,
     icon: FinancesIcon,
     children: [
-      { id: "pay-fees", label: "Pay Fees", path: `/${PARENT_ROOT_ROUTE}/fees/pay-fees`, icon: FinancesIcon },
-      { id: "payment-history", label: "Payment History", path: `/${PARENT_ROOT_ROUTE}/fees/payment-history`, icon: FinancesIcon },
+      { id: "pay-fees", label: "Pay Fees", path: `/${PARENT_ROOT_ROUTE}/fees/pay-fees`, },
+      { id: "payment-history", label: "Payment History", path: `/${PARENT_ROOT_ROUTE}/fees/payment-history`,},
     ],
   },
 ];

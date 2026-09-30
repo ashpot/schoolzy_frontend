@@ -1,17 +1,14 @@
 import React from "react";
-import { Users, TrendingUp, Award, BookOpen } from "lucide-react";
-import type { ClassResultData } from "../../types/classResult";
+import { Users, TrendingUp, Award, TrendingDown } from "lucide-react";
+import type { ClassResultResponse } from "../../types/classResult";
 
-interface ClassResultStatCardsProps {
-  result: ClassResultData;
-}
-
-const ClassResultStatCards: React.FC<ClassResultStatCardsProps> = ({ result }) => {
+const ClassResultStatCards: React.FC<{ result: ClassResultResponse }> = ({ result }) => {
+  const { statistics } = result;
   const cards = [
-    { icon: Users, value: result.totalStudents, label: "Total Students", color: "bg-blue-50 text-brand-primary" },
-    { icon: TrendingUp, value: `${result.classAverage}%`, label: "Class Average", color: "bg-green-50 text-success" },
-    { icon: Award, value: result.topStudent, label: "Top Student", color: "bg-purple-50 text-purple-600" },
-    { icon: BookOpen, value: `${result.passRate}%`, label: "Pass Rate", color: "bg-amber-50 text-warning" },
+    { icon: Users, value: statistics.students, label: "Total Students", color: "bg-blue-50 text-brand-primary" },
+    { icon: TrendingUp, value: statistics.class_average.toFixed(1), label: "Class Average", color: "bg-green-50 text-success" },
+    { icon: Award, value: statistics.highest_total, label: "Highest Total", color: "bg-purple-50 text-purple-600" },
+    { icon: TrendingDown, value: statistics.lowest_total, label: "Lowest Total", color: "bg-amber-50 text-warning" },
   ];
 
   return (

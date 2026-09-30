@@ -52,7 +52,7 @@ export default function PaidListFilter({ selectedFeeId, onFeeChange, onLoad, isL
             <div className="flex items-center gap-1.5 mt-2 flex-wrap">
               <FeeTypeBadge name={selectedFee.feeTypeName} index={feeColorIndex} size="sm" />
               <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200">
-                {selectedFee.term}
+               {selectedFee.termName}
               </span>
               <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-100">
                 {formatNaira(selectedFee.amount)}

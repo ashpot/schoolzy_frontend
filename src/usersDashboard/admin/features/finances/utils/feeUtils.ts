@@ -15,10 +15,10 @@ export function formatDisplayDate(dateStr: string): string {
 }
 
 export function termColor(term: string): string {
-  switch (term) {
-    case "First Term":  return "bg-blue-50 text-blue-700 border border-blue-100";
-    case "Second Term": return "bg-purple-50 text-purple-700 border border-purple-100";
-    case "Third Term":  return "bg-green-50 text-green-700 border border-green-100";
+  switch (term.toUpperCase()) {
+    case "FIRST TERM":  return "bg-blue-50 text-blue-700 border border-blue-100";
+    case "SECOND TERM": return "bg-purple-50 text-purple-700 border border-purple-100";
+    case "THIRD TERM":  return "bg-green-50 text-green-700 border border-green-100";
     default:            return "bg-gray-50 text-gray-600 border border-gray-100";
   }
 }

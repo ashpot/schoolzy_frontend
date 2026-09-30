@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "lucide-react";
 import { fadeUp } from "../animations/variants";
-import { mockAssignedFees, mockFees } from "../data/mockData";
+import { useFeesList } from "../hooks/useFinances";
 import AssignFeeForm from "../components/assign-fees/AssignFeeForm";
 import AssignedFeesTable from "../components/assign-fees/AssignedFeesTable";
 import SplitLayout from "../components/shared/SplitLayout";
@@ -10,7 +10,10 @@ import StatPill from "../components/shared/StatPill";
 import type { AssignedFee } from "../types";
 
 export default function AssignFeesPage() {
-  const [assignedFees, setAssignedFees] = useState<AssignedFee[]>(mockAssignedFees);
+  const { data: fees } = useFeesList();
+  // No GET /finances/assigned-fees/ endpoint exists — this list is
+  // session-only and resets on refresh, same limitation as assigned-classes.
+  const [assignedFees, setAssignedFees] = useState<AssignedFee[]>([]);
 
   return (
     <motion.div variants={fadeUp} initial="hidden" animate="show" className="dashboard-p space-y-6">
@@ -21,13 +24,13 @@ export default function AssignFeesPage() {
             Map fees to school sections so students are billed correctly each term
           </p>
         </div>
-        <StatPill icon={Link} value={`${assignedFees.length} assignments`} variant="blue" />
+        <StatPill icon={Link} value={`${assignedFees.length} assigned this session`} variant="blue" />
       </div>
 
       <SplitLayout
         left={
           <AssignFeeForm
-            fees={mockFees}
+            fees={fees ?? []}
             onSuccess={(item) => setAssignedFees((prev) => [item, ...prev])}
           />
         }

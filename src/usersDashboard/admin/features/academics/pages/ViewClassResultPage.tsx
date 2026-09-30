@@ -1,58 +1,17 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Users } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { slideFromLeft } from "../animations/variants";
-import { useLoadClassResult } from "../hooks/useAcademics";
+import { Users, Loader2, AlertCircle } from "lucide-react";
+import { useClassResult } from "../hooks/useAcademics";
+import type { ClassResultFilters } from "../types/classResult";
 import PageHeader from "@/shared/ui/PageHeader";
-import FormSelect from "@/shared/ui/FormSelect";
-import SubmitButton from "@/shared/ui/SubmitButton";
-import FormHeader from "../components/shared/FormHeader";
-import type { ClassResultData } from "../types/classResult";
-import { mockClassResult } from "../data/mockData";
+import Button from "@/shared/ui/Button";
+import ClassResultFilter from "../components/view-class-result/ClassResultFilter";
 import ClassResultStatCards from "../components/view-class-result/ClassResultStatCards";
 import ClassResultTable from "../components/view-class-result/ClassResultTable";
-import Button from "@/shared/ui/Button";
-
-const schema = z.object({
-  term: z.string().min(1, "Please select a term"),
-  session: z.string().min(1, "Please select a session"),
-  class: z.string().min(1, "Please select a class"),
-  class_group: z.string().min(1, "Please select a class group"),
-});
-type FormValues = z.infer<typeof schema>;
 
 const ViewClassResultPage: React.FC = () => {
-  const [classResult, setClassResult] = useState<ClassResultData | null>(null);
-  const loadMutation = useLoadClassResult();
-
-  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { term: "", session: "" },
-  });
-
-  const onSubmit = (values: FormValues) => {
-    loadMutation.mutate(values, {
-      onSuccess: () => {
-        setClassResult(mockClassResult);
-        console.log("testing button")
-      },
-    });
-  };
-
-  const termOptions = [
-    { value: "First Term", label: "First Term" },
-    { value: "Second Term", label: "Second Term" },
-    { value: "Third Term", label: "Third Term" },
-  ];
-
-  const sessionOptions = [
-    { value: "2025/2026", label: "2025/2026" },
-    { value: "2024/2025", label: "2024/2025" },
-    { value: "2023/2024", label: "2023/2024" },
-  ];
+  const [filters, setFilters] = useState<ClassResultFilters | null>(null);
+  const { data, isFetching, isError, error } = useClassResult(filters);
 
   return (
     <div>
@@ -62,75 +21,23 @@ const ViewClassResultPage: React.FC = () => {
         showAdd={false}
       />
 
-      {/* Filter Card */}
-      <motion.div
-        variants={slideFromLeft}
-        initial="hidden"
-        animate="show"
-        className="bg-white rounded-2xl card-shadow mb-6"
-      >
-        <FormHeader
-            title="Class Result Filter"
-            icon={<Users className="w-4 h-4 text-brand-primary" />}
-          />
-        <form onSubmit={handleSubmit(onSubmit)} noValidate className="p-6">
-          <div className="grid md:grid-cols-4 gap-4 mb-5">
-            <div>
-              <FormSelect
-                label="Class"
-                placeholder="Select class"
-                options={termOptions}
-                isLoading={loadMutation.isPending}
-                error={errors.class?.message}
-                {...register("class")}
-              />
-            </div>
+      <ClassResultFilter isLoading={isFetching} onSubmit={setFilters} />
 
-            <div>
-              <FormSelect
-                label="Class Group"
-                placeholder="Select class group"
-                options={sessionOptions}
-                isLoading={loadMutation.isPending}
-                error={errors.class_group?.message}
-                {...register("class_group")}
-              />
-            </div>
+      {isFetching && (
+        <div className="flex items-center justify-center gap-2 py-16 text-text-muted">
+          <Loader2 size={18} className="animate-spin" />
+          <span className="text-sm">Loading results…</span>
+        </div>
+      )}
 
-             <div>
-              <FormSelect
-                label="Term"
-                placeholder="Select term"
-                options={termOptions}
-                isLoading={loadMutation.isPending}
-                error={errors.term?.message}
-                {...register("term")}
-              />
-            </div>
+      {isError && !isFetching && (
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 text-danger text-sm">
+          <AlertCircle size={16} />
+          {error instanceof Error ? error.message : "Failed to load class result."}
+        </div>
+      )}
 
-            <div>
-              <FormSelect
-                label="Session"
-                placeholder="Select session"
-                options={sessionOptions}
-                isLoading={loadMutation.isPending}
-                error={errors.session?.message}
-                {...register("session")}
-              />
-            </div>
-          </div>
-
-          {/* Load Button */}
-          <SubmitButton
-            label="Load Students"
-            isLoading={loadMutation.isPending}
-            className="w-50"
-          />
-        </form>
-      </motion.div>
-
-      {/* Empty State */}
-      {!classResult && (
+      {!data && !isFetching && !isError && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -140,26 +47,24 @@ const ViewClassResultPage: React.FC = () => {
           <div className="w-20 h-20 rounded-full bg-blue-50 flex-center mb-4">
             <Users className="w-9 h-9 text-brand-primary" />
           </div>
-          <h3 className="text-lg font-semibold text-text-nav mb-2">
-            No class loaded yet
-          </h3>
+          <h3 className="text-lg font-semibold text-text-nav mb-2">No class loaded yet</h3>
           <p className="text-sm text-text-muted max-w-md">
-            Select a class, group, term and session above then click{" "}
+            Select a class, group, session and term above then click{" "}
             <span className="font-semibold text-text-nav">Load Students</span>
           </p>
         </motion.div>
       )}
 
-      {classResult && (
+      {data && !isFetching && (
         <div className="flex flex-col gap-6 mt-6">
-          <ClassResultStatCards result={classResult} />
-          <ClassResultTable result={classResult} />
+          <ClassResultStatCards result={data} />
+          <ClassResultTable result={data} />
           <div className="flex justify-end">
             <Button
               variant="primary"
               onClick={() => {
                 // TODO: Implement printable class result format (UI not provided yet)
-                console.log("View printable format for", classResult.className);
+                console.log("View printable format for", data.class.name);
               }}
             >
               View Printable Format

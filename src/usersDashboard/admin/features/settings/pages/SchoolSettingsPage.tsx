@@ -74,3 +74,49 @@ export default function SchoolSettingsPage() {
     </motion.div>
   );
 }
+
+// TEMP DEBUG: remove after checking console output
+// import { useEffect } from "react";
+
+// const BASE = "https://api.schoolzy.com.ng/api/v1";
+// const TENANT = "etihad"; // TODO: your real tenant slug
+
+// export default function EditSchoolProbe() {
+//   useEffect(() => {
+//     (async () => {
+//       console.log("PROBE edit-school running");
+//       // No Content-Type here: the browser must set the multipart boundary itself
+//       const headers = {
+//         Authorization: `Token ${localStorage.getItem("schoolzy_token")}`,
+//         "X-Tenant-Domain": `${TENANT}.schoolzy.com.ng`,
+//       };
+
+//       const show = async (label: string, res: Response) => {
+//         const text = await res.text();
+//         let body: unknown = text.slice(0, 800);
+//         try { body = JSON.parse(text); } catch { /* keep raw text */ }
+//         console.log(`${label} → ${res.status}`, body);
+//         return body as Record<string, unknown>;
+//       };
+
+//       // 1. Read current settings (the doc lists PATCH only, so GET may 405)
+//       const before = await show("GET /public/settings/", await fetch(`${BASE}/public/settings/`, { headers }));
+
+//       // 2. PATCH one text field, no image, to isolate the basic behaviour
+//       const fd = new FormData();
+//       fd.append("motto", "PROBE MOTTO");
+//       await show("PATCH text only", await fetch(`${BASE}/public/settings/`, { method: "PATCH", headers, body: fd }));
+
+//       // 3. Restore the original motto if we managed to read it
+//       if (before && typeof before.motto === "string") {
+//         const restore = new FormData();
+//         restore.append("motto", before.motto);
+//         await show("PATCH restore", await fetch(`${BASE}/public/settings/`, { method: "PATCH", headers, body: restore }));
+//       } else {
+//         console.log("Could not read the original motto, restore it manually");
+//       }
+//     })();
+//   }, []);
+
+//   return <div className="p-6">Check console…</div>;
+// }

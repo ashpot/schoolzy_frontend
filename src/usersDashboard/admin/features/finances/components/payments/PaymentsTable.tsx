@@ -5,9 +5,6 @@ import { staggerContainer, rowVariant } from "../../animations/variants";
 import { useDeletePayment } from "../../hooks/useFinances";
 import { formatNaira, formatDisplayDate } from "../../utils/feeUtils";
 import { avatarColor, getInitials } from "../../data/mockData";
-import FeeTypeBadge from "../shared/FeeTypeBadge";
-import SectionBadge from "../shared/SectionBadge";
-import BalanceBadge from "./BalanceBadge";
 import type { Payment } from "../../types";
 import Button from "@/shared/ui/Button";
 import EditModal, { type EditField } from "@/shared/modal/EditModal";
@@ -27,7 +24,7 @@ const PAYMENT_EDIT_FIELDS: EditField<Payment>[] = [
 
 export default function PaymentsTable({ items, onDelete }: PaymentsTableProps) {
   const [search, setSearch] = useState("");
-  const [page, setPage]     = useState(1);
+  const [page, setPage] = useState(1);
   const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Payment | null>(null);
   const deleteMutation = useDeletePayment();
@@ -36,15 +33,16 @@ export default function PaymentsTable({ items, onDelete }: PaymentsTableProps) {
     () => items.filter((p) =>
       p.studentName.toLowerCase().includes(search.toLowerCase()) ||
       p.feeName.toLowerCase().includes(search.toLowerCase()) ||
-      p.admissionNo.toLowerCase().includes(search.toLowerCase())
+      p.admissionNo.toLowerCase().includes(search.toLowerCase()) ||
+      p.receiptNumber.toLowerCase().includes(search.toLowerCase())
     ),
     [items, search]
   );
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const start = filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
-  const end   = Math.min(page * PAGE_SIZE, filtered.length);
+  const end = Math.min(page * PAGE_SIZE, filtered.length);
 
   const handleConfirmDelete = () => {
     if (pendingDelete) {
@@ -58,14 +56,13 @@ export default function PaymentsTable({ items, onDelete }: PaymentsTableProps) {
   };
 
   const handleSaveEdit = (updated: Payment) => {
-    // TODO: Replace with actual API call e.g. api.patch(`/finances/payments/${updated.id}/`, updated)
+    // TODO: Replace with actual API call e.g. api.patch(`/finances/payments/${updated.id}/`, updated) — no edit endpoint yet
     console.log("Saving edited payment:", updated);
     setEditingPayment(null);
   };
 
   return (
     <div className="bg-white rounded-2xl card-shadow overflow-hidden">
-      {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-border-line02">
         <div className="flex items-center gap-2">
           <Users size={16} className="text-brand-primary" />
@@ -86,7 +83,6 @@ export default function PaymentsTable({ items, onDelete }: PaymentsTableProps) {
         </div>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full text-sm min-w-max">
           <thead>
@@ -94,6 +90,7 @@ export default function PaymentsTable({ items, onDelete }: PaymentsTableProps) {
               <th className="px-6 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wide w-12">#</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wide">Student</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wide">Fee</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wide">Receipt No.</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wide">Received By</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wide">Amount</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wide">Balance</th>
@@ -103,7 +100,7 @@ export default function PaymentsTable({ items, onDelete }: PaymentsTableProps) {
           <motion.tbody key={page} variants={staggerContainer} initial="hidden" animate="show">
             {paginated.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-16 text-center">
+                <td colSpan={8} className="py-16 text-center">
                   <div className="flex flex-col items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center">
                       <Clock size={22} className="text-brand-primary" />
@@ -124,58 +121,53 @@ export default function PaymentsTable({ items, onDelete }: PaymentsTableProps) {
                     {(page - 1) * PAGE_SIZE + idx + 1}
                   </td>
 
-                  {/* Student */}
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-2.5">
-                      <div className={`w-8 h-8 rounded-full flex-center text-xs font-bold shrink-0 ${avatarColor(payment.studentName)}`}>
-                        {getInitials(payment.studentName)}
+                      <div className={`w-8 h-8 rounded-full flex-center text-xs font-bold shrink-0 ${avatarColor(payment.studentName || "?")}`}>
+                        {getInitials(payment.studentName || "?")}
                       </div>
                       <div>
-                        <p className="font-medium text-text-primary">{payment.studentName}</p>
-                        <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                          <span className="text-xs text-text-muted">{payment.admissionNo}</span>
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-600">{payment.studentClass}</span>
-                          <SectionBadge label={payment.sectionLabel} size="sm" />
-                        </div>
+                        <p className="font-medium text-text-primary">{payment.studentName || "—"}</p>
+                        <span className="text-xs text-text-muted">{payment.admissionNo || "—"}</span>
                       </div>
                     </div>
                   </td>
 
-                  {/* Fee */}
                   <td className="px-4 py-4">
                     <p className="font-medium text-text-primary">{payment.feeName}</p>
-                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                      <FeeTypeBadge name={payment.feeTypeName} index={payment.feeTypeIndex} size="sm" />
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium border
-                        ${payment.term === "First Term"  ? "bg-blue-50 text-blue-700 border-blue-100" :
-                          payment.term === "Second Term" ? "bg-purple-50 text-purple-700 border-purple-100" :
-                          "bg-green-50 text-green-700 border-green-100"}`}>
-                        {payment.term}
-                      </span>
-                    </div>
+                    <p className="text-xs text-text-muted mt-0.5">{payment.description}</p>
                   </td>
 
-                  {/* Received By */}
+                  <td className="px-4 py-4 text-text-secondary font-mono text-xs">
+                    {payment.receiptNumber}
+                  </td>
+
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-1.5 text-text-secondary">
                       <Clock size={12} className="text-text-muted shrink-0" />
                       <div>
-                        <p className="text-sm font-medium text-text-primary">{payment.receivedBy}</p>
+                        <p className="text-sm font-medium text-text-primary">{payment.receivedByLabel || "—"}</p>
                         <p className="text-xs text-text-muted">{formatDisplayDate(payment.receivedDate)}</p>
                       </div>
                     </div>
                   </td>
 
-                  {/* Amount */}
-                  <td className="px-4 py-4">
-                    <p className="font-semibold text-text-primary">{formatNaira(payment.amount)}</p>
-                    <p className="text-xs text-text-muted mt-0.5">of {formatNaira(payment.totalFeeAmount)}</p>
+                  <td className="px-4 py-4 font-semibold text-text-primary">
+                    {formatNaira(payment.amount)}
                   </td>
 
-                  {/* Balance */}
                   <td className="px-4 py-4">
-                    <BalanceBadge amount={payment.amount} totalFeeAmount={payment.totalFeeAmount} />
+                    {payment.balance <= 0 ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-100">
+                        Paid
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-600 border border-red-100">
+                        {formatNaira(payment.balance)}
+                      </span>
+                    )}
                   </td>
+
                   <td className="px-4 py-4 text-right">
                     <div className="flex justify-end items-center gap-1" onClick={(e) => e.stopPropagation()}>
                       <EditButton onClick={() => setEditingPayment(payment)} />
@@ -197,7 +189,6 @@ export default function PaymentsTable({ items, onDelete }: PaymentsTableProps) {
         </table>
       </div>
 
-      {/* Footer */}
       <div className="flex items-center justify-between px-6 py-4 border-t border-border-line02">
         <p className="text-xs text-text-muted">
           Showing <span className="font-semibold text-text-primary">{start}–{end}</span> of{" "}
@@ -229,7 +220,7 @@ export default function PaymentsTable({ items, onDelete }: PaymentsTableProps) {
 
       <DeleteConfirmModal
         isOpen={pendingDelete !== null}
-        itemLabel={pendingDelete?.studentName ?? ""}
+        itemLabel={pendingDelete?.studentName || pendingDelete?.receiptNumber || ""}
         isDeleting={deleteMutation.isPending}
         onConfirm={handleConfirmDelete}
         onCancel={() => setPendingDelete(null)}

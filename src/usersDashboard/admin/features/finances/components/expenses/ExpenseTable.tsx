@@ -4,7 +4,6 @@ import { ShoppingCart, Search, Calendar, Clock, Trash2 } from "lucide-react";
 import { staggerContainer, rowVariant } from "../../animations/variants";
 import { useDeleteExpense } from "../../hooks/useFinances";
 import { formatNaira, formatDisplayDate } from "../../utils/feeUtils";
-import { expenseCategoryColor } from "../../data/mockData";
 import Button from "@/shared/ui/Button";
 import type { Expense } from "../../types";
 import EditModal, { type EditField } from "@/shared/modal/EditModal";
@@ -25,29 +24,20 @@ const EXPENSE_EDIT_FIELDS: EditField<Expense>[] = [
 
 export default function ExpenseTable({ items, onDelete }: ExpenseTableProps) {
   const [search, setSearch] = useState("");
-  const [page, setPage]     = useState(1);
+  const [page, setPage] = useState(1);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Expense | null>(null);
   const deleteMutation = useDeleteExpense();
 
   const filtered = useMemo(
-    () => items.filter((e) =>
-      e.description.toLowerCase().includes(search.toLowerCase()) ||
-      e.category.toLowerCase().includes(search.toLowerCase())
-    ),
+    () => items.filter((e) => e.description.toLowerCase().includes(search.toLowerCase())),
     [items, search]
   );
 
-  const pageSubtotal = useMemo(() => {
-    const pageItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-    return pageItems.reduce((s, e) => s + e.amount, 0);
-  }, [filtered, page]);
-
-  const grandTotal  = useMemo(() => filtered.reduce((s, e) => s + e.amount, 0), [filtered]);
-  const totalPages  = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated   = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const start = filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
-  const end   = Math.min(page * PAGE_SIZE, filtered.length);
+  const end = Math.min(page * PAGE_SIZE, filtered.length);
 
   const handleConfirmDelete = () => {
     if (pendingDelete) {
@@ -61,14 +51,13 @@ export default function ExpenseTable({ items, onDelete }: ExpenseTableProps) {
   };
 
   const handleSaveEdit = (updated: Expense) => {
-    // TODO: Replace with actual API call e.g. api.patch(`/finances/expenses/${updated.id}/`, updated)
+    // TODO: Replace with actual API call e.g. api.patch(`/finances/expenses/${updated.id}/`, updated) — no edit endpoint yet
     console.log("Saving edited expense:", updated);
     setEditingExpense(null);
   };
 
   return (
     <div className="bg-white rounded-2xl card-shadow overflow-hidden">
-      {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-border-line02">
         <div className="flex items-center gap-2">
           <ShoppingCart size={16} className="text-brand-primary" />
@@ -89,7 +78,6 @@ export default function ExpenseTable({ items, onDelete }: ExpenseTableProps) {
         </div>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full text-sm min-w-max">
           <thead>
@@ -130,12 +118,7 @@ export default function ExpenseTable({ items, onDelete }: ExpenseTableProps) {
                       <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center shrink-0 mt-0.5">
                         <ShoppingCart size={13} className="text-brand-primary" />
                       </div>
-                      <div>
-                        <p className="font-medium text-text-primary leading-snug">{expense.description}</p>
-                        <span className={`mt-1 inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${expenseCategoryColor(expense.category)}`}>
-                          {expense.category}
-                        </span>
-                      </div>
+                      <p className="font-medium text-text-primary leading-snug">{expense.description}</p>
                     </div>
                   </td>
                   <td className="px-4 py-4 font-semibold text-brand-primary">
@@ -150,7 +133,7 @@ export default function ExpenseTable({ items, onDelete }: ExpenseTableProps) {
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-1.5 text-text-secondary">
                       <Clock size={12} className="text-text-muted shrink-0" />
-                      <span className="text-sm">{expense.recordedBy}</span>
+                      <span className="text-sm">{expense.recordedByLabel || "—"}</span>
                     </div>
                   </td>
                   <td className="px-4 py-4 text-right">
@@ -171,28 +154,9 @@ export default function ExpenseTable({ items, onDelete }: ExpenseTableProps) {
               ))
             )}
           </motion.tbody>
-
-          {/* Page subtotal + grand total row */}
-          {filtered.length > 0 && (
-            <tfoot>
-              <tr className="border-t border-border-line02 bg-gray-50/40">
-                <td colSpan={2} className="px-6 py-2.5 text-xs text-text-muted">
-                  Page subtotal ({paginated.length} records)
-                </td>
-                <td className="px-4 py-2.5 font-semibold text-text-primary text-sm">
-                  {formatNaira(pageSubtotal)}
-                </td>
-                <td colSpan={2} className="px-4 py-2.5 text-xs text-text-muted text-right">
-                  Grand total: <span className="font-semibold text-text-primary">{formatNaira(grandTotal)}</span>
-                </td>
-                <td />
-              </tr>
-            </tfoot>
-          )}
         </table>
       </div>
 
-      {/* Footer */}
       <div className="flex items-center justify-between px-6 py-4 border-t border-border-line02">
         <p className="text-xs text-text-muted">
           Showing <span className="font-semibold text-text-primary">{start}–{end}</span> of{" "}

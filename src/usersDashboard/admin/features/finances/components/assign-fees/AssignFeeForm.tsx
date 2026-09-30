@@ -2,10 +2,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import { assignFeeSchema, type AssignFeeValues } from "../../schemas";
-import { useAssignFee } from "../../hooks/useFinances";
-import { sectionOptions } from "../../data/mockData";
+import { useAssignFee, useSectionsList } from "../../hooks/useFinances";
 import { formatNaira } from "../../utils/feeUtils";
-import type { AssignedFee, Fee } from "../../types";
+import type { AssignedFee, Fee, AssignFeePayload } from "../../types";
 import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import FormHeader from "@/shared/ui/FormHeader";
@@ -17,40 +16,37 @@ interface AssignFeeFormProps {
 
 export default function AssignFeeForm({ fees, onSuccess }: AssignFeeFormProps) {
   const mutation = useAssignFee();
+  const { data: sections, isLoading: sectionsLoading } = useSectionsList();
 
   const feeOptions = fees.map((f) => ({
     value: f.id,
     label: `${f.name} — ${formatNaira(f.amount)}`,
   }));
+  const sectionOptions = (sections ?? []).map((s) => ({
+    value: String(s.id),
+    label: s.title,
+  }));
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<AssignFeeValues>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<AssignFeeValues>({
     resolver: zodResolver(assignFeeSchema),
     defaultValues: { feeId: "", sectionId: "" },
   });
 
   const onSubmit = (values: AssignFeeValues) => {
-    const fee = fees.find((f) => f.id === values.feeId);
-    const section = sectionOptions.find((s) => s.value === values.sectionId);
-    if (!fee || !section) return;
+    const payload: AssignFeePayload = {
+      fee: Number(values.feeId),
+      section: Number(values.sectionId),
+    };
 
-    mutation.mutate(values, {
-      onSuccess: () => {
-        const newItem: AssignedFee = {
-          id: Date.now().toString(),
-          feeId: fee.id,
-          feeName: fee.name,
-          feeTypeName: fee.feeTypeName,
-          feeTypeIndex: fees.findIndex((f) => f.feeTypeId === fee.feeTypeId),
-          amount: fee.amount,
-          sectionId: section.value,
-          sectionLabel: section.label,
-        };
-        onSuccess(newItem);
+    mutation.mutate(payload, {
+      onSuccess: (response) => {
+        onSuccess({
+          id: String(response.id),
+          feeId: String(response.fee),
+          feeName: response.fee_name,
+          sectionId: String(response.section),
+          sectionLabel: response.section_name,
+        });
         reset();
       },
     });
@@ -69,8 +65,9 @@ export default function AssignFeeForm({ fees, onSuccess }: AssignFeeFormProps) {
         />
         <FormSelect
           label="Section"
-          placeholder="Select section"
+          placeholder={sectionsLoading ? "Loading sections..." : "Select section"}
           options={sectionOptions}
+          isLoading={sectionsLoading}
           error={errors.sectionId?.message}
           {...register("sectionId")}
         />

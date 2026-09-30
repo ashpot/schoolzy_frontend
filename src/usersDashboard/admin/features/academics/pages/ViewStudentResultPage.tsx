@@ -146,3 +146,5 @@ const ViewStudentResultPage: React.FC = () => {
 };
 
 export default ViewStudentResultPage;
+
+

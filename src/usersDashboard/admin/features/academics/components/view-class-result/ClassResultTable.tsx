@@ -1,26 +1,26 @@
 import React, { useState } from "react";
 import { Search } from "lucide-react";
-import type { ClassResultData } from "../../types/classResult";
+import type { ClassResultResponse } from "../../types/classResult";
 import AvatarInitials from "../../../users/components/shared/AvatarInitials";
 
-interface ClassResultTableProps {
-  result: ClassResultData;
-}
-
 const PER_PAGE = 10;
+const HEADERS = ["#", "STUDENT NAME", "SUBJECTS OFFERED", "TOTAL", "AVERAGE", "GRADE", "POSITION"];
 
-const ClassResultTable: React.FC<ClassResultTableProps> = ({ result }) => {
+const ClassResultTable: React.FC<{ result: ClassResultResponse }> = ({ result }) => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
+  const q = search.toLowerCase();
   const filtered = result.students.filter(
     (s) =>
-      s.fullName.toLowerCase().includes(search.toLowerCase()) ||
-      s.admissionNumber.toLowerCase().includes(search.toLowerCase())
+      s.student.full_name.toLowerCase().includes(q) ||
+      (s.student.admission_number ?? "").toLowerCase().includes(q)
   );
   const start = (page - 1) * PER_PAGE;
   const paged = filtered.slice(start, start + PER_PAGE);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+
+  // TODO: per-subject score columns once students[].subjects shape is confirmed
 
   return (
     <div className="bg-white rounded-2xl card-shadow overflow-hidden">
@@ -28,7 +28,7 @@ const ClassResultTable: React.FC<ClassResultTableProps> = ({ result }) => {
         <div className="flex items-center gap-2">
           <h3 className="section-title">Result Sheet</h3>
           <span className="px-2 py-0.5 rounded-full bg-bg-input text-xs font-medium text-brand-primary">
-            {result.className} - {result.term}, {result.session}
+            {result.class.name} - {result.term.name}, {result.term.session}
           </span>
         </div>
         <div className="relative">
@@ -45,39 +45,37 @@ const ClassResultTable: React.FC<ClassResultTableProps> = ({ result }) => {
       <table className="w-full text-sm">
         <thead>
           <tr className="text-left text-text-muted text-xs">
-            <th className="px-6 py-3 font-medium">#</th>
-            <th className="px-6 py-3 font-medium">STUDENT NAME</th>
-            {result.subjects.map((subj) => (
-              <th key={subj} className="px-6 py-3 font-medium">{subj.toUpperCase()}</th>
-            ))}
-            <th className="px-6 py-3 font-medium">TOTAL SUBJECTS</th>
-            <th className="px-6 py-3 font-medium">TOTAL MARKS OBTAINABLE</th>
-            <th className="px-6 py-3 font-medium">CUMULATIVE TOTAL</th>
+            {HEADERS.map((h) => <th key={h} className="px-6 py-3 font-medium">{h}</th>)}
           </tr>
         </thead>
         <tbody>
-          {paged.map((s, i) => (
-            <tr key={s.id} className="border-t border-border-line02 hover:bg-bg-soft/50">
-              <td className="px-6 py-3.5 text-text-muted">{start + i + 1}</td>
-              <td className="px-6 py-3.5">
-                <div className="flex items-center gap-2.5">
-                  <AvatarInitials name={s.fullName} />
-                  <div>
-                    <p className="font-medium text-text-primary">{s.fullName}</p>
-                    <p className="text-xs text-text-muted">{s.admissionNumber}</p>
-                  </div>
-                </div>
+          {paged.length === 0 ? (
+            <tr>
+              <td colSpan={HEADERS.length} className="py-12 text-center text-text-muted text-sm">
+                No students found for this class and term
               </td>
-              {result.subjects.map((subj) => (
-                <td key={subj} className="px-6 py-3.5 text-text-secondary">
-                  {s.scores.find((sc) => sc.subject === subj)?.score ?? "—"}
-                </td>
-              ))}
-              <td className="px-6 py-3.5 text-text-secondary">{s.totalSubjects}</td>
-              <td className="px-6 py-3.5 text-text-secondary">{s.marksObtainable}</td>
-              <td className="px-6 py-3.5 font-semibold text-text-primary">{s.cumulativeTotal}</td>
             </tr>
-          ))}
+          ) : (
+            paged.map((s, i) => (
+              <tr key={s.student.id} className="border-t border-border-line02 hover:bg-bg-soft/50">
+                <td className="px-6 py-3.5 text-text-muted">{start + i + 1}</td>
+                <td className="px-6 py-3.5">
+                  <div className="flex items-center gap-2.5">
+                    <AvatarInitials name={s.student.full_name} />
+                    <div>
+                      <p className="font-medium text-text-primary">{s.student.full_name}</p>
+                      <p className="text-xs text-text-muted">{s.student.admission_number ?? "—"}</p>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-3.5 text-text-secondary">{s.summary.subjects_offered}</td>
+                <td className="px-6 py-3.5 font-semibold text-text-primary">{s.summary.total}</td>
+                <td className="px-6 py-3.5 text-text-secondary">{s.summary.average.toFixed(1)}</td>
+                <td className="px-6 py-3.5 text-text-secondary">{s.summary.grade}</td>
+                <td className="px-6 py-3.5 text-text-secondary">{s.summary.class_position ?? "—"}</td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
 

@@ -1,22 +1,23 @@
-import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Plus, CreditCard, Banknote, Clock } from "lucide-react";
+import { CreditCard, Banknote, Clock, Loader2, AlertCircle } from "lucide-react";
 import { fadeUp } from "../animations/variants";
-import { mockFees, mockFeeTypes } from "../data/mockData";
+import { useFeesList, useFeeTypesList } from "../hooks/useFinances";
 import { isOverdue, formatNaira } from "../utils/feeUtils";
 import FeesForm from "../components/fees/FeesForm";
 import FeesTable from "../components/fees/FeesTable";
 import SplitLayout from "../components/shared/SplitLayout";
 import StatPill from "../components/shared/StatPill";
-import Button from "@/shared/ui/Button";
-import type { Fee, FeeType } from "../types";
 
 export default function FeesPage() {
-  const [fees, setFees] = useState<Fee[]>(mockFees);
-  const [feeTypes] = useState<FeeType[]>(mockFeeTypes);
+  const { data: feesData, isLoading: feesLoading, isError: feesError, error: feesErrObj } = useFeesList();
+  const { data: feeTypesData, isLoading: feeTypesLoading } = useFeeTypesList();
 
-  const totalAmount = useMemo(() => fees.reduce((sum, f) => sum + f.amount, 0), [fees]);
-  const overdueCount = useMemo(() => fees.filter((f) => isOverdue(f.dateDue)).length, [fees]);
+  const fees = feesData ?? [];
+  const feeTypes = feeTypesData ?? [];
+  const isLoading = feesLoading || feeTypesLoading;
+
+  const totalAmount = fees.reduce((sum, f) => sum + f.amount, 0);
+  const overdueCount = fees.filter((f) => isOverdue(f.dateDue)).length;
 
   return (
     <motion.div variants={fadeUp} initial="hidden" animate="show" className="dashboard-p space-y-6">
@@ -31,26 +32,25 @@ export default function FeesPage() {
           <StatPill icon={CreditCard} label="Total Fees"   value={fees.length}             variant="blue"  />
           <StatPill icon={Banknote}   label="Total Amount" value={formatNaira(totalAmount)} variant="green" />
           <StatPill icon={Clock}      label="Overdue"      value={overdueCount}             variant="amber" />
-          <Button variant="primary" size="md" leftIcon={<Plus/>}>
-            Create Fee
-          </Button>
         </div>
       </div>
 
-      <SplitLayout
-        left={
-          <FeesForm
-            feeTypes={feeTypes}
-            onSuccess={(newFee) => setFees((prev) => [newFee, ...prev])}
-          />
-        }
-        right={
-          <FeesTable
-            items={fees}
-            onDelete={(id) => setFees((prev) => prev.filter((f) => f.id !== id))}
-          />
-        }
-      />
+      {isLoading ? (
+        <div className="flex items-center justify-center gap-2 py-16 text-text-muted">
+          <Loader2 size={18} className="animate-spin" />
+          <span className="text-sm">Loading fees…</span>
+        </div>
+      ) : feesError ? (
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 text-danger text-sm">
+          <AlertCircle size={16} />
+          {feesErrObj instanceof Error ? feesErrObj.message : "Failed to load fees."}
+        </div>
+      ) : (
+        <SplitLayout
+          left={<FeesForm feeTypes={feeTypes} onSuccess={() => {}} />}
+          right={<FeesTable items={fees} onDelete={() => {}} />}
+        />
+      )}
     </motion.div>
   );
 }
