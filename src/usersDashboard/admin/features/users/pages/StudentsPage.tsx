@@ -25,7 +25,7 @@ const COLUMNS: ColumnDef<Student>[] = [
   },
   {
     key: "admNo", header: "Adm. No.",
-    render: (s) => <span className="text-text-muted">{s.admNo}</span>,
+    render: (s) => <span className="text-text-muted">{s.admission_number}</span>,
   },
   {
     key: "username", header: "Username",

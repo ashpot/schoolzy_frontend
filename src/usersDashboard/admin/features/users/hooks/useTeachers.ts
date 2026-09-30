@@ -21,7 +21,7 @@ export const useTeachersList = (page = 1, search = "") =>
             t.firstName.toLowerCase().includes(q) ||
             t.lastName.toLowerCase().includes(q) ||
             t.username.toLowerCase().includes(q) ||
-            t.empNo.toLowerCase().includes(q)
+            t.employment_number.toLowerCase().includes(q)
         );
       }
 

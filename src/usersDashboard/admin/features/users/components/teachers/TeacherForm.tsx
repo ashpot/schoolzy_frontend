@@ -19,7 +19,7 @@ const SEX_OPTIONS = [
 
 const TeacherForm: React.FC = () => {
   const { mutate, isPending } = useAddTeacher();
-  const [createdUser, setCreatedUser] = useState<{ fullName: string; username: string; password: string } | null>(null);
+  const [createdUser, setCreatedUser] = useState<{ fullName: string; username: string; password: string, employmentNumber: string } | null>(null);
 
   const {
     register,
@@ -31,7 +31,7 @@ const TeacherForm: React.FC = () => {
   } = useForm<TeacherFormValues>({
     resolver: zodResolver(teacherSchema),
     defaultValues: {
-      empNo: "", firstName: "", lastName: "", middleName: "",
+      employment_number: "", firstName: "", lastName: "", middleName: "",
       sex: undefined, dob: "", phone: "", address: "", city: "",
       state: "", country: "", email: "", dateOfEmployment: "",
       username: "", password: "", confirmPassword: "",
@@ -53,12 +53,14 @@ const TeacherForm: React.FC = () => {
         username: values.username,
         password: values.password,
         email: values.email,
+        employment_number: values.employment_number,
       },
       { onSuccess: () =>{
          setCreatedUser({
             fullName: `${values.firstName} ${values.lastName}`,
             username: values.username,
             password: values.password,
+            employmentNumber: values.employment_number,
           });
         reset()
       } }
@@ -80,7 +82,7 @@ const TeacherForm: React.FC = () => {
       <motion.div variants={staggerContainer} initial="hidden" animate="show" className="flex flex-col gap-3.5 mt-2">
         <motion.div variants={fieldFadeUp}>
           <FormInput label="Employment Number" placeholder="e.g. TCH/2024/013"
-            isLoading={isPending} error={errors.empNo?.message} {...register("empNo")} />
+            isLoading={isPending} error={errors.employment_number?.message} {...register("employment_number")} />
         </motion.div>
 
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">

@@ -15,7 +15,8 @@ import UserCreatedModal from "../shared/UserCreatedModal";
 const StudentForm: React.FC = () => {
   const { mutate, isPending } = useAddStudent();
   const { data: classGroups, isLoading: classGroupsLoading } = useClassGroupsList();
-  const [createdUser, setCreatedUser] = useState<{ fullName: string; username: string; password: string } | null>(null);
+  const [createdUser, setCreatedUser] =
+  useState<{ fullName: string; username: string; password: string; admissionNumber:string } | null>(null);
 
   const {
     register,
@@ -28,7 +29,7 @@ const StudentForm: React.FC = () => {
     resolver: zodResolver(studentSchema),
     defaultValues: {
       firstName: "", lastName: "", email: "", classGroup: "" as unknown as number,
-      username: "", password: "", confirmPassword: "", admNo: "",
+      username: "", password: "", confirmPassword: "", admission_number: "",
     },
   });
 
@@ -53,12 +54,14 @@ const StudentForm: React.FC = () => {
         password: values.password,
         email: values.email,
         class_group: values.classGroup,
+        admission_number: values.admission_number,
       },
       { onSuccess: () => {
         setCreatedUser({
           fullName: `${values.firstName} ${values.lastName}`,
           username: values.username,
           password: values.password,
+          admissionNumber: values.admission_number,
         });
         reset()
       } }
@@ -84,7 +87,7 @@ const StudentForm: React.FC = () => {
       >
         <motion.div variants={fieldFadeUp}>
           <FormInput label="Admission Number" placeholder="e.g. ADM/2024/013"
-            isLoading={isPending} error={errors.admNo?.message} {...register("admNo")} />
+            isLoading={isPending} error={errors.admission_number?.message} {...register("admission_number")} />
         </motion.div>
 
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">

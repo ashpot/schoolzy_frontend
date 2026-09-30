@@ -1,5 +1,5 @@
 export interface Student {
-  id: string; admNo: string; firstName: string; middleName?: string;
+  id: string; admission_number: string; firstName: string; middleName?: string;
   lastName: string; username: string; sex: "Male" | "Female"; dob: string;
   phone: string; address: string; city: string; state: string; country: string;
   email: string; classGroup: string; section: "Jnr Sec" | "Snr Sec";
@@ -18,7 +18,7 @@ export interface ClassGroupListItem {
 }
 
 export interface Teacher {
-  id: string; empNo: string; firstName: string; middleName?: string;
+  id: string; employment_number: string; firstName: string; middleName?: string;
   lastName: string; username: string; sex: "Male" | "Female"; dob: string;
   phone: string; address: string; city: string; state: string; country: string;
   email: string; classLabel: string; dateOfEmployment: string; photo?: string;

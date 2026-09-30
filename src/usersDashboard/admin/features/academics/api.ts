@@ -10,4 +10,6 @@ export const ACADEMICS_ENDPOINTS = {
   LIST_ASSESSMENT_TYPES: `${API_BASE_URL}/academics/assessment-types/`,
   CLASS_RESULT: (classGroupId: string, termId: string) =>
   `${API_BASE_URL}/results/classes/${classGroupId}/?term=${termId}`,
+  ASSIGN_SUBJECTS_TO_TEACHER: (teacherId: string) =>
+  `${API_BASE_URL}/academics/teachers/${teacherId}/assign-subjects/`,
 } as const;

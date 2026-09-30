@@ -117,3 +117,12 @@ export interface AssessmentTypeResponse {
   weeklable: boolean;
   section: number;
 }
+
+export interface AssignSubjectsPayload {
+  class_group: number;
+  subjects: number[];
+}
+export interface AssignSubjectsResponse {
+  message: string;
+  total_assigned: number;
+}

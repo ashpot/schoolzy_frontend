@@ -144,7 +144,4 @@ const ViewStudentResultPage: React.FC = () => {
     </div>
   );
 };
-
 export default ViewStudentResultPage;
-
-

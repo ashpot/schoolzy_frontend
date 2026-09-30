@@ -11,6 +11,8 @@ interface CreateUserPayload {
   password: string;
   email: string;
   class_group?: number; // Student only
+  admission_number?: string; // Student only
+  employment_number?: string; // Teacher only
 }
 
 export function createUserMutation(role: UserRole, queryKeyPrefix: string) {

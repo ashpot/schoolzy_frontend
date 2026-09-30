@@ -24,7 +24,7 @@ export const useStudentsList = (page = 1, search = "") =>
             s.firstName.toLowerCase().includes(q) ||
             s.lastName.toLowerCase().includes(q) ||
             s.username.toLowerCase().includes(q) ||
-            s.admNo.toLowerCase().includes(q)
+            s.admission_number.toLowerCase().includes(q)
         );
       }
 

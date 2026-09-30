@@ -16,7 +16,7 @@ import BulkUploadModal from "../components/shared/bulk-upload/BulkUploadModal";
 const COLUMNS: ColumnDef<Teacher>[] = [
   {
     key: "empNo", header: "Emp. No.",
-    render: (t) => <span className="text-text-muted text-xs">{t.empNo}</span>,
+    render: (t) => <span className="text-text-muted text-xs">{t.employment_number}</span>,
   },
   {
     key: "name", header: "Full Name",

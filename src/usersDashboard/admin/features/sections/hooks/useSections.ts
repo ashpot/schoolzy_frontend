@@ -3,6 +3,7 @@ import type { ClassValues, ClassGroupValues, FormTeacherValues, DenominatorValue
 import type { ClassGroupPayload, ClassPayload, SectionPayload, SectionListItem, ClassListItem, ClassGroupResponse, ClassResponse, SectionResponse, ClassGroupListItem } from "../types";
 import { apiRequest } from "@/shared/lib/apiClient";
 import { SECTIONS_ENDPOINTS } from "../api";
+import { USERS_ENDPOINTS } from "@/usersDashboard/admin/features/users/api";
 
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -146,5 +147,24 @@ export const useClassGroupsList = () => {
   return useQuery({
     queryKey: ["class-groups", "list"],
     queryFn: async () => apiRequest<ClassGroupListItem[]>(SECTIONS_ENDPOINTS.LIST_CLASS_GROUPS),
+  });
+};
+
+interface TeacherOption {
+  id: number;
+  first_name: string;
+  last_name: string;
+  role: string;
+}
+
+// Teacher dropdown source — ?role= is broken server-side (returns
+// unfiltered list), so fetch everyone and filter client-side by real role.
+export const useTeacherOptionsList = () => {
+  return useQuery({
+    queryKey: ["users", "teachers", "options"],
+    queryFn: async () => {
+      const raw = await apiRequest<TeacherOption[]>(USERS_ENDPOINTS.LIST_ALL);
+      return raw.filter((u) => u.role === "Teacher");
+    },
   });
 };

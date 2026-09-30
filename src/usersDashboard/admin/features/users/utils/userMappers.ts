@@ -13,7 +13,7 @@ export function toStudent(u: UserResponse, classGroups: ClassGroupListItem[]): S
   const cg = classGroups.find((c) => c.id === u.class_group);
   return {
     id: String(u.id),
-    admNo: u.admission_number ?? "—",
+    admission_number: u.admission_number ?? "—",
     firstName: u.first_name,
     middleName: u.middle_name ?? undefined,
     lastName: u.last_name,
@@ -37,7 +37,7 @@ export function toStudent(u: UserResponse, classGroups: ClassGroupListItem[]): S
 export function toTeacher(u: UserResponse): Teacher {
   return {
     id: String(u.id),
-    empNo: u.employment_number ?? "—",
+    employment_number: u.employment_number ?? "—",
     firstName: u.first_name,
     middleName: u.middle_name ?? undefined,
     lastName: u.last_name,
