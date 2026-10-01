@@ -10,7 +10,6 @@ import SessionForm from "../components/sessions-page/SessionForm";
 import SessionsTable from "../components/sessions-page/SessionsTable";
 import SessionCreatedModal from "../components/shared/SessionCreateModal";
 
-// API shape → UI shape
 function toSession(item: SessionListItem): Session {
   return {
     id: String(item.id),
@@ -28,8 +27,6 @@ export default function SessionsPage() {
   const sessions = (data ?? []).map(toSession);
   const activeSession = sessions.find((s) => s.isActive);
 
-  // Query invalidation (see useCreateSession) refetches the list on success,
-  // so we only need this to drive the "created" confirmation modal.
   const handleCreate = (session: Session) => {
     setCreatedSession(session);
   };
@@ -48,22 +45,24 @@ export default function SessionsPage() {
         )}
       </div>
 
-      {isLoading ? (
-        <div className="flex items-center justify-center gap-2 py-16 text-text-muted">
-          <Loader2 size={18} className="animate-spin" />
-          <span className="text-sm">Loading sessions…</span>
-        </div>
-      ) : isError ? (
-        <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 text-danger text-sm">
-          <AlertCircle size={16} />
-          {error instanceof Error ? error.message : "Failed to load sessions."}
-        </div>
-      ) : (
-        <SplitLayout
-          left={<SessionForm onSuccess={handleCreate} />}
-          right={<SessionsTable sessions={sessions} onDelete={() => {}} />}
-        />
-      )}
+      <SplitLayout
+        left={<SessionForm onSuccess={handleCreate} />}
+        right={
+          isLoading ? (
+            <div className="bg-white rounded-2xl card-shadow flex items-center justify-center gap-2 py-16 text-text-muted">
+              <Loader2 size={18} className="animate-spin" />
+              <span className="text-sm">Loading sessions…</span>
+            </div>
+          ) : isError ? (
+            <div className="bg-white rounded-2xl card-shadow flex items-center gap-2 px-4 py-16 justify-center text-danger text-sm">
+              <AlertCircle size={16} />
+              {error instanceof Error ? error.message : "Failed to load sessions."}
+            </div>
+          ) : (
+            <SessionsTable sessions={sessions} onDelete={() => {}} />
+          )
+        }
+      />
 
       <SessionCreatedModal
         isOpen={!!createdSession}

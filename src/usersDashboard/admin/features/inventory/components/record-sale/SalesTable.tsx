@@ -2,7 +2,6 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Search, ShoppingCart, Calendar, Trash2 } from "lucide-react";
 import type { SaleRecord } from "../../types";
-import { TYPE_COLORS } from "../../data/mockData";
 import { formatNaira, formatDisplayDate, isToday } from "../../utils/inventoryUtils";
 import { useDeleteSale } from "../../hooks/useInventory";
 import { staggerContainer, rowVariant } from "../../animations/variants";
@@ -12,42 +11,36 @@ const PAGE_SIZE = 8;
 
 interface Props {
   sales: SaleRecord[];
-  onDelete: (id: string) => void;
 }
 
-export default function SalesTable({ sales, onDelete }: Props) {
+export default function SalesTable({ sales }: Props) {
   const [search, setSearch] = useState("");
-  const [page, setPage]     = useState(1);
+  const [page, setPage] = useState(1);
   const [pendingDelete, setPendingDelete] = useState<SaleRecord | null>(null);
-  const deleteMutation      = useDeleteSale();
+  const deleteMutation = useDeleteSale();
 
   const filtered = sales.filter((s) =>
-    s.itemName.toLowerCase().includes(search.toLowerCase()) ||
-    s.typeName.toLowerCase().includes(search.toLowerCase())
+    s.itemName.toLowerCase().includes(search.toLowerCase())
   );
-  const total      = filtered.length;
+  const total = filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const safePage   = Math.min(page, totalPages);
-  const slice      = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const safePage = Math.min(page, totalPages);
+  const slice = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
-  const pageUnits  = slice.reduce((s, r) => s + r.quantity, 0);
+  const pageUnits = slice.reduce((s, r) => s + r.quantity, 0);
   const pageAmount = slice.reduce((s, r) => s + r.amount, 0);
   const grandTotal = sales.reduce((s, r) => s + r.amount, 0);
 
   const handleConfirmDelete = () => {
     if (pendingDelete) {
       deleteMutation.mutate(pendingDelete.id, {
-        onSuccess: () => {
-          onDelete(pendingDelete.id);
-          setPendingDelete(null);
-        },
+        onSuccess: () => setPendingDelete(null),
       });
     }
   };
 
   return (
     <div className="bg-white rounded-2xl card-shadow overflow-x-auto">
-      {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-border-line02">
         <div className="flex items-center gap-2">
           <ShoppingCart size={16} className="text-brand-primary" />
@@ -67,7 +60,6 @@ export default function SalesTable({ sales, onDelete }: Props) {
         </div>
       </div>
 
-      {/* Table */}
       <table className="w-full text-sm min-w-max">
         <thead>
           <tr className="border-b border-border-line02 bg-bg-input">
@@ -109,17 +101,11 @@ export default function SalesTable({ sales, onDelete }: Props) {
                       </div>
                       <div>
                         <p className="text-text-primary text-sm font-medium leading-tight">{sale.itemName}</p>
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${TYPE_COLORS[sale.typeName] ?? "bg-gray-50 text-gray-600 border-gray-100"}`}>
-                            <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />
-                            {sale.typeName}
+                        {todayEntry && (
+                          <span className="inline-flex items-center gap-0.5 mt-1 px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-semibold border border-green-200">
+                            ✦ NEW
                           </span>
-                          {todayEntry && (
-                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-semibold border border-green-200">
-                              ✦ NEW
-                            </span>
-                          )}
-                        </div>
+                        )}
                       </div>
                     </div>
                   </td>
@@ -150,7 +136,6 @@ export default function SalesTable({ sales, onDelete }: Props) {
         </motion.tbody>
       </table>
 
-      {/* Page subtotal */}
       {slice.length > 0 && (
         <div className="flex items-center justify-between px-5 py-3 border-t border-border-line02 bg-bg-input/50">
           <span className="text-xs text-text-muted font-medium">Page subtotal ({slice.length} sales)</span>
@@ -162,7 +147,6 @@ export default function SalesTable({ sales, onDelete }: Props) {
         </div>
       )}
 
-      {/* Pagination */}
       {total > 0 && (
         <div className="flex items-center justify-between px-5 py-3.5 border-t border-border-line02">
           <span className="text-xs text-text-muted">

@@ -2,9 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Package, AlertTriangle, ChevronDown, Trash2 } from "lucide-react";
 import type { InventoryItem, ItemType } from "../../types";
-import { TYPE_COLORS } from "../../data/mockData";
-import { LOW_STOCK_THRESHOLD } from "../../utils/inventoryUtils";
-import { formatNaira } from "../../utils/inventoryUtils";
+import { LOW_STOCK_THRESHOLD, formatNaira } from "../../utils/inventoryUtils";
 import { useDeleteInventoryItem } from "../../hooks/useInventory";
 import { staggerContainer, rowVariant } from "../../animations/variants";
 import Button from "@/shared/ui/Button";
@@ -17,7 +15,6 @@ const PAGE_SIZE = 8;
 interface Props {
   items: InventoryItem[];
   itemTypes: ItemType[];
-  onDelete: (id: string) => void;
 }
 
 const ITEM_EDIT_FIELDS: EditField<InventoryItem>[] = [
@@ -26,51 +23,47 @@ const ITEM_EDIT_FIELDS: EditField<InventoryItem>[] = [
   { key: "unitPrice", label: "Unit Price", type: "number" },
 ];
 
-export default function ItemsTable({ items, itemTypes, onDelete }: Props) {
-  const [search, setSearch]     = useState("");
+export default function ItemsTable({ items, itemTypes }: Props) {
+  const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
-  const [page, setPage]         = useState(1);
+  const [page, setPage] = useState(1);
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
   const [pendingDelete, setPendingDelete] = useState<InventoryItem | null>(null);
-  const deleteMutation          = useDeleteInventoryItem();
+  const deleteMutation = useDeleteInventoryItem();
 
   const lowStockCount = items.filter((i) => i.quantity < LOW_STOCK_THRESHOLD).length;
 
   const filtered = items.filter((i) => {
     const matchSearch = i.name.toLowerCase().includes(search.toLowerCase()) ||
                         i.typeName.toLowerCase().includes(search.toLowerCase());
-    const matchType   = typeFilter ? i.typeId === typeFilter : true;
+    const matchType = typeFilter ? i.typeId === typeFilter : true;
     return matchSearch && matchType;
   });
 
-  const total      = filtered.length;
+  const total = filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const safePage   = Math.min(page, totalPages);
-  const slice      = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const safePage = Math.min(page, totalPages);
+  const slice = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
-  const pageUnits  = slice.reduce((s, i) => s + i.quantity, 0);
-  const pageValue  = slice.reduce((s, i) => s + i.quantity * i.unitPrice, 0);
+  const pageUnits = slice.reduce((s, i) => s + i.quantity, 0);
+  const pageValue = slice.reduce((s, i) => s + i.quantity * i.unitPrice, 0);
 
   const handleConfirmDelete = () => {
     if (pendingDelete) {
       deleteMutation.mutate(pendingDelete.id, {
-        onSuccess: () => {
-          onDelete(pendingDelete.id);
-          setPendingDelete(null);
-        },
+        onSuccess: () => setPendingDelete(null),
       });
     }
   };
 
   const handleSaveEdit = (updated: InventoryItem) => {
-    // TODO: Replace with actual API call e.g. api.patch(`/inventory/items/${updated.id}/`, updated)
+    // TODO: Replace with actual API call e.g. api.patch(`/inventory/items/${updated.id}/`, updated) — no edit endpoint yet
     console.log("Saving edited inventory item:", updated);
     setEditingItem(null);
   };
 
   return (
     <div className="bg-white rounded-2xl card-shadow overflow-hidden">
-      {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-border-line02 gap-3 flex-wrap">
         <div className="flex items-center gap-2">
           <Package size={16} className="text-brand-primary" />
@@ -80,7 +73,6 @@ export default function ItemsTable({ items, itemTypes, onDelete }: Props) {
           </span>
         </div>
         <div className="flex items-center gap-2">
-          {/* Type filter */}
           <div className="relative">
             <select
               value={typeFilter}
@@ -94,7 +86,6 @@ export default function ItemsTable({ items, itemTypes, onDelete }: Props) {
             </select>
             <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
           </div>
-          {/* Search */}
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
             <input
@@ -107,7 +98,6 @@ export default function ItemsTable({ items, itemTypes, onDelete }: Props) {
         </div>
       </div>
 
-      {/* Low-stock warning banner */}
       {lowStockCount > 0 && (
         <div className="mx-5 mt-4 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200">
           <AlertTriangle size={15} className="text-warning shrink-0" />
@@ -117,7 +107,6 @@ export default function ItemsTable({ items, itemTypes, onDelete }: Props) {
         </div>
       )}
 
-      {/* Table */}
       <div className="mt-2 overflow-x-auto">
         <table className="w-full text-sm min-w-max">
           <thead>
@@ -162,7 +151,7 @@ export default function ItemsTable({ items, itemTypes, onDelete }: Props) {
                       </div>
                     </td>
                     <td className="px-4 py-3.5">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${TYPE_COLORS[item.typeName] ?? "bg-gray-50 text-gray-600 border-gray-100"}`}>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border bg-gray-50 text-gray-600 border-gray-100">
                         <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />
                         {item.typeName}
                       </span>
@@ -204,7 +193,6 @@ export default function ItemsTable({ items, itemTypes, onDelete }: Props) {
           </motion.tbody>
         </table>
 
-        {/* Page footer totals row */}
         {slice.length > 0 && (
           <div className="flex items-center justify-between px-5 py-3 border-t border-border-line02 bg-bg-input/50">
             <span className="text-xs text-text-muted font-medium">Page — {slice.length} items</span>
@@ -216,7 +204,6 @@ export default function ItemsTable({ items, itemTypes, onDelete }: Props) {
         )}
       </div>
 
-      {/* Pagination */}
       {total > 0 && (
         <div className="flex items-center justify-between px-5 py-3.5 border-t border-border-line02">
           <span className="text-xs text-text-muted">

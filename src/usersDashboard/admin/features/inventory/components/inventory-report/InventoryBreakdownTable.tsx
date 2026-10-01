@@ -1,38 +1,40 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Search, LayoutList, AlertTriangle } from "lucide-react";
-import { mockReportRows, TYPE_COLORS } from "../../data/mockData";
 import { formatNaira } from "../../utils/inventoryUtils";
 import { staggerContainer, rowVariant } from "../../animations/variants";
+import type { ReportBreakdownRow } from "../../types";
 
-export default function InventoryBreakdownTable() {
-  const [search, setSearch]       = useState("");
+interface Props {
+  rows: ReportBreakdownRow[];
+}
+
+export default function InventoryBreakdownTable({ rows }: Props) {
+  const [search, setSearch] = useState("");
   const [showLowOnly, setShowLowOnly] = useState(false);
 
-  const filtered = mockReportRows.filter((r) => {
+  const filtered = rows.filter((r) => {
     const matchSearch = r.name.toLowerCase().includes(search.toLowerCase()) ||
                         r.typeName.toLowerCase().includes(search.toLowerCase());
     return matchSearch && (showLowOnly ? r.isLow : true);
   });
 
-  const totalQtyAvailable = mockReportRows.reduce((s, r) => s + r.qtyAvailable, 0);
-  const totalQtySold      = mockReportRows.reduce((s, r) => s + r.qtySold, 0);
-  const totalRevenue      = mockReportRows.reduce((s, r) => s + r.revenue, 0);
-  const lowCount          = mockReportRows.filter((r) => r.isLow).length;
+  const totalQtyAvailable = rows.reduce((s, r) => s + r.qtyAvailable, 0);
+  const totalQtySold = rows.reduce((s, r) => s + r.qtySold, 0);
+  const totalRevenue = rows.reduce((s, r) => s + r.revenue, 0);
+  const lowCount = rows.filter((r) => r.isLow).length;
 
   return (
     <div className="bg-white rounded-2xl card-shadow overflow-hidden">
-      {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-border-line02 gap-3 flex-wrap">
         <div className="flex items-center gap-2">
           <LayoutList size={16} className="text-brand-primary" />
           <span className="font-semibold text-text-primary text-sm">Inventory Breakdown</span>
           <span className="ml-1 text-xs font-semibold bg-blue-50 text-brand-primary rounded-full px-2 py-0.5">
-            {mockReportRows.length}
+            {rows.length}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          {/* Low-stock pill toggle */}
           <button
             type="button"
             onClick={() => setShowLowOnly((v) => !v)}
@@ -45,7 +47,6 @@ export default function InventoryBreakdownTable() {
             <AlertTriangle size={12} />
             {lowCount} low-stock items
           </button>
-          {/* Search */}
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
             <input
@@ -58,7 +59,10 @@ export default function InventoryBreakdownTable() {
         </div>
       </div>
 
-      {/* Table */}
+      <p className="px-5 pt-3 text-xs text-text-muted">
+        Qty Sold and Revenue reflect sales within the selected period only. Qty Available is current stock.
+      </p>
+
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border-line02 bg-bg-input">
@@ -71,48 +75,55 @@ export default function InventoryBreakdownTable() {
           </tr>
         </thead>
         <motion.tbody variants={staggerContainer} initial="hidden" animate="show">
-          {filtered.map((row, idx) => (
-            <motion.tr
-              key={row.id}
-              variants={rowVariant}
-              className={`border-b border-border-line02 transition-colors ${row.isLow ? "bg-amber-50/30 hover:bg-amber-50/60" : "hover:bg-gray-50/50"}`}
-            >
-              <td className="px-5 py-3.5 text-text-muted text-xs">{idx + 1}</td>
-              <td className="px-4 py-3.5">
-                <div className="flex items-center gap-2.5">
-                  <div className={`w-7 h-7 rounded-lg flex-center shrink-0 ${TYPE_COLORS[row.typeName]?.split(" ")[0] ?? "bg-gray-50"}`}>
-                    <LayoutList size={12} className={TYPE_COLORS[row.typeName]?.split(" ")[1] ?? "text-gray-500"} />
+          {filtered.length === 0 ? (
+            <tr>
+              <td colSpan={6} className="py-16 text-center text-text-muted text-sm">
+                No items match your filters
+              </td>
+            </tr>
+          ) : (
+            filtered.map((row, idx) => (
+              <motion.tr
+                key={row.id}
+                variants={rowVariant}
+                className={`border-b border-border-line02 transition-colors ${row.isLow ? "bg-amber-50/30 hover:bg-amber-50/60" : "hover:bg-gray-50/50"}`}
+              >
+                <td className="px-5 py-3.5 text-text-muted text-xs">{idx + 1}</td>
+                <td className="px-4 py-3.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-blue-50 flex-center shrink-0">
+                      <LayoutList size={12} className="text-brand-primary" />
+                    </div>
+                    <div>
+                      <p className="text-text-primary text-sm font-medium leading-tight">{row.name}</p>
+                      {row.isLow && (
+                        <span className="inline-flex items-center gap-1 mt-0.5 px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-700 text-xs font-bold border border-amber-200">
+                          <AlertTriangle size={9} />
+                          LOW STOCK
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-text-primary text-sm font-medium leading-tight">{row.name}</p>
-                    {row.isLow && (
-                      <span className="inline-flex items-center gap-1 mt-0.5 px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-700 text-xs font-bold border border-amber-200">
-                        <AlertTriangle size={9} />
-                        LOW STOCK
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </td>
-              <td className="px-4 py-3.5">
-                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${TYPE_COLORS[row.typeName] ?? "bg-gray-50 text-gray-600 border-gray-100"}`}>
-                  <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />
-                  {row.typeName}
-                </span>
-              </td>
-              <td className="px-4 py-3.5 text-right text-text-primary font-semibold text-sm">{row.qtyAvailable}</td>
-              <td className="px-4 py-3.5 text-right text-text-secondary text-sm">{row.qtySold}</td>
-              <td className={`px-5 py-3.5 text-right font-semibold text-sm ${row.revenue === 0 ? "text-text-muted" : "text-text-primary"}`}>
-                {formatNaira(row.revenue)}
-              </td>
-            </motion.tr>
-          ))}
+                </td>
+                <td className="px-4 py-3.5">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border bg-gray-50 text-gray-600 border-gray-100">
+                    <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />
+                    {row.typeName}
+                  </span>
+                </td>
+                <td className="px-4 py-3.5 text-right text-text-primary font-semibold text-sm">{row.qtyAvailable}</td>
+                <td className="px-4 py-3.5 text-right text-text-secondary text-sm">{row.qtySold}</td>
+                <td className={`px-5 py-3.5 text-right font-semibold text-sm ${row.revenue === 0 ? "text-text-muted" : "text-text-primary"}`}>
+                  {formatNaira(row.revenue)}
+                </td>
+              </motion.tr>
+            ))
+          )}
         </motion.tbody>
       </table>
 
-      {/* Totals footer */}
       <div className="flex items-center justify-between px-5 py-3.5 border-t border-border-line02 bg-bg-input/60">
-        <span className="text-xs font-semibold text-text-primary">Totals ({mockReportRows.length} items)</span>
+        <span className="text-xs font-semibold text-text-primary">Totals ({rows.length} items)</span>
         <div className="flex items-center gap-8">
           <span className="text-xs font-bold text-text-primary">{totalQtyAvailable}</span>
           <span className="text-xs font-bold text-text-primary">{totalQtySold}</span>

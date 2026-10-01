@@ -1,7 +1,6 @@
 import type { InventoryItem, SaleRecord } from "../types";
 
 export const LOW_STOCK_THRESHOLD = 5;
-
 export function formatNaira(amount: number): string {
   return `₦${amount.toLocaleString("en-NG", { minimumFractionDigits: 2 })}`;
 }
@@ -17,18 +16,26 @@ export function computeInventoryStats(items: InventoryItem[]) {
 export function computeSaleStats(sales: SaleRecord[]) {
   const todayStr     = new Date().toISOString().split("T")[0];
   const totalRevenue = sales.reduce((s, r) => s + r.amount, 0);
-  const todaySales   = sales.filter((r) => r.date === todayStr);
+  const todaySales   = sales.filter((r) => isToday(r.date));
   const todayRevenue = todaySales.reduce((s, r) => s + r.amount, 0);
   const unitsSold    = sales.reduce((s, r) => s + r.quantity, 0);
-  return { totalRevenue, todayRevenue, todaySalesCount: todaySales.length, unitsSold };
+  return { totalRevenue, todayRevenue, todaySalesCount: todaySales.length, unitsSold, todayStr };
 }
 
 export function formatDisplayDate(iso: string): string {
-  const [y, m, d] = iso.split("-").map(Number);
-  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  return `${String(d).padStart(2, "0")} ${months[m - 1]} ${y}`;
+  return new Date(iso).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 export function isToday(iso: string): boolean {
-  return iso === new Date().toISOString().split("T")[0];
+  const d = new Date(iso);
+  const now = new Date();
+  return (
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate()
+  );
 }

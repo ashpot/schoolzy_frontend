@@ -1,14 +1,8 @@
 import { Boxes, ShoppingBag, TrendingUp, AlertTriangle } from "lucide-react";
 import { formatNaira } from "../../utils/inventoryUtils";
+import type { InventoryReportSummary } from "../../types";
 
-interface Props {
-  itemsInStock: number;
-  itemsSold: number;
-  revenueFromSales: number;
-  lowStockItems: number;
-}
-
-export default function ReportStatCards({ itemsInStock, itemsSold, revenueFromSales, lowStockItems }: Props) {
+export default function ReportStatCards({ summary }: { summary: InventoryReportSummary }) {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <div className="bg-white rounded-2xl card-shadow p-4 flex items-center gap-4">
@@ -16,8 +10,8 @@ export default function ReportStatCards({ itemsInStock, itemsSold, revenueFromSa
           <Boxes size={20} className="text-brand-primary" />
         </div>
         <div>
-          <p className="text-xs text-text-muted uppercase tracking-wide font-medium">Items in Stock</p>
-          <p className="card-number mt-0.5">{itemsInStock}</p>
+          <p className="text-xs text-text-muted uppercase tracking-wide font-medium">Total Stock</p>
+          <p className="card-number mt-0.5">{summary.total_stock}</p>
           <p className="text-xs text-text-muted mt-0.5">units across all items</p>
         </div>
       </div>
@@ -28,8 +22,8 @@ export default function ReportStatCards({ itemsInStock, itemsSold, revenueFromSa
         </div>
         <div>
           <p className="text-xs text-text-muted uppercase tracking-wide font-medium">Items Sold</p>
-          <p className="card-number mt-0.5">{itemsSold}</p>
-          <p className="text-xs text-text-muted mt-0.5">within this month</p>
+          <p className="card-number mt-0.5">{summary.total_items_sold}</p>
+          <p className="text-xs text-text-muted mt-0.5">within selected period</p>
         </div>
       </div>
 
@@ -39,7 +33,7 @@ export default function ReportStatCards({ itemsInStock, itemsSold, revenueFromSa
         </div>
         <div>
           <p className="text-xs text-text-muted uppercase tracking-wide font-medium">Revenue from Sales</p>
-          <p className="card-number mt-0.5">{formatNaira(revenueFromSales)}</p>
+          <p className="card-number mt-0.5">{formatNaira(summary.revenue)}</p>
           <p className="text-xs text-text-muted mt-0.5">total net sales value</p>
         </div>
       </div>
@@ -50,8 +44,8 @@ export default function ReportStatCards({ itemsInStock, itemsSold, revenueFromSa
         </div>
         <div>
           <p className="text-xs text-text-muted uppercase tracking-wide font-medium">Low Stock Items</p>
-          <p className="card-number mt-0.5">{lowStockItems}</p>
-          <p className="text-xs text-text-muted mt-0.5">below 5 units</p>
+          <p className="card-number mt-0.5">{summary.low_stock_count}</p>
+          <p className="text-xs text-text-muted mt-0.5">below threshold</p>
         </div>
       </div>
     </div>

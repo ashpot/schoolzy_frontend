@@ -2,20 +2,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Hash, Plus, CalendarDays } from "lucide-react";
 import { inventoryItemSchema, type InventoryItemValues } from "../../schemas";
-import { useAddInventoryItem } from "../../hooks/useInventory";
-import type { InventoryItem, ItemType } from "../../types";
+import { useAddInventoryItem, useItemTypesList } from "../../hooks/useInventory";
 import FormInput from "@/shared/ui/FormInput";
 import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import FormHeader from "@/shared/ui/FormHeader";
-import {z} from "zod";
+import { z } from "zod";
 
-interface Props {
-  itemTypes: ItemType[];
-  onSuccess: (item: InventoryItem) => void;
-}
-
-export default function ItemForm({ itemTypes, onSuccess }: Props) {
+export default function ItemForm() {
   const { register, handleSubmit, reset, formState: { errors } } =
     useForm<z.input<typeof inventoryItemSchema>, any, InventoryItemValues>({
       resolver: zodResolver(inventoryItemSchema),
@@ -23,22 +17,13 @@ export default function ItemForm({ itemTypes, onSuccess }: Props) {
     });
 
   const mutation = useAddInventoryItem();
+  const { data: itemTypes, isLoading: typesLoading } = useItemTypesList();
 
-  const typeOptions = itemTypes.map((t) => ({ label: t.name, value: t.id }));
+  const typeOptions = (itemTypes ?? []).map((t) => ({ label: t.name, value: t.id }));
 
   const onSubmit = (values: InventoryItemValues) => {
     mutation.mutate(values, {
-      onSuccess: () => {
-        const typeName = itemTypes.find((t) => t.id === values.typeId)?.name ?? "";
-        const newItem: InventoryItem = {
-          id: Date.now().toString(),
-          ...values,
-          typeName,
-          addedAt: new Date().toISOString().split("T")[0],
-        };
-        onSuccess(newItem);
-        reset();
-      },
+      onSuccess: () => reset(),
     });
   };
 
@@ -57,12 +42,12 @@ export default function ItemForm({ itemTypes, onSuccess }: Props) {
         <FormSelect
           label="Item Type *"
           options={typeOptions}
-          placeholder="Select a type"
+          placeholder={typesLoading ? "Loading item types..." : "Select a type"}
+          isLoading={mutation.isPending || typesLoading}
           error={errors.typeId?.message}
           {...register("typeId")}
         />
 
-        {/* Quantity — # prefix */}
         <div>
           <label className="text-sm font-medium text-label block mb-1.5">Quantity *</label>
           <div className="relative">
@@ -79,7 +64,6 @@ export default function ItemForm({ itemTypes, onSuccess }: Props) {
           {errors.quantity && <p className="text-xs text-danger mt-1">{errors.quantity.message}</p>}
         </div>
 
-        {/* Unit Price — ₦ prefix */}
         <div>
           <label className="text-sm font-medium text-label block mb-1.5">Unit Price *</label>
           <div className="relative">
@@ -97,7 +81,6 @@ export default function ItemForm({ itemTypes, onSuccess }: Props) {
           {errors.unitPrice && <p className="text-xs text-danger mt-1">{errors.unitPrice.message}</p>}
         </div>
 
-        {/* Auto date hint */}
         <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-bg-input border border-border-line02">
           <CalendarDays size={13} className="text-text-muted shrink-0" />
           <p className="text-xs text-text-muted">Date added will be recorded automatically</p>

@@ -1,18 +1,13 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Tag, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { itemTypeSchema, type ItemTypeValues } from "../../schemas";
 import { useAddItemType } from "../../hooks/useInventory";
-import type { ItemType } from "../../types";
 import FormInput from "@/shared/ui/FormInput";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import FormHeader from "@/shared/ui/FormHeader";
 
-interface Props {
-  onSuccess: (item: ItemType) => void;
-}
-
-export default function ItemTypeForm({ onSuccess }: Props) {
+export default function ItemTypeForm() {
   const { register, handleSubmit, watch, reset, formState: { errors } } =
     useForm<ItemTypeValues>({
       resolver: zodResolver(itemTypeSchema),
@@ -20,19 +15,11 @@ export default function ItemTypeForm({ onSuccess }: Props) {
     });
 
   const mutation = useAddItemType();
-  const descLen  = (watch("description") ?? "").length;
+  const descLen = (watch("description") ?? "").length;
 
   const onSubmit = (values: ItemTypeValues) => {
     mutation.mutate(values, {
-      onSuccess: () => {
-        const newType: ItemType = {
-          id: Date.now().toString(),
-          ...values,
-          createdAt: new Date().toISOString().split("T")[0],
-        };
-        onSuccess(newType);
-        reset();
-      },
+      onSuccess: () => reset(),
     });
   };
 
@@ -48,7 +35,6 @@ export default function ItemTypeForm({ onSuccess }: Props) {
           {...register("name")}
         />
 
-        {/* Description textarea */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label className="text-sm font-medium text-label">Description *</label>
@@ -64,14 +50,6 @@ export default function ItemTypeForm({ onSuccess }: Props) {
           {errors.description && (
             <p className="text-xs text-danger mt-1">{errors.description.message}</p>
           )}
-        </div>
-
-        {/* Hint */}
-        <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-bg-input border border-border-line02">
-          <Tag size={13} className="text-text-muted mt-0.5 shrink-0" />
-          <p className="text-xs text-text-muted leading-relaxed">
-            Type names must be unique. Duplicate names will be rejected.
-          </p>
         </div>
 
         <SubmitButton label="Add Item Type" isLoading={mutation.isPending} />

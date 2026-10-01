@@ -1,8 +1,6 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { Package } from "lucide-react";
-import { mockInventoryItems, mockItemTypes } from "../data/mockData";
-import type { InventoryItem } from "../types";
+import { Package, Loader2, AlertCircle } from "lucide-react";
+import { useInventoryItemsList, useItemTypesList } from "../hooks/useInventory";
 import { computeInventoryStats } from "../utils/inventoryUtils";
 import { fadeUp } from "../animations/variants";
 import StatPill from "../components/shared/StatPill";
@@ -12,7 +10,11 @@ import ItemForm from "../components/items/ItemForm";
 import ItemsTable from "../components/items/ItemsTable";
 
 export default function ItemsPage() {
-  const [items, setItems] = useState<InventoryItem[]>(mockInventoryItems);
+  const { data: itemsData, isLoading: itemsLoading, isError: itemsError, error: itemsErrObj } = useInventoryItemsList();
+  const { data: itemTypesData } = useItemTypesList();
+
+  const items = itemsData ?? [];
+  const itemTypes = itemTypesData ?? [];
   const stats = computeInventoryStats(items);
 
   return (
@@ -28,18 +30,21 @@ export default function ItemsPage() {
       <ItemStatCards {...stats} />
 
       <SplitLayout
-        left={
-          <ItemForm
-            itemTypes={mockItemTypes}
-            onSuccess={(item) => setItems((prev) => [item, ...prev])}
-          />
-        }
+        left={<ItemForm />}
         right={
-          <ItemsTable
-            items={items}
-            itemTypes={mockItemTypes}
-            onDelete={(id) => setItems((prev) => prev.filter((i) => i.id !== id))}
-          />
+          itemsLoading ? (
+            <div className="bg-white rounded-2xl card-shadow flex items-center justify-center gap-2 py-16 text-text-muted">
+              <Loader2 size={18} className="animate-spin" />
+              <span className="text-sm">Loading inventory…</span>
+            </div>
+          ) : itemsError ? (
+            <div className="bg-white rounded-2xl card-shadow flex items-center gap-2 px-4 py-16 justify-center text-danger text-sm">
+              <AlertCircle size={16} />
+              {itemsErrObj instanceof Error ? itemsErrObj.message : "Failed to load inventory items."}
+            </div>
+          ) : (
+            <ItemsTable items={items} itemTypes={itemTypes} />
+          )
         }
       />
     </motion.div>
