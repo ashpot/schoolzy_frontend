@@ -2,19 +2,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Hash, Plus } from "lucide-react";
 import { saleSchema, type SaleValues } from "../../schemas";
-import { useAddSale } from "../../hooks/useInventory";
-import type { InventoryItem, SaleRecord } from "../../types";
+import { useAddSale, useInventoryItemsList } from "../../hooks/useInventory";
 import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import FormHeader from "@/shared/ui/FormHeader";
-import {z} from "zod";
+import { z } from "zod";
 
-interface Props {
-  items: InventoryItem[];
-  onSuccess: (sale: SaleRecord) => void;
-}
-
-export default function SaleForm({ items, onSuccess }: Props) {
+export default function SaleForm() {
   const { register, handleSubmit, reset, formState: { errors } } =
     useForm<z.input<typeof saleSchema>, any, SaleValues>({
       resolver: zodResolver(saleSchema),
@@ -22,24 +16,12 @@ export default function SaleForm({ items, onSuccess }: Props) {
     });
 
   const mutation = useAddSale();
-  const itemOptions = items.map((i) => ({ label: i.name, value: i.id }));
+  const { data: items, isLoading: itemsLoading } = useInventoryItemsList();
+  const itemOptions = (items ?? []).map((i) => ({ label: i.name, value: i.id }));
 
   const onSubmit = (values: SaleValues) => {
     mutation.mutate(values, {
-      onSuccess: () => {
-        const item = items.find((i) => i.id === values.itemId);
-        const newSale: SaleRecord = {
-          id: Date.now().toString(),
-          itemId: values.itemId,
-          itemName: item?.name ?? "",
-          typeName: item?.typeName ?? "",
-          quantity: values.quantity,
-          amount: values.amount,
-          date: new Date().toISOString().split("T")[0],
-        };
-        onSuccess(newSale);
-        reset();
-      },
+      onSuccess: () => reset(),
     });
   };
 
@@ -50,12 +32,12 @@ export default function SaleForm({ items, onSuccess }: Props) {
         <FormSelect
           label="Item *"
           options={itemOptions}
-          placeholder="Select an item"
+          placeholder={itemsLoading ? "Loading items..." : "Select an item"}
+          isLoading={mutation.isPending || itemsLoading}
           error={errors.itemId?.message}
           {...register("itemId")}
         />
 
-        {/* Quantity */}
         <div>
           <label className="text-sm font-medium text-label block mb-1.5">Quantity *</label>
           <div className="relative">
@@ -72,7 +54,6 @@ export default function SaleForm({ items, onSuccess }: Props) {
           {errors.quantity && <p className="text-xs text-danger mt-1">{errors.quantity.message}</p>}
         </div>
 
-        {/* Amount */}
         <div>
           <label className="text-sm font-medium text-label block mb-1.5">Amount *</label>
           <div className="relative">

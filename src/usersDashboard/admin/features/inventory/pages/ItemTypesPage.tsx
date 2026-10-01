@@ -1,8 +1,6 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { Layers } from "lucide-react";
-import { mockItemTypes } from "../data/mockData";
-import type { ItemType } from "../types";
+import { Layers, Loader2, AlertCircle } from "lucide-react";
+import { useItemTypesList } from "../hooks/useInventory";
 import { fadeUp } from "../animations/variants";
 import SplitLayout from "../components/shared/SplitLayout";
 import StatPill from "../components/shared/StatPill";
@@ -10,7 +8,8 @@ import ItemTypeForm from "../components/item-types/ItemTypeForm";
 import ItemTypesTable from "../components/item-types/ItemTypesTable";
 
 export default function ItemTypesPage() {
-  const [types, setTypes] = useState<ItemType[]>(mockItemTypes);
+  const { data, isLoading, isError, error } = useItemTypesList();
+  const types = data ?? [];
 
   return (
     <motion.div variants={fadeUp} initial="hidden" animate="show" className="dashboard-p space-y-6">
@@ -23,16 +22,21 @@ export default function ItemTypesPage() {
       </div>
 
       <SplitLayout
-        left={
-          <ItemTypeForm
-            onSuccess={(item) => setTypes((prev) => [item, ...prev])}
-          />
-        }
+        left={<ItemTypeForm />}
         right={
-          <ItemTypesTable
-            types={types}
-            onDelete={(id) => setTypes((prev) => prev.filter((t) => t.id !== id))}
-          />
+          isLoading ? (
+            <div className="bg-white rounded-2xl card-shadow flex items-center justify-center gap-2 py-16 text-text-muted">
+              <Loader2 size={18} className="animate-spin" />
+              <span className="text-sm">Loading item types…</span>
+            </div>
+          ) : isError ? (
+            <div className="bg-white rounded-2xl card-shadow flex items-center gap-2 px-4 py-16 justify-center text-danger text-sm">
+              <AlertCircle size={16} />
+              {error instanceof Error ? error.message : "Failed to load item types."}
+            </div>
+          ) : (
+            <ItemTypesTable types={types} />
+          )
         }
       />
     </motion.div>

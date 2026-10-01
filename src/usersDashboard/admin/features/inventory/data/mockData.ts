@@ -1,17 +1,17 @@
 import type { ItemType, InventoryItem, SaleRecord } from "../types";
 
 export const mockItemTypes: ItemType[] = [
-  { id: "1",  name: "Stationery",    description: "Writing materials, paper, markers, and general office supplies used in classrooms and offices.",                      createdAt: "2025-09-01" },
-  { id: "2",  name: "Furniture",     description: "Desks, chairs, cabinets, shelves, and other fixed or movable furnishings across the school.",                          createdAt: "2025-09-01" },
-  { id: "3",  name: "Electronics",   description: "Projectors, computers, printers, and other electronic devices used for teaching and administration.",                   createdAt: "2025-09-01" },
-  { id: "4",  name: "Cleaning",      description: "Detergents, mops, brooms, and sanitation products used to maintain hygiene on the premises.",                          createdAt: "2025-09-01" },
-  { id: "5",  name: "Sports",        description: "Balls, cones, nets, uniforms, and equipment used during physical education and inter-house events.",                   createdAt: "2025-09-01" },
-  { id: "6",  name: "Lab Equipment", description: "Microscopes, beakers, Bunsen burners, and other apparatus used in science laboratories.",                              createdAt: "2025-09-01" },
-  { id: "7",  name: "Books",         description: "Textbooks, exercise books, reference materials, and library publications for students and staff.",                      createdAt: "2025-09-01" },
-  { id: "8",  name: "Uniform",       description: "School shirts, trousers, skirts, ties, and branded apparel issued to students and support staff.",                     createdAt: "2025-09-01" },
-  { id: "9",  name: "Kitchen",       description: "Cooking gas, utensils, and consumables for school kitchen and canteen operations.",                                     createdAt: "2025-09-01" },
-  { id: "10", name: "Medical",       description: "First aid kits, medicines, and basic medical supplies kept in the school clinic for emergencies.",                     createdAt: "2025-09-01" },
-  { id: "11", name: "Tools",         description: "Hammers, screwdrivers, measuring tapes, and equipment used by the maintenance team for repairs.",                      createdAt: "2025-09-01" },
+  { id: "1",  name: "Stationery",    description: "Writing materials, paper, markers, and general office supplies used in classrooms and offices.",    },
+  { id: "2",  name: "Furniture",     description: "Desks, chairs, cabinets, shelves, and other fixed or movable furnishings across the school.",        },
+  { id: "3",  name: "Electronics",   description: "Projectors, computers, printers, and other electronic devices used for teaching and administration.", },
+  { id: "4",  name: "Cleaning",      description: "Detergents, mops, brooms, and sanitation products used to maintain hygiene on the premises.",        },
+  { id: "5",  name: "Sports",        description: "Balls, cones, nets, uniforms, and equipment used during physical education and inter-house events.", },
+  { id: "6",  name: "Lab Equipment", description: "Microscopes, beakers, Bunsen burners, and other apparatus used in science laboratories.",            },
+  { id: "7",  name: "Books",         description: "Textbooks, exercise books, reference materials, and library publications for students and staff.",    },
+  { id: "8",  name: "Uniform",       description: "School shirts, trousers, skirts, ties, and branded apparel issued to students and support staff.",   },
+  { id: "9",  name: "Kitchen",       description: "Cooking gas, utensils, and consumables for school kitchen and canteen operations.",                   },
+  { id: "10", name: "Medical",       description: "First aid kits, medicines, and basic medical supplies kept in the school clinic for emergencies.",   },
+  { id: "11", name: "Tools",         description: "Hammers, screwdrivers, measuring tapes, and equipment used by the maintenance team for repairs.",    },
 ];
 
 export const mockInventoryItems: InventoryItem[] = [
@@ -40,16 +40,16 @@ const d = (offset: number) => {
 };
 
 export const mockSales: SaleRecord[] = [
-  { id: "1",  itemId: "7",  itemName: "English Language Textbook (JSS1)",   typeName: "Books",       quantity: 5,  amount: 11000, date: today   },
-  { id: "2",  itemId: "12", itemName: "Whiteboard Marker Set (4 colours)",  typeName: "Stationery",  quantity: 10, amount: 9500,  date: today   },
-  { id: "3",  itemId: "8",  itemName: "School Uniform Shirt (M)",           typeName: "Uniform",     quantity: 3,  amount: 10500, date: d(1)    },
-  { id: "4",  itemId: "1",  itemName: "A4 Printing Paper (500 sheets ream)",typeName: "Stationery",  quantity: 2,  amount: 9000,  date: d(2)    },
-  { id: "5",  itemId: "5",  itemName: "Football (size 5)",                  typeName: "Sports",      quantity: 2,  amount: 17000, date: d(3)    },
-  { id: "6",  itemId: "10", itemName: "First-Aid Kit (Standard)",           typeName: "Medical",     quantity: 1,  amount: 11500, date: d(4)    },
-  { id: "7",  itemId: "4",  itemName: "Liquid Floor Cleaner (5L)",          typeName: "Cleaning",    quantity: 4,  amount: 15200, date: d(5)    },
-  { id: "8",  itemId: "11", itemName: "Hammer & Nail Set",                  typeName: "Tools",       quantity: 1,  amount: 4200,  date: d(6)    },
-  { id: "9",  itemId: "3",  itemName: "Ceiling Projector — Epson EX3280",   typeName: "Electronics", quantity: 1,  amount: 185000,date: d(10)   },
-  { id: "10", itemId: "14", itemName: "Laptop — Lenovo IdeaPad 3",          typeName: "Electronics", quantity: 1,  amount: 420000,date: d(15)   },
+  { id: "1",  itemId: "7",  itemName: "English Language Textbook (JSS1)",    quantity: 5,  amount: 11000, date: today   },
+  { id: "2",  itemId: "12", itemName: "Whiteboard Marker Set (4 colours)",   quantity: 10, amount: 9500,  date: today   },
+  { id: "3",  itemId: "8",  itemName: "School Uniform Shirt (M)",            quantity: 3,  amount: 10500, date: d(1)    },
+  { id: "4",  itemId: "1",  itemName: "A4 Printing Paper (500 sheets ream)", quantity: 2,  amount: 9000,  date: d(2)    },
+  { id: "5",  itemId: "5",  itemName: "Football (size 5)",                   quantity: 2,  amount: 17000, date: d(3)    },
+  { id: "6",  itemId: "10", itemName: "First-Aid Kit (Standard)",            quantity: 1,  amount: 11500, date: d(4)    },
+  { id: "7",  itemId: "4",  itemName: "Liquid Floor Cleaner (5L)",           quantity: 4,  amount: 15200, date: d(5)    },
+  { id: "8",  itemId: "11", itemName: "Hammer & Nail Set",                   quantity: 1,  amount: 4200,  date: d(6)    },
+  { id: "9",  itemId: "3",  itemName: "Ceiling Projector — Epson EX3280",    quantity: 1,  amount: 185000,date: d(10)   },
+  { id: "10", itemId: "14", itemName: "Laptop — Lenovo IdeaPad 3",           quantity: 1,  amount: 420000,date: d(15)   },
 ];
 
 // Report chart data

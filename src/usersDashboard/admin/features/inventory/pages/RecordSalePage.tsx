@@ -1,19 +1,6 @@
-// const RecordSalePage = () => {
-//   return (
-//     <div>
-//       <h1 className="page-title">Record Sale</h1>
-//       <p className="text-body mt-2">Record a sale.</p>
-//     </div>
-//   );
-// };
-
-// export default RecordSalePage;
-
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { Receipt } from "lucide-react";
-import { mockSales, mockInventoryItems } from "../data/mockData";
-import type { SaleRecord } from "../types";
+import { Receipt, Loader2, AlertCircle } from "lucide-react";
+import { useSalesList } from "../hooks/useInventory";
 import { computeSaleStats } from "../utils/inventoryUtils";
 import { fadeUp } from "../animations/variants";
 import StatPill from "../components/shared/StatPill";
@@ -23,7 +10,8 @@ import SaleForm from "../components/record-sale/SaleForm";
 import SalesTable from "../components/record-sale/SalesTable";
 
 export default function RecordSalePage() {
-  const [sales, setSales] = useState<SaleRecord[]>(mockSales);
+  const { data, isLoading, isError, error } = useSalesList();
+  const sales = data ?? [];
   const stats = computeSaleStats(sales);
 
   return (
@@ -39,17 +27,21 @@ export default function RecordSalePage() {
       <SaleStatCards {...stats} />
 
       <SplitLayout
-        left={
-          <SaleForm
-            items={mockInventoryItems}
-            onSuccess={(sale) => setSales((prev) => [sale, ...prev])}
-          />
-        }
+        left={<SaleForm />}
         right={
-          <SalesTable
-            sales={sales}
-            onDelete={(id) => setSales((prev) => prev.filter((s) => s.id !== id))}
-          />
+          isLoading ? (
+            <div className="bg-white rounded-2xl card-shadow flex items-center justify-center gap-2 py-16 text-text-muted">
+              <Loader2 size={18} className="animate-spin" />
+              <span className="text-sm">Loading sales…</span>
+            </div>
+          ) : isError ? (
+            <div className="bg-white rounded-2xl card-shadow flex items-center gap-2 px-4 py-16 justify-center text-danger text-sm">
+              <AlertCircle size={16} />
+              {error instanceof Error ? error.message : "Failed to load sales."}
+            </div>
+          ) : (
+            <SalesTable sales={sales} />
+          )
         }
       />
     </motion.div>

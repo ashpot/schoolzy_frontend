@@ -10,11 +10,10 @@ import StatPill from "../components/shared/StatPill";
 
 export default function FeesPage() {
   const { data: feesData, isLoading: feesLoading, isError: feesError, error: feesErrObj } = useFeesList();
-  const { data: feeTypesData, isLoading: feeTypesLoading } = useFeeTypesList();
+  const { data: feeTypesData } = useFeeTypesList();
 
   const fees = feesData ?? [];
   const feeTypes = feeTypesData ?? [];
-  const isLoading = feesLoading || feeTypesLoading;
 
   const totalAmount = fees.reduce((sum, f) => sum + f.amount, 0);
   const overdueCount = fees.filter((f) => isOverdue(f.dateDue)).length;
@@ -35,22 +34,24 @@ export default function FeesPage() {
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="flex items-center justify-center gap-2 py-16 text-text-muted">
-          <Loader2 size={18} className="animate-spin" />
-          <span className="text-sm">Loading fees…</span>
-        </div>
-      ) : feesError ? (
-        <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 text-danger text-sm">
-          <AlertCircle size={16} />
-          {feesErrObj instanceof Error ? feesErrObj.message : "Failed to load fees."}
-        </div>
-      ) : (
-        <SplitLayout
-          left={<FeesForm feeTypes={feeTypes} onSuccess={() => {}} />}
-          right={<FeesTable items={fees} onDelete={() => {}} />}
-        />
-      )}
+      <SplitLayout
+        left={<FeesForm feeTypes={feeTypes} onSuccess={() => {}} />}
+        right={
+          feesLoading ? (
+            <div className="bg-white rounded-2xl card-shadow flex items-center justify-center gap-2 py-16 text-text-muted">
+              <Loader2 size={18} className="animate-spin" />
+              <span className="text-sm">Loading fees…</span>
+            </div>
+          ) : feesError ? (
+            <div className="bg-white rounded-2xl card-shadow flex items-center gap-2 px-4 py-16 justify-center text-danger text-sm">
+              <AlertCircle size={16} />
+              {feesErrObj instanceof Error ? feesErrObj.message : "Failed to load fees."}
+            </div>
+          ) : (
+            <FeesTable items={fees} onDelete={() => {}} />
+          )
+        }
+      />
     </motion.div>
   );
 }

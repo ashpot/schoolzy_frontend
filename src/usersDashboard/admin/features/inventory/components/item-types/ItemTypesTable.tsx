@@ -2,7 +2,6 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Layers, Trash2 } from "lucide-react";
 import type { ItemType } from "../../types";
-import { TYPE_COLORS } from "../../data/mockData";
 import { useDeleteItemType } from "../../hooks/useInventory";
 import { staggerContainer, rowVariant } from "../../animations/variants";
 import Button from "@/shared/ui/Button";
@@ -14,7 +13,6 @@ const PAGE_SIZE = 8;
 
 interface Props {
   types: ItemType[];
-  onDelete: (id: string) => void;
 }
 
 const ITEM_TYPE_EDIT_FIELDS: EditField<ItemType>[] = [
@@ -22,42 +20,38 @@ const ITEM_TYPE_EDIT_FIELDS: EditField<ItemType>[] = [
   { key: "description", label: "Description" },
 ];
 
-export default function ItemTypesTable({ types, onDelete }: Props) {
-  const [search, setSearch]   = useState("");
-  const [page, setPage]       = useState(1);
+export default function ItemTypesTable({ types }: Props) {
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [editingType, setEditingType] = useState<ItemType | null>(null);
   const [pendingDelete, setPendingDelete] = useState<ItemType | null>(null);
-  const deleteMutation        = useDeleteItemType();
+  const deleteMutation = useDeleteItemType();
 
   const filtered = types.filter((t) =>
     t.name.toLowerCase().includes(search.toLowerCase()) ||
     t.description.toLowerCase().includes(search.toLowerCase())
   );
-  const total     = filtered.length;
+  const total = filtered.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const safePage  = Math.min(page, totalPages);
-  const slice     = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const safePage = Math.min(page, totalPages);
+  const slice = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   const handleConfirmDelete = () => {
     if (pendingDelete) {
       deleteMutation.mutate(pendingDelete.id, {
-        onSuccess: () => {
-          onDelete(pendingDelete.id);
-          setPendingDelete(null);
-        },
+        onSuccess: () => setPendingDelete(null),
       });
     }
   };
 
   const handleSaveEdit = (updated: ItemType) => {
-    // TODO: Replace with actual API call e.g. api.patch(`/inventory/item-types/${updated.id}/`, updated)
+    // TODO: Replace with actual API call e.g. api.patch(`/inventory/item-types/${updated.id}/`, updated) — no edit endpoint yet
     console.log("Saving edited item type:", updated);
     setEditingType(null);
   };
 
   return (
     <div className="bg-white rounded-2xl card-shadow overflow-hidden">
-      {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-border-line02">
         <div className="flex items-center gap-2">
           <Layers size={16} className="text-brand-primary" />
@@ -77,7 +71,6 @@ export default function ItemTypesTable({ types, onDelete }: Props) {
         </div>
       </div>
 
-      {/* Table */}
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border-line02 bg-bg-input">
@@ -109,7 +102,7 @@ export default function ItemTypesTable({ types, onDelete }: Props) {
               >
                 <td className="px-5 py-3.5 text-text-muted text-xs">{(safePage - 1) * PAGE_SIZE + idx + 1}</td>
                 <td className="px-4 py-3.5">
-                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${TYPE_COLORS[type.name] ?? "bg-gray-50 text-gray-600 border-gray-100"}`}>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border bg-gray-50 text-gray-600 border-gray-100">
                     <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />
                     {type.name}
                   </span>
@@ -137,7 +130,6 @@ export default function ItemTypesTable({ types, onDelete }: Props) {
         </motion.tbody>
       </table>
 
-      {/* Pagination */}
       {total > 0 && (
         <div className="flex items-center justify-between px-5 py-3.5 border-t border-border-line02">
           <span className="text-xs text-text-muted">
