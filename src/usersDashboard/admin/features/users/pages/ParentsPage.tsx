@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import type { ColumnDef, Parent } from "../types";
-import AvatarInitials from "../components/shared/AvatarInitials";
+// import AvatarInitials from "../components/shared/AvatarInitials";
 import GenderBadge from "../components/shared/GenderBadge";
 import { useDeleteParent, useParentsList } from "../hooks/useParents";
 import UserPageHeader from "../components/shared/UserPageHeader";
@@ -21,7 +21,8 @@ const COLUMNS: ColumnDef<Parent>[] = [
     key: "name", header: "Full Name",
     render: (p) => (
       <div className="flex items-center gap-2.5">
-        <AvatarInitials name={`${p.firstName} ${p.lastName}`} />
+        {/* <AvatarInitials name={`${p.firstName} ${p.lastName}`} /> */}
+        <img src={p.photo} alt={p.firstName} className="h-9 w-9 rounded-full" />
         <span className="font-medium text-text-primary">{p.firstName} {p.lastName}</span>
       </div>
     ),

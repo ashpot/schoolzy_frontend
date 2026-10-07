@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import type { ColumnDef, Student } from "../types";
-import AvatarInitials from "../components/shared/AvatarInitials";
+// import AvatarInitials from "../components/shared/AvatarInitials";
 import GenderBadge from "../components/shared/GenderBadge";
 import SectionBadge from "../components/shared/SectionBadge";
 import { useDeleteStudent, useStudentsList } from "../hooks/useStudents";
@@ -18,7 +18,8 @@ const COLUMNS: ColumnDef<Student>[] = [
     key: "name", header: "Student Name",
     render: (s) => (
       <div className="flex items-center gap-2.5">
-        <AvatarInitials name={`${s.firstName} ${s.lastName}`} />
+        {/* <AvatarInitials name={`${s.firstName} ${s.lastName}`} /> */}
+        <img src={s.photo} alt={s.firstName} className="h-9 w-9 rounded-full" />
         <span className="font-medium text-text-primary">{s.firstName} {s.lastName}</span>
       </div>
     ),
@@ -51,6 +52,7 @@ const StudentsPage: React.FC = () => {
   const { data, isLoading } = useStudentsList(page, search);
   const { mutate: remove }  = useDeleteStudent();
   const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
+  console.log(data)
 
   const handleSearch = (q: string) => { setSearch(q); setPage(1); };
 
