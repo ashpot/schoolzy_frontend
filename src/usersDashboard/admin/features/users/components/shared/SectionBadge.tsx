@@ -1,7 +1,7 @@
 import React from "react";
 import { cn } from "@/shared/utils/cn";
 
-const SectionBadge: React.FC<{ section: string }> = ({ section }) => (
+const SectionBadge: React.FC<{ section: string | undefined}> = ({ section }) => (
   <span
     className={cn(
       "inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-lato font-medium whitespace-nowrap",

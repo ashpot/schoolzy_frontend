@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import type { ColumnDef, Parent } from "../types";
-// import AvatarInitials from "../components/shared/AvatarInitials";
+import AvatarInitials from "../components/shared/AvatarInitials";
 import GenderBadge from "../components/shared/GenderBadge";
 import { useDeleteParent, useParentsList } from "../hooks/useParents";
 import UserPageHeader from "../components/shared/UserPageHeader";
@@ -9,8 +9,6 @@ import UserFormPanel from "../components/shared/UserFormPanel";
 import ParentForm from "../components/parents/ParentForm";
 import UserListPanel from "../components/shared/UserListPanel";
 import { pageFade } from "../animations/variants";
-
-
 
 const COLUMNS: ColumnDef<Parent>[] = [
   {
@@ -21,19 +19,23 @@ const COLUMNS: ColumnDef<Parent>[] = [
     key: "name", header: "Full Name",
     render: (p) => (
       <div className="flex items-center gap-2.5">
-        {/* <AvatarInitials name={`${p.firstName} ${p.lastName}`} /> */}
-        <img src={p.photo} alt={p.firstName} className="h-9 w-9 rounded-full" />
+        {p.raw?.photo ? (
+          <img src={p.raw.photo} alt={p.firstName} className="h-9 w-9 rounded-full object-cover" />
+        ) : (
+          <AvatarInitials name={`${p.firstName} ${p.lastName}`} />
+        )}
         <span className="font-medium text-text-primary">{p.firstName} {p.lastName}</span>
       </div>
     ),
   },
   {
     key: "username", header: "Username",
-    render: (p) => <span className="text-text-secondary">{p.username}</span>,
+    render: (p) => <span className="text-text-secondary">{p.raw?.username}</span>,
   },
   {
     key: "sex", header: "Gender",
-    render: (p) => <GenderBadge gender={p.sex} />,
+    render: (p) =>
+      p.raw?.sex ? <GenderBadge gender={p.raw.sex} /> : <span className="text-text-muted">—</span>,
   },
 ];
 

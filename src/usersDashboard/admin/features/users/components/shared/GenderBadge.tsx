@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/shared/utils/cn";
 
-const GenderBadge: React.FC<{ gender: "Male" | "Female" }> = ({ gender }) => (
+const GenderBadge: React.FC<{ gender: "Male" | "Female" | null}> = ({ gender }) => (
   <motion.span
     initial={{ opacity: 0, scale: 0.8 }}
     animate={{ opacity: 1, scale: 1 }}

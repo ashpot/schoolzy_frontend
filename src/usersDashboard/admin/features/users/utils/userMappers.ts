@@ -9,8 +9,18 @@ function sectionLabel(sectionName: string | undefined): "Jnr Sec" | "Snr Sec" {
   return "Jnr Sec"; // default bucket — Primary/Pre-Primary sections will misclassify here
 }
 
-export function toStudent(u: UserResponse, classGroups: ClassGroupListItem[]): Student {
-  const cg = classGroups.find((c) => c.id === u.class_group);
+/** Accepts the embedded object (new API) or a numeric id looked up in classGroups (old API). */
+function resolveClassGroup(
+  cg: UserResponse["class_group"],
+  classGroups: ClassGroupListItem[]
+): ClassGroupListItem | undefined {
+  if (cg && typeof cg === "object") return cg;
+  if (typeof cg === "number") return classGroups.find((c) => c.id === cg);
+  return undefined;
+}
+
+export function toStudent(u: UserResponse, classGroups: ClassGroupListItem[] = []): Student {
+  const cg = resolveClassGroup(u.class_group, classGroups);
   return {
     id: String(u.id),
     admission_number: u.admission_number ?? "—",
@@ -25,12 +35,13 @@ export function toStudent(u: UserResponse, classGroups: ClassGroupListItem[]): S
     city: u.city ?? "",
     state: u.state ?? "",
     country: u.country ?? "",
-    email: u.email,
+    email: u.email ?? "",
     classGroup: cg?.name ?? "—",
     section: sectionLabel(cg?.section_name),
     classLabel: cg?.name ?? "—",
     dateOfAdmission: u.date_of_admission ?? "",
     photo: u.photo ?? undefined,
+    raw: u,
   };
 }
 
@@ -49,10 +60,11 @@ export function toTeacher(u: UserResponse): Teacher {
     city: u.city ?? "",
     state: u.state ?? "",
     country: u.country ?? "",
-    email: u.email,
+    email: u.email ?? "",
     classLabel: "—", // not available from /users/ — needs /academics/assigned-classes/
     dateOfEmployment: u.date_of_employment ?? "",
     photo: u.photo ?? undefined,
+    raw: u,
   };
 }
 
@@ -71,9 +83,10 @@ export function toAdmin(u: UserResponse): Admin {
     city: u.city ?? "",
     state: u.state ?? "",
     country: u.country ?? "",
-    email: u.email,
+    email: u.email ?? "",
     signature: u.signature ?? undefined,
     photo: u.photo ?? undefined,
+    raw: u,
   };
 }
 
@@ -92,7 +105,8 @@ export function toParent(u: UserResponse): Parent {
     city: u.city ?? "",
     state: u.state ?? "",
     country: u.country ?? "",
-    email: u.email,
+    email: u.email ?? "",
     photo: u.photo ?? undefined,
+    raw: u,
   };
 }

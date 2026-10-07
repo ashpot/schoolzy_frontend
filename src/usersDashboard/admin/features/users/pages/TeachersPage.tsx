@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import type { ColumnDef, Teacher } from "../types";
-// import AvatarInitials from "../components/shared/AvatarInitials";
 import GenderBadge from "../components/shared/GenderBadge";
 import { useDeleteTeacher, useTeachersList } from "../hooks/useTeachers";
 import UserPageHeader from "../components/shared/UserPageHeader";
@@ -11,30 +10,34 @@ import TeacherForm from "../components/teachers/TeacherForm";
 import UserListPanel from "../components/shared/UserListPanel";
 import { teacherBulkUploadConfig } from "../data/mockData";
 import BulkUploadModal from "../components/shared/bulk-upload/BulkUploadModal";
-
+import AvatarInitials from "../components/shared/AvatarInitials";
 
 const COLUMNS: ColumnDef<Teacher>[] = [
   {
     key: "empNo", header: "Emp. No.",
-    render: (t) => <span className="text-text-muted text-xs">{t.employment_number}</span>,
+    render: (t) => <span className="text-text-muted text-xs">{t.raw?.employment_number ?? "—"}</span>,
   },
   {
     key: "name", header: "Full Name",
     render: (t) => (
       <div className="flex items-center gap-2.5">
-        {/* <AvatarInitials name={`${t.firstName} ${t.lastName}`} /> */}
-        <img src={t.photo} alt={t.firstName} className="h-9 w-9 rounded-full" />
+        {t.raw?.photo ? (
+          <img src={t.raw.photo} alt={t.firstName} className="h-9 w-9 rounded-full object-cover" />
+        ) : (
+          <AvatarInitials name={`${t.firstName} ${t.lastName}`} />
+        )}
         <span className="font-medium text-text-primary">{t.firstName} {t.lastName}</span>
       </div>
     ),
   },
   {
     key: "username", header: "Username",
-    render: (t) => <span className="text-text-secondary">{t.username}</span>,
+    render: (t) => <span className="text-text-secondary">{t.raw?.username}</span>,
   },
   {
     key: "sex", header: "Gender",
-    render: (t) => <GenderBadge gender={t.sex} />,
+    render: (t) =>
+      t.raw?.sex ? <GenderBadge gender={t.raw.sex} /> : <span className="text-text-muted">—</span>,
   },
   {
     key: "class", header: "Class",
@@ -47,7 +50,7 @@ const TeachersPage: React.FC = () => {
   const [search, setSearch] = useState("");
   const { data, isLoading } = useTeachersList(page, search);
   const { mutate: remove }  = useDeleteTeacher();
-  const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false)
+  const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
 
   const handleSearch = (q: string) => { setSearch(q); setPage(1); };
 
@@ -63,7 +66,7 @@ const TeachersPage: React.FC = () => {
         isOpen={isBulkUploadOpen}
         onClose={() => setIsBulkUploadOpen(false)}
         config={teacherBulkUploadConfig}
-        queryKey="students"
+        queryKey="teachers"
       />
       <div className="grid grid-cols-1 xl:grid-cols-[420px_1fr] gap-5 items-start">
         <UserFormPanel title="Add Teacher">
