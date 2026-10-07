@@ -18,14 +18,18 @@ const COLUMNS: ColumnDef<Admin>[] = [
     key: "name", header: "Full Name",
     render: (a) => (
       <div className="flex items-center gap-2.5">
-        <AvatarInitials name={`${a.firstName} ${a.lastName}`} />
+        {a.raw?.photo ? (
+          <img src={a.raw.photo} alt={a.firstName} className="h-9 w-9 rounded-full object-cover" />
+        ) : (
+          <AvatarInitials name={`${a.firstName} ${a.lastName}`} />
+        )}
         <span className="font-medium text-text-primary">{a.firstName} {a.lastName}</span>
       </div>
     ),
   },
   {
     key: "username", header: "Username",
-    render: (a) => <span className="text-text-secondary">{a.username}</span>,
+    render: (a) => <span className="text-text-secondary">{a.raw?.username}</span>,
   },
 ];
 

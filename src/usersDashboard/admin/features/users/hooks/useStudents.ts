@@ -11,12 +11,10 @@ export const useStudentsList = (page = 1, search = "") =>
   useQuery({
     queryKey: ["users", "students", page, search],
     queryFn: async () => {
-      const [raw, classGroups] = await Promise.all([
-        apiRequest<UserResponse[]>(USERS_ENDPOINTS.LIST_BY_ROLE("Student")),
-        apiRequest<ClassGroupListItem[]>(USERS_ENDPOINTS.LIST_CLASS_GROUPS),
-      ]);
-
-      let mapped = raw.map((u) => toStudent(u, classGroups));
+      // class_group now arrives embedded in each user, so no second request is needed
+      const raw = await apiRequest<UserResponse[]>(USERS_ENDPOINTS.LIST_BY_ROLE("Student"));
+      // console.log("Fetched students:", raw);
+      let mapped = raw.map((u) => toStudent(u));
       if (search) {
         const q = search.toLowerCase();
         mapped = mapped.filter(

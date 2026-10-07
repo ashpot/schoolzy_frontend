@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { adminSchema, type AdminFormValues } from "../../schemas";
 import { staggerContainer, fieldFadeUp } from "../../animations/variants";
 import { useAddAdmin } from "../../hooks/useAdmins";
 import { generateUsername } from "@/shared/utils/generateUsername";
+import { toProfilePayload } from "../../utils/toProfilePayload";
 import PhotoUpload from "../shared/PhotoUpload";
 import SignatureUpload from "../shared/SignatureUpload";
 import FormInput from "@/shared/ui/FormInput";
@@ -20,8 +21,8 @@ const SEX_OPTIONS = [
 const AdminForm: React.FC = () => {
   const { mutate, isPending } = useAddAdmin();
   const [_signatureFile, setSignatureFile] = useState<File | null>(null);
-  const [createdUser, setCreatedUser] = useState<{ fullName: string; username: string; password: string } | null>(null);
-
+  const [createdUser, setCreatedUser] =
+    useState<{ fullName: string; username: string; password: string } | null>(null);
 
   const {
     register,
@@ -36,6 +37,7 @@ const AdminForm: React.FC = () => {
       firstName: "", lastName: "", middleName: "", sex: undefined,
       dob: "", phone: "", address: "", city: "", state: "", country: "", email: "",
       username: "", password: "", confirmPassword: "",
+      photo: undefined,
     },
   });
 
@@ -47,30 +49,29 @@ const AdminForm: React.FC = () => {
   }, [firstName, lastName, setValue]);
 
   const onSubmit = (values: AdminFormValues) => {
-    // TODO: include signatureFile in FormData when wiring to real API
-    mutate(
-      {
-        first_name: values.firstName,
-        last_name: values.lastName,
-        username: values.username,
-        password: values.password,
-        email: values.email,
-      },
-      { onSuccess: () => {
+    // TODO: send signature once the backend confirms the field name + multipart support
+    mutate(toProfilePayload(values), {
+      onSuccess: () => {
         setCreatedUser({
           fullName: `${values.firstName} ${values.lastName}`,
           username: values.username,
           password: values.password,
         });
         reset();
-        setSignatureFile(null)
-      } }
-    );
+        setSignatureFile(null);
+      },
+    });
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      <PhotoUpload />
+      <Controller
+        control={control}
+        name="photo"
+        render={({ field }) => (
+          <PhotoUpload value={field.value} onChange={field.onChange} error={errors.photo?.message} />
+        )}
+      />
       <UserCreatedModal
         isOpen={!!createdUser}
         onClose={() => setCreatedUser(null)}
@@ -83,8 +84,8 @@ const AdminForm: React.FC = () => {
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
           <FormInput label="First Name" placeholder="First name"
             isLoading={isPending} error={errors.firstName?.message} {...register("firstName")} />
-          <FormInput label="Last Name"   placeholder="Last name"
-            isLoading={isPending} error={errors.lastName?.message}  {...register("lastName")} />
+          <FormInput label="Last Name" placeholder="Last name"
+            isLoading={isPending} error={errors.lastName?.message} {...register("lastName")} />
         </motion.div>
 
         <motion.div variants={fieldFadeUp}>
@@ -111,7 +112,7 @@ const AdminForm: React.FC = () => {
 
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
           <FormInput label="City" placeholder="City"
-            isLoading={isPending} error={errors.city?.message}  {...register("city")} />
+            isLoading={isPending} error={errors.city?.message} {...register("city")} />
           <FormInput label="State" placeholder="State"
             isLoading={isPending} error={errors.state?.message} {...register("state")} />
         </motion.div>
@@ -122,11 +123,11 @@ const AdminForm: React.FC = () => {
         </motion.div>
 
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Email Address" type="email" placeholder="admin@example.com"
+          <FormInput label="Email Address (optional)" type="email" placeholder="admin@example.com"
             isLoading={isPending} error={errors.email?.message} {...register("email")} />
         </motion.div>
 
-        {/* Signature — outside RHF, handled manually */}
+        {/* Signature — outside RHF, not sent yet */}
         <motion.div variants={fieldFadeUp}>
           <SignatureUpload onChange={(f) => setSignatureFile(f)} />
         </motion.div>

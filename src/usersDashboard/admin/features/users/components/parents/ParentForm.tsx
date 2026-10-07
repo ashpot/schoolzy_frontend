@@ -1,17 +1,18 @@
-import FormInput from "@/shared/ui/FormInput";
-import FormSelect from "@/shared/ui/FormSelect";
 import React, { useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { parentSchema, type ParentFormValues } from "../../schemas";
 import { staggerContainer, fieldFadeUp } from "../../animations/variants";
 import { useAddParent } from "../../hooks/useParents";
 import { generateUsername } from "@/shared/utils/generateUsername";
+import { toProfilePayload } from "../../utils/toProfilePayload";
 import PhotoUpload from "../shared/PhotoUpload";
 import AssignChildField from "../shared/AssignChildField";
-import SubmitButton from "@/shared/ui/SubmitButton";
 import UserCreatedModal from "../shared/UserCreatedModal";
+import FormInput from "@/shared/ui/FormInput";
+import FormSelect from "@/shared/ui/FormSelect";
+import SubmitButton from "@/shared/ui/SubmitButton";
 
 const SEX_OPTIONS = [
   { value: "Male", label: "Male" }, { value: "Female", label: "Female" },
@@ -19,7 +20,8 @@ const SEX_OPTIONS = [
 
 const ParentForm: React.FC = () => {
   const { mutate, isPending } = useAddParent();
-  const [createdUser, setCreatedUser] = useState<{ fullName: string; username: string; password: string } | null>(null);
+  const [createdUser, setCreatedUser] =
+    useState<{ fullName: string; username: string; password: string } | null>(null);
 
   const {
     register,
@@ -35,6 +37,7 @@ const ParentForm: React.FC = () => {
       dob: "", phone: "", address: "", city: "", state: "", country: "", email: "",
       username: "", password: "", confirmPassword: "",
       assignedChildren: [],
+      photo: undefined,
     },
   });
 
@@ -46,31 +49,36 @@ const ParentForm: React.FC = () => {
   }, [firstName, lastName, setValue]);
 
   const onSubmit = (values: ParentFormValues) => {
-    // NOTE: values.assignedChildren is captured in form state but intentionally
-    // left out of the payload below — backend child-assignment endpoint
-    // (POST /student-parents/) isn't wired yet. Will loop-assign post-creation later.
+    // Form state keeps child ids as strings; backend expects integers.
+    const childIds = values.assignedChildren.map((c) => Number(c.id));
+
     mutate(
       {
-        first_name: values.firstName,
-        last_name: values.lastName,
-        username: values.username,
-        password: values.password,
-        email: values.email,
+        ...toProfilePayload(values),
+        children: childIds.length > 0 ? childIds : undefined,
       },
-      { onSuccess: () => {
-        setCreatedUser({
-          fullName: `${values.firstName} ${values.lastName}`,
-          username: values.username,
-          password: values.password,
-        });
-        reset()
-      } }
+      {
+        onSuccess: () => {
+          setCreatedUser({
+            fullName: `${values.firstName} ${values.lastName}`,
+            username: values.username,
+            password: values.password,
+          });
+          reset();
+        },
+      }
     );
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      <PhotoUpload />
+      <Controller
+        control={control}
+        name="photo"
+        render={({ field }) => (
+          <PhotoUpload value={field.value} onChange={field.onChange} error={errors.photo?.message} />
+        )}
+      />
       <UserCreatedModal
         isOpen={!!createdUser}
         onClose={() => setCreatedUser(null)}
@@ -83,8 +91,8 @@ const ParentForm: React.FC = () => {
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
           <FormInput label="First Name" placeholder="First name"
             isLoading={isPending} error={errors.firstName?.message} {...register("firstName")} />
-          <FormInput label="Last Name"  placeholder="Last name"
-            isLoading={isPending} error={errors.lastName?.message}  {...register("lastName")} />
+          <FormInput label="Last Name" placeholder="Last name"
+            isLoading={isPending} error={errors.lastName?.message} {...register("lastName")} />
         </motion.div>
 
         <motion.div variants={fieldFadeUp}>
@@ -110,8 +118,8 @@ const ParentForm: React.FC = () => {
         </motion.div>
 
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
-          <FormInput label="City"  placeholder="City"
-            isLoading={isPending} error={errors.city?.message}  {...register("city")} />
+          <FormInput label="City" placeholder="City"
+            isLoading={isPending} error={errors.city?.message} {...register("city")} />
           <FormInput label="State" placeholder="State"
             isLoading={isPending} error={errors.state?.message} {...register("state")} />
         </motion.div>
@@ -122,7 +130,7 @@ const ParentForm: React.FC = () => {
         </motion.div>
 
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Email Address" type="email" placeholder="parent@example.com"
+          <FormInput label="Email Address (optional)" type="email" placeholder="parent@example.com"
             isLoading={isPending} error={errors.email?.message} {...register("email")} />
         </motion.div>
 

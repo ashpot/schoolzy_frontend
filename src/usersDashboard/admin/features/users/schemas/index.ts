@@ -5,18 +5,29 @@ const phoneRegex = /^\+?[0-9\s\-()]{7,15}$/;
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;
 
+const MAX_PHOTO_BYTES = 2 * 1024 * 1024; // 2 MB
+
+const photoField = z
+  .instanceof(File)
+  .refine((f) => f.type.startsWith("image/"), "Photo must be an image")
+  .refine((f) => f.size <= MAX_PHOTO_BYTES, "Photo must be 2MB or smaller")
+  .optional();
+
+const optionalEmail = z.string().email("Enter a valid email address").optional().or(z.literal(""));
+
 const basePersonFields = {
   firstName:  z.string().min(1, "First name is required"),
   lastName:   z.string().min(1, "Last name is required"),
   middleName: z.string().optional(),
-  sex:        z.enum(["Male", "Female"], { message: "Please select a gender" }).optional(),
-  dob:        z.string().min(1, "Date of birth is required").optional(),
-  phone:      z.string().regex(phoneRegex, "Enter a valid phone number").optional(),
-  address:    z.string().min(1, "Address is required").optional(),
-  city:       z.string().min(1, "City is required").optional(),
-  state:      z.string().min(1, "State is required").optional(),
-  country:    z.string().min(1, "Country is required").optional(),
-  email:      z.string().email("Enter a valid email address"),
+  sex:        z.enum(["Male", "Female"], { message: "Please select a gender" }).optional().or(z.literal("")),
+  dob:        z.string().optional(),
+  phone:      z.string().regex(phoneRegex, "Enter a valid phone number").optional().or(z.literal("")),
+  address:    z.string().optional(),
+  city:       z.string().optional(),
+  state:      z.string().optional(),
+  country:    z.string().optional(),
+  email:      optionalEmail,
+  photo:      photoField,
 };
 
 const credentialFields = {
@@ -32,11 +43,12 @@ const credentialFields = {
 export const studentSchema = z
   .object({
     ...credentialFields,
-    admission_number:     z.string().min(1, "Admission number is required"),
+    admission_number: z.string().min(1, "Admission number is required"),
     firstName:  z.string().min(1, "First name is required"),
     lastName:   z.string().min(1, "Last name is required"),
-    email:      z.string().email("Enter a valid email address"),
+    email:      optionalEmail,
     classGroup: z.coerce.number().min(1, "Please select a class group"),
+    photo:      photoField,
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -49,8 +61,8 @@ export const teacherSchema = z
   .object({
     ...basePersonFields,
     ...credentialFields,
-    employment_number:            z.string().min(1, "Employment number is required"),
-    dateOfEmployment: z.string().min(1, "Date of employment is required"),
+    employment_number: z.string().min(1, "Employment number is required"),
+    dateOfEmployment:  z.string().min(1, "Date of employment is required"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",

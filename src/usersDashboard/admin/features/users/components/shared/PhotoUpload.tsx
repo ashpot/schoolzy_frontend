@@ -1,22 +1,32 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Camera } from "lucide-react";
 
 interface PhotoUploadProps {
-  value?: string;
-  onChange?: (file: File, preview: string) => void;
+  value?: File | null;
+  onChange?: (file: File | undefined) => void;
+  error?: string;
 }
 
-const PhotoUpload: React.FC<PhotoUploadProps> = ({ value, onChange }) => {
-  const [preview, setPreview] = useState<string | undefined>(value);
+const PhotoUpload: React.FC<PhotoUploadProps> = ({ value, onChange, error }) => {
+  const [preview, setPreview] = useState<string | undefined>();
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Preview follows the form value, so reset() clears it automatically
+  useEffect(() => {
+    if (!value) {
+      setPreview(undefined);
+      return;
+    }
+    const url = URL.createObjectURL(value);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [value]);
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-    onChange?.(file, url);
+    if (file) onChange?.(file);
+    e.target.value = ""; // allow re-picking the same file
   };
 
   return (
@@ -36,19 +46,12 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ value, onChange }) => {
         {preview ? (
           <img src={preview} alt="Preview" className="w-full h-full object-cover" />
         ) : (
-          <>
-            <Camera className="w-7 h-7 text-brand-primary/60 group-hover:text-brand-primary transition-colors" />
-          </>
+          <Camera className="w-7 h-7 text-brand-primary/60 group-hover:text-brand-primary transition-colors" />
         )}
       </motion.button>
       <p className="text-xs text-text-muted">Click to upload photo</p>
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handleFile}
-      />
+      {error && <p className="text-xs text-danger">{error}</p>}
+      <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
     </motion.div>
   );
 };

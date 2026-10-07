@@ -1,14 +1,14 @@
-import { useState } from "react";
-import UserCreatedModal from "../shared/UserCreatedModal";
-import React from "react";
-import { useForm, useWatch } from "react-hook-form";
+import React, { useState } from "react";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { teacherSchema, type TeacherFormValues } from "../../schemas";
 import { staggerContainer, fieldFadeUp } from "../../animations/variants";
 import { useAddTeacher } from "../../hooks/useTeachers";
 import { generateUsername } from "@/shared/utils/generateUsername";
+import { toProfilePayload } from "../../utils/toProfilePayload";
 import PhotoUpload from "../shared/PhotoUpload";
+import UserCreatedModal from "../shared/UserCreatedModal";
 import FormInput from "@/shared/ui/FormInput";
 import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
@@ -19,7 +19,8 @@ const SEX_OPTIONS = [
 
 const TeacherForm: React.FC = () => {
   const { mutate, isPending } = useAddTeacher();
-  const [createdUser, setCreatedUser] = useState<{ fullName: string; username: string; password: string, employmentNumber: string } | null>(null);
+  const [createdUser, setCreatedUser] =
+    useState<{ fullName: string; username: string; password: string; employmentNumber: string } | null>(null);
 
   const {
     register,
@@ -35,6 +36,7 @@ const TeacherForm: React.FC = () => {
       sex: undefined, dob: "", phone: "", address: "", city: "",
       state: "", country: "", email: "", dateOfEmployment: "",
       username: "", password: "", confirmPassword: "",
+      photo: undefined,
     },
   });
 
@@ -48,22 +50,21 @@ const TeacherForm: React.FC = () => {
   const onSubmit = (values: TeacherFormValues) => {
     mutate(
       {
-        first_name: values.firstName,
-        last_name: values.lastName,
-        username: values.username,
-        password: values.password,
-        email: values.email,
+        ...toProfilePayload(values),
         employment_number: values.employment_number,
+        date_of_employment: values.dateOfEmployment,
       },
-      { onSuccess: () =>{
-         setCreatedUser({
+      {
+        onSuccess: () => {
+          setCreatedUser({
             fullName: `${values.firstName} ${values.lastName}`,
             username: values.username,
             password: values.password,
             employmentNumber: values.employment_number,
           });
-        reset()
-      } }
+          reset();
+        },
+      }
     );
   };
 
@@ -77,7 +78,13 @@ const TeacherForm: React.FC = () => {
         password={createdUser?.password ?? ""}
         role="Teacher"
       />
-      <PhotoUpload />
+      <Controller
+        control={control}
+        name="photo"
+        render={({ field }) => (
+          <PhotoUpload value={field.value} onChange={field.onChange} error={errors.photo?.message} />
+        )}
+      />
 
       <motion.div variants={staggerContainer} initial="hidden" animate="show" className="flex flex-col gap-3.5 mt-2">
         <motion.div variants={fieldFadeUp}>
@@ -88,8 +95,8 @@ const TeacherForm: React.FC = () => {
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
           <FormInput label="First Name" placeholder="First name"
             isLoading={isPending} error={errors.firstName?.message} {...register("firstName")} />
-          <FormInput label="Last Name"  placeholder="Last name"
-            isLoading={isPending} error={errors.lastName?.message}  {...register("lastName")} />
+          <FormInput label="Last Name" placeholder="Last name"
+            isLoading={isPending} error={errors.lastName?.message} {...register("lastName")} />
         </motion.div>
 
         <motion.div variants={fieldFadeUp}>
@@ -115,8 +122,8 @@ const TeacherForm: React.FC = () => {
         </motion.div>
 
         <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
-          <FormInput label="City"  placeholder="City"
-            isLoading={isPending} error={errors.city?.message}  {...register("city")} />
+          <FormInput label="City" placeholder="City"
+            isLoading={isPending} error={errors.city?.message} {...register("city")} />
           <FormInput label="State" placeholder="State"
             isLoading={isPending} error={errors.state?.message} {...register("state")} />
         </motion.div>
@@ -127,7 +134,7 @@ const TeacherForm: React.FC = () => {
         </motion.div>
 
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Email Address" type="email" placeholder="teacher@example.com"
+          <FormInput label="Email Address (optional)" type="email" placeholder="teacher@example.com"
             isLoading={isPending} error={errors.email?.message} {...register("email")} />
         </motion.div>
 
