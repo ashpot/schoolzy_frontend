@@ -8,7 +8,7 @@ import { useDeleteStudent, useStudentsList } from "../hooks/useStudents";
 import { pageFade } from "../animations/variants";
 import UserPageHeader from "../components/shared/UserPageHeader";
 import UserFormPanel from "../components/shared/UserFormPanel";
-import StudentForm from "../components/students/StudentsForm";
+import StudentForm from "../components/students/StudentForm";
 import UserListPanel from "../components/shared/UserListPanel";
 import BulkUploadModal from "../components/shared/bulk-upload/BulkUploadModal";
 import { studentBulkUploadConfig } from "../data/mockData";

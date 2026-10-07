@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { studentSchema, type StudentFormValues } from "../../schemas";
@@ -16,7 +16,7 @@ const StudentForm: React.FC = () => {
   const { mutate, isPending } = useAddStudent();
   const { data: classGroups, isLoading: classGroupsLoading } = useClassGroupsList();
   const [createdUser, setCreatedUser] =
-  useState<{ fullName: string; username: string; password: string; admissionNumber:string } | null>(null);
+    useState<{ fullName: string; username: string; password: string; admissionNumber: string } | null>(null);
 
   const {
     register,
@@ -30,6 +30,7 @@ const StudentForm: React.FC = () => {
     defaultValues: {
       firstName: "", lastName: "", email: "", classGroup: "" as unknown as number,
       username: "", password: "", confirmPassword: "", admission_number: "",
+      photo: undefined,
     },
   });
 
@@ -52,25 +53,34 @@ const StudentForm: React.FC = () => {
         last_name: values.lastName,
         username: values.username,
         password: values.password,
-        email: values.email,
+        email: values.email || undefined,
         class_group: values.classGroup,
         admission_number: values.admission_number,
+        photo: values.photo,
       },
-      { onSuccess: () => {
-        setCreatedUser({
-          fullName: `${values.firstName} ${values.lastName}`,
-          username: values.username,
-          password: values.password,
-          admissionNumber: values.admission_number,
-        });
-        reset()
-      } }
+      {
+        onSuccess: () => {
+          setCreatedUser({
+            fullName: `${values.firstName} ${values.lastName}`,
+            username: values.username,
+            password: values.password,
+            admissionNumber: values.admission_number,
+          });
+          reset();
+        },
+      }
     );
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      <PhotoUpload />
+      <Controller
+        control={control}
+        name="photo"
+        render={({ field }) => (
+          <PhotoUpload value={field.value} onChange={field.onChange} error={errors.photo?.message} />
+        )}
+      />
       <UserCreatedModal
         isOpen={!!createdUser}
         onClose={() => setCreatedUser(null)}
@@ -79,12 +89,7 @@ const StudentForm: React.FC = () => {
         password={createdUser?.password ?? ""}
         role="Student"
       />
-      <motion.div
-        variants={staggerContainer}
-        initial="hidden"
-        animate="show"
-        className="flex flex-col gap-3.5 mt-2"
-      >
+      <motion.div variants={staggerContainer} initial="hidden" animate="show" className="flex flex-col gap-3.5 mt-2">
         <motion.div variants={fieldFadeUp}>
           <FormInput label="Admission Number" placeholder="e.g. ADM/2024/013"
             isLoading={isPending} error={errors.admission_number?.message} {...register("admission_number")} />
@@ -98,7 +103,7 @@ const StudentForm: React.FC = () => {
         </motion.div>
 
         <motion.div variants={fieldFadeUp}>
-          <FormInput label="Email Address" type="email" placeholder="student@example.com"
+          <FormInput label="Email Address (optional)" type="email" placeholder="student@example.com"
             isLoading={isPending} error={errors.email?.message} {...register("email")} />
         </motion.div>
 

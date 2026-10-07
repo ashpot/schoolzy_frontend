@@ -49,6 +49,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ tenant }) => {
   };
 
   const schoolName = tenant?.school_name ?? 'My School';
+  const school_details = {
+    school_name: tenant?.school_name ?? 'My School',
+    logo: tenant?.logo ?? '',
+    favicon: tenant?.favicon ?? '',
+    school_slug: tenant?.school_slug ?? '',
+  };
+  localStorage.setItem('school_details', JSON.stringify(school_details));
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="w-full max-w-md mx-auto">

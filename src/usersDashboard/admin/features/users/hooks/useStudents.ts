@@ -56,7 +56,7 @@ export const useClassGroupsList = () => {
 
 export const useStudentOptionsList = () => {
   return useQuery({
-    queryKey: ["users", "students", "options"],
+    queryKey: ["users", "students", "parent-options"],
     queryFn: async () => {
       const raw = await apiRequest<UserResponse[]>(USERS_ENDPOINTS.LIST_ALL);
       return raw

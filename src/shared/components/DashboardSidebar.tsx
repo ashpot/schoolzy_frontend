@@ -5,6 +5,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 import type { NavItem } from "@/shared/types/navigation";
 import brandLogo from "@/assets/brand/schoolzy_brand_name.svg";
+const school_details = JSON.parse(localStorage.getItem("school_details") || "{}");
 
 const UserAvatar = ({ initials }: { initials: string }) => (
   <div className="w-9 h-9 rounded-full bg-brand-primary flex items-center justify-center text-white text-sm font-semibold shrink-0">
@@ -44,8 +45,16 @@ const initials = name
       )}
     >
       {/* Brand */}
-      <div className="px-5 py-5.5 border-b border-border-line02">
-        <img src={brandLogo} alt="My School" className="h-8 md:h-9" />
+      <div className="px-5 py-5.5 border-b border-border-line02 flex items-center gap-2.5">
+        {/* <img src={brandLogo} alt="My School" className="h-8 md:h-9" /> */}
+        <img src={school_details.logo || brandLogo}
+          alt={school_details.slug || ""}
+          className="h-10 md:h-12" />
+          <h1
+            className="text-text-primary font-jakarta font-semibold text-[28px] capitalize"
+          >
+            {school_details.school_slug}
+          </h1>
       </div>
 
       {/* Navigation */}

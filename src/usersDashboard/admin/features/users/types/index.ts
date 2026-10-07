@@ -2,7 +2,7 @@ export interface Student {
   id: string; admission_number: string; firstName: string; middleName?: string;
   lastName: string; username: string; sex: "Male" | "Female"; dob: string;
   phone: string; address: string; city: string; state: string; country: string;
-  email: string; classGroup: string; section: "Jnr Sec" | "Snr Sec";
+  email?: string; classGroup: string; section: "Jnr Sec" | "Snr Sec";
   classLabel: string; dateOfAdmission: string; photo?: string;
 }
 
@@ -21,21 +21,21 @@ export interface Teacher {
   id: string; employment_number: string; firstName: string; middleName?: string;
   lastName: string; username: string; sex: "Male" | "Female"; dob: string;
   phone: string; address: string; city: string; state: string; country: string;
-  email: string; classLabel: string; dateOfEmployment: string; photo?: string;
+  email?: string; classLabel: string; dateOfEmployment: string; photo?: string;
 }
 
 export interface Admin {
   id: string; adminId: string; firstName: string; middleName?: string;
   lastName: string; username: string; sex: "Male" | "Female"; dob: string;
   phone: string; address: string; city: string; state: string; country: string;
-  email: string; signature?: string; photo?: string;
+  email?: string; signature?: string; photo?: string;
 }
 
 export interface Parent {
   id: string; parentId: string; firstName: string; middleName?: string;
   lastName: string; username: string; sex: "Male" | "Female"; dob: string;
   phone: string; address: string; city: string; state: string;
-  country: string; email: string; photo?: string;
+  country: string; email?: string; photo?: string;
 }
 
 export interface PaginatedResponse<T> {
