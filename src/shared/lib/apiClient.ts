@@ -32,6 +32,6 @@ export async function apiRequest<T>(url: string, options: RequestOptions = {}): 
     const errorBody = await res.json().catch(() => ({}));
     throw new Error(errorBody.message || errorBody.error || errorBody.detail || "Request failed");
   }
-
+  // console.log("apiRequest response:", res.json());
   return res.json();
 }

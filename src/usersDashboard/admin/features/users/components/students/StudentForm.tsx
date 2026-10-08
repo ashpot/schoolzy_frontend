@@ -12,6 +12,23 @@ import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
 import UserCreatedModal from "../shared/UserCreatedModal";
 
+const SEX_OPTIONS = [
+  { value: "Male", label: "Male" }, { value: "Female", label: "Female" },
+];
+
+// Local date as YYYY-MM-DD (toISOString would use UTC and can be a day off)
+const today = () => new Date().toLocaleDateString("en-CA");
+
+const getDefaults = () => ({
+  admission_number: "", firstName: "", middleName: "", lastName: "",
+  sex: undefined, dob: "", email: "",
+  address: "", city: "", state: "", country: "",
+  classGroup: "" as unknown as number,
+  dateOfAdmission: today(),
+  username: "", password: "", confirmPassword: "",
+  photo: undefined,
+});
+
 const StudentForm: React.FC = () => {
   const { mutate, isPending } = useAddStudent();
   const { data: classGroups, isLoading: classGroupsLoading } = useClassGroupsList();
@@ -27,11 +44,7 @@ const StudentForm: React.FC = () => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(studentSchema),
-    defaultValues: {
-      firstName: "", lastName: "", email: "", classGroup: "" as unknown as number,
-      username: "", password: "", confirmPassword: "", admission_number: "",
-      photo: undefined,
-    },
+    defaultValues: getDefaults(),
   });
 
   const firstName = useWatch({ control, name: "firstName" });
@@ -50,10 +63,18 @@ const StudentForm: React.FC = () => {
     mutate(
       {
         first_name: values.firstName,
+        middle_name: values.middleName,
         last_name: values.lastName,
         username: values.username,
         password: values.password,
         email: values.email || undefined,
+        sex: values.sex,
+        date_of_birth: values.dob,
+        address: values.address,
+        city: values.city,
+        state: values.state,
+        country: values.country,
+        date_of_admission: values.dateOfAdmission,
         class_group: values.classGroup,
         admission_number: values.admission_number,
         photo: values.photo,
@@ -66,7 +87,7 @@ const StudentForm: React.FC = () => {
             password: values.password,
             admissionNumber: values.admission_number,
           });
-          reset();
+          reset(getDefaults()); // admission date goes back to today
         },
       }
     );
@@ -103,19 +124,50 @@ const StudentForm: React.FC = () => {
         </motion.div>
 
         <motion.div variants={fieldFadeUp}>
+          <FormInput label="Middle Name" placeholder="Middle name"
+            isLoading={isPending} error={errors.middleName?.message} {...register("middleName")} />
+        </motion.div>
+
+        <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
+          <FormSelect label="Sex" placeholder="Select..." options={SEX_OPTIONS}
+            isLoading={isPending} error={errors.sex?.message} {...register("sex")} />
+          <FormInput label="Date of Birth" type="date"
+            isLoading={isPending} error={errors.dob?.message} {...register("dob")} />
+        </motion.div>
+
+        <motion.div variants={fieldFadeUp}>
           <FormInput label="Email Address (optional)" type="email" placeholder="student@example.com"
             isLoading={isPending} error={errors.email?.message} {...register("email")} />
         </motion.div>
 
         <motion.div variants={fieldFadeUp}>
+          <FormInput label="Address" placeholder="Street address"
+            isLoading={isPending} error={errors.address?.message} {...register("address")} />
+        </motion.div>
+
+        <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
+          <FormInput label="City" placeholder="City"
+            isLoading={isPending} error={errors.city?.message} {...register("city")} />
+          <FormInput label="State" placeholder="State"
+            isLoading={isPending} error={errors.state?.message} {...register("state")} />
+        </motion.div>
+
+        <motion.div variants={fieldFadeUp}>
+          <FormInput label="Country" placeholder="Country"
+            isLoading={isPending} error={errors.country?.message} {...register("country")} />
+        </motion.div>
+
+        <motion.div variants={fieldFadeUp} className="grid grid-cols-2 gap-3">
           <FormSelect
             label="Class Group"
-            placeholder={classGroupsLoading ? "Loading class groups..." : "Select class group"}
+            placeholder={classGroupsLoading ? "Loading..." : "Select class group"}
             options={classGroupOptions}
             isLoading={isPending || classGroupsLoading}
             error={errors.classGroup?.message}
             {...register("classGroup")}
           />
+          <FormInput label="Date of Admission" type="date"
+            isLoading={isPending} error={errors.dateOfAdmission?.message} {...register("dateOfAdmission")} />
         </motion.div>
 
         <motion.div variants={fieldFadeUp}>

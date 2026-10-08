@@ -1,10 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   mockSubjectTeachers,
-  mockPsychomotiveMetrics,
 } from "../data/mockData";
 import type {
-  PsychomotiveMetric,
   SectionListItem,
   Grade, GradePayload, GradeResponse,
   Subject, SubjectPayload, SubjectResponse,
@@ -313,51 +311,6 @@ export function useDeleteGrade() {
       return { success: true };
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["academics", "grades"] }),
-  });
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PSYCHOMOTIVE (unchanged — still mock)
-// ─────────────────────────────────────────────────────────────────────────────
-let psychomotiveStore = [...mockPsychomotiveMetrics];
-
-export function usePsychomotiveList(page: number, search: string, section: string | "All") {
-  return useQuery({
-    queryKey: ["academics", "psychomotive", page, search, section],
-    queryFn: async () => {
-      await new Promise((r) => setTimeout(r, 200));
-      let filtered = section === "All" ? psychomotiveStore : psychomotiveStore.filter((d) => d.section === section);
-      if (search)
-        filtered = filtered.filter((p) => p.title.toLowerCase().includes(search.toLowerCase()));
-      return paginate(filtered, page);
-    },
-  });
-}
-
-export function useAddPsychomotive() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: Omit<PsychomotiveMetric, "id">) => {
-      await new Promise((r) => setTimeout(r, 500));
-      const newItem: PsychomotiveMetric = {
-        ...payload,
-        id: `PSY-${String(psychomotiveStore.length + 1).padStart(3, "0")}`,
-      };
-      psychomotiveStore = [newItem, ...psychomotiveStore];
-      return newItem;
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["academics", "psychomotive"] }),
-  });
-}
-
-export function useDeletePsychomotive() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (id: string) => {
-      await new Promise((r) => setTimeout(r, 300));
-      psychomotiveStore = psychomotiveStore.filter((p) => p.id !== id);
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["academics", "psychomotive"] }),
   });
 }
 

@@ -36,6 +36,7 @@ export const attendanceSchema = z.object({
 });
 export type AttendanceFormValues = z.infer<typeof attendanceSchema>;
 
+// Result-entry scores (unchanged)
 export const psychomotiveSchema = z.object({
   scores: z.array(z.object({
     skill: z.string(),
@@ -43,6 +44,13 @@ export const psychomotiveSchema = z.object({
   })),
 });
 export type PsychomotiveFormValues = z.infer<typeof psychomotiveSchema>;
+
+// Add-metric form (title + section id)
+export const psychomotiveMetricSchema = z.object({
+  title:   z.string().min(2, "Title is required"),
+  section: z.string().min(1, "Please select a section"),
+});
+export type PsychomotiveMetricFormValues = z.infer<typeof psychomotiveMetricSchema>;
 
 export const resultCommentSchema = z.object({
   classTeacherComment: z.string().optional(),

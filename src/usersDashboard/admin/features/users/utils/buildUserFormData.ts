@@ -12,6 +12,7 @@ export interface CreateUserPayload {
   state?: string;
   country?: string;
   date_of_birth?: string;
+  date_of_admission?: string; // Student only
   class_group?: number; // Student only
   admission_number?: string; // Student only
   employment_number?: string; // Teacher only
@@ -19,6 +20,13 @@ export interface CreateUserPayload {
   children?: number[]; // Parent only — student ids
   photo?: File | null;
 }
+
+/**
+ * Builds multipart FormData from a payload.
+ * - Skips undefined / null / "" (DRF rejects "" on date, FK and choice fields)
+ * - Arrays become repeated keys: children=1&children=4
+ * - Files are appended as-is
+ */
 export function buildUserFormData(payload: CreateUserPayload & { role: string }): FormData {
   const fd = new FormData();
 
