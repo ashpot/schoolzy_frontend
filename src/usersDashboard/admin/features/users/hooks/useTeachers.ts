@@ -13,7 +13,7 @@ export const useTeachersList = (page = 1, search = "") =>
     queryFn: async () => {
       const raw = await apiRequest<UserResponse[]>(USERS_ENDPOINTS.LIST_BY_ROLE("Teacher"));
       let mapped = raw.map(toTeacher);
-      console.log("Fetched teachers:", raw);
+      // console.log("Fetched teachers:", raw);
       if (search) {
         const q = search.toLowerCase();
         mapped = mapped.filter(

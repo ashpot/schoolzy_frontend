@@ -39,16 +39,24 @@ const credentialFields = {
   confirmPassword: z.string(),
 };
 
-// ── Student
+// ── Student (everything required except email)
 export const studentSchema = z
   .object({
     ...credentialFields,
     admission_number: z.string().min(1, "Admission number is required"),
-    firstName:  z.string().min(1, "First name is required"),
-    lastName:   z.string().min(1, "Last name is required"),
-    email:      optionalEmail,
-    classGroup: z.coerce.number().min(1, "Please select a class group"),
-    photo:      photoField,
+    firstName:        z.string().min(1, "First name is required"),
+    middleName:       z.string().min(1, "Middle name is required"),
+    lastName:         z.string().min(1, "Last name is required"),
+    sex:        z.enum(["Male", "Female"], { message: "Please select a gender" }).optional().or(z.literal("")),
+    dob:              z.string().min(1, "Date of birth is required"),
+    email:            optionalEmail,
+    address:          z.string().min(1, "Address is required"),
+    city:             z.string().min(1, "City is required"),
+    state:            z.string().min(1, "State is required"),
+    country:          z.string().min(1, "Country is required"),
+    classGroup:       z.coerce.number().min(1, "Please select a class group"),
+    dateOfAdmission:  z.string().min(1, "Date of admission is required"),
+    photo:            photoField,
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
