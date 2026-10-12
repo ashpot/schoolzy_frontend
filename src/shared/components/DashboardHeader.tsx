@@ -1,16 +1,14 @@
 import { useState } from "react";
-import { ChevronsLeft, Search, ChevronDown, Calendar, BookOpen, User, LogOut } from "lucide-react";
+import { ChevronsLeft, Search, ChevronDown, BookOpen, User, LogOut } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 import { useOutsideClick } from "@/shared/hooks/useOutsideClick";
 import DropdownOverlay from "./DropdownOverlay";
 import NotificationOverlay from "./NotificationOverlay";
-import MessageOverlay from "./MessageOverlay";
 import UserAvatar from "./UseAvatar";
 import Button from "../ui/Button";
-import { BellIcon, MessageIcon } from "../lib/SvgLib";
+import { BellIcon, } from "../lib/SvgLib";
 import { useNavigate } from "react-router";
 
-const SESSIONS = ["2025/2026", "2024/2025", "2023/2024"];
 const TERMS = ["First Term", "Second Term", "Third Term"];
 
 type OpenMenu = "session" | "term" | "user" | "bell" | "message" | null;
@@ -30,10 +28,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 }) => {
   const [query, setQuery] = useState("");
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
-  const [session, setSession] = useState("2025/2026");
   const [term, setTerm] = useState("Second Term");
   const [hasNotification, setHasNotification] = useState(true);
-  const [hasMessage, setHasMessage] = useState(true);
   const user = JSON.parse(localStorage.getItem("schoolzy_user") || "{}");
   const navigate = useNavigate();
 
@@ -46,11 +42,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     navigate("/auth/signin");
   }
 
-  const sessionRef = useOutsideClick(() => openMenu === "session" && close());
   const termRef    = useOutsideClick(() => openMenu === "term"    && close());
   const userRef    = useOutsideClick(() => openMenu === "user"    && close());
   const bellRef    = useOutsideClick(() => openMenu === "bell"    && close());
-  const messageRef = useOutsideClick(() => openMenu === "message" && close());
 
   return (
     <header className="w-full border-b border-border-line02 bg-white shadow-sm">
@@ -85,34 +79,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
         {/* Right: Controls */}
         <div className="flex items-center gap-2 md:gap-3 shrink-0">
-
-          {/* Session */}
-          <div ref={sessionRef} className="relative hidden sm:block">
-            <button
-              onClick={() => toggle("session")}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-2 rounded-lg border text-[13px] font-lato font-medium transition-colors",
-                openMenu === "session"
-                  ? "border-brand-primary bg-brand-primary/5 text-brand-primary"
-                  : "border-border-line02 bg-white text-text-muted01 hover:bg-bg-soft"
-              )}
-            >
-              <Calendar className="w-3.5 h-3.5 text-text-muted" />
-              <span>Session {session}</span>
-              <ChevronDown className={cn("w-3.5 h-3.5 text-text-muted transition-transform duration-200", openMenu === "session" && "rotate-180")} />
-            </button>
-            <DropdownOverlay
-              isOpen={openMenu === "session"}
-              className="right-0"
-              items={SESSIONS.map((s) => ({
-                label: `Session ${s}`,
-                icon: <Calendar className="w-4 h-4" />,
-                active: session === s,
-                onClick: () => { setSession(s); close(); },
-              }))}
-            />
-          </div>
-
           {/* Term */}
           <div ref={termRef} className="relative hidden sm:block">
             <button
@@ -140,19 +106,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             />
           </div>
 
-          {/* Messages */}
-          <div ref={messageRef} className="relative">
-            <button
-              onClick={() => { toggle("message"); setHasMessage(false); }}
-              className="relative p-2 rounded-lg hover:bg-bg-soft transition-colors border border-border-line02"
-            >
-              <MessageIcon className="text-text-secondary" />
-              {hasMessage && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-primary rounded-full" />}
-            </button>
-            <MessageOverlay isOpen={openMenu === "message"} onClose={close} />
-          </div>
-
-          {/* Bell */}
+          {/* notification */}
           <div ref={bellRef} className="relative">
             <button
               onClick={() => { toggle("bell"); setHasNotification(false); }}

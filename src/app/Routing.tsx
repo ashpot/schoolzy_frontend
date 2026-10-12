@@ -1,7 +1,7 @@
 import { AnimatePresence } from "framer-motion";
 import { Route, Routes, useLocation } from "react-router";
 import { ForgotPasswordPage, RegistrationSuccessPage, SigninPage, SignupPage } from "@/auth";
-import { AdminDashboardLayout, AuthLayout, DashboardLayout, PublicLayout } from "./layouts";
+import { AdminDashboardLayout, AuthLayout, DashboardLayout, OnboardingLayout, PublicLayout } from "./layouts";
 import { CookiePolicyPage, LandingPage, PrivacyPolicyPage, TermsOfServicePage } from "@/landing";
 import { DashboardHome } from "@/usersDashboard/admin/features/dashboard";
 import { AdminsPage, ParentsPage, StudentsPage, TeachersPage } from "@/usersDashboard/admin/features/users";
@@ -36,6 +36,7 @@ import {
 import NotFoundPage from "@/shared/components/NotFoundPage";
 import { CheckResultsPage } from "@/usersDashboard/parent/features/results";
 import ScrollToTop from "./ScrollToTop";
+import { OnboardingPage } from "@/usersDashboard/admin/features/onboarding";
 
 
 
@@ -66,6 +67,10 @@ const AppRouter = () => {
           <Route path="/auth/signin" element={<SigninPage />} />
           <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/auth/registration-success" element={<RegistrationSuccessPage />} />
+        </Route>
+
+        <Route element={<OnboardingLayout />}>
+          <Route path="/onboarding" element={<OnboardingPage />} />
         </Route>
 
         {/*____________________ School Admin Dashboard __________________*/}

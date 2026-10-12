@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import DashboardSidebar from "@/shared/components/DashboardSidebar";
 import DashboardHeader from "@/shared/components/DashboardHeader";
 import { sidebarNavItems } from "@/shared/data/sidebarNav";
+import SetupBanner from "@/usersDashboard/admin/features/onboarding/components/onboarding-page/SetupBanner";
 
 const AdminDashboardLayout: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -59,6 +60,7 @@ const AdminDashboardLayout: React.FC = () => {
 
         <main className="flex-1 overflow-y-auto">
           <div className="admin-p py-6 md:py-10">
+            <SetupBanner />
             <Outlet />
           </div>
         </main>

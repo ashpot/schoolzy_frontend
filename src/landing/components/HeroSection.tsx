@@ -51,17 +51,16 @@ export default function HeroSection() {
                 Get Started
               </motion.button>
               </Link>
-              <Link
-                to="/auth/signup"
-              >
-                <motion.button
+                <motion.a
+                href="https://bit.ly/SchoolzyDemoRequest"
+                target="_blank"
+                rel="noopener noreferrer"
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   className="rounded-full border border-border-line01 px-7 py-3.5 text-sm font-jakarta font-semibold text-text-primary hover:bg-bg-soft transition-colors"
                 >
                   Request a Demo
-                </motion.button>
-              </Link>
+                </motion.a>
 
             </div>
 

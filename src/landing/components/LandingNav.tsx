@@ -38,12 +38,14 @@ export default function Header() {
 
           {/* Desktop actions */}
           <div className="hidden lg:flex items-center gap-6">
-            <Link
-              to="/auth/signup"
+            <a
+              href="https://bit.ly/SchoolzyDemoRequest"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-sm font-jakarta font-medium text-text-nav hover:text-brand-primary transition-colors"
             >
               Request a Demo
-            </Link>
+            </a>
             <Link
               to="/auth/signup"
             >
