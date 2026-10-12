@@ -64,7 +64,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ tenant }) => {
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="w-16 h-16 md:w-20 md:h-20 bg-brand-primary rounded-2xl md:rounded-3xl flex justify-center items-center shadow-lg overflow-hidden"
+            className="w-16 h-16 md:w-20 md:h-20 rounded-full flex justify-center items-center shadow-lg overflow-hidden"
           >
             {tenant?.logo ? (
               <img src={tenant.logo} alt={`${schoolName} logo`} className="w-full h-full object-cover" />

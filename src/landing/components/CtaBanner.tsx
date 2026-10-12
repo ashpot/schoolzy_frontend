@@ -53,19 +53,16 @@ export default function CtaSection() {
                 Get Started
               </motion.button>
             </Link>
-
-            <Link
-              to="/signup"
-            >
-              <motion.button
+              <motion.a
+                href="https://bit.ly/SchoolzyDemoRequest"
+                target="_blank"
+                rel="noopener noreferrer"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 className="rounded-full bg-white px-7 py-3.5 text-sm font-jakarta font-semibold text-text-primary hover:bg-bg-soft transition-colors"
               >
                 Request a Demo
-              </motion.button>
-            </Link>
-
+              </motion.a>
           </div>
         </div>
       </motion.div>

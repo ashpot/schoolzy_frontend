@@ -41,6 +41,5 @@ export const FinancesIcon   = LazyIcon(() => import("./icons/FinancesIcon"));
 export const InventoryIcon  = LazyIcon(() => import("./icons/InventoryIcon"));
 export const SessionsIcon   = LazyIcon(() => import("./icons/SessionsIcon"));
 export const SettingsIcon   = LazyIcon(() => import("./icons/SettingsIcon"));
-export const MessageIcon   = LazyIcon(() => import("@/shared/lib/icons/MessageSquare"));
 export const BellIcon   = LazyIcon(() => import("@/shared/lib/icons/NotificationBell"));
 export { LayoutDashboard as DashboardIcon } from "lucide-react";

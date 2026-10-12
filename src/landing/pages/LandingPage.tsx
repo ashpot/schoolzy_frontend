@@ -12,6 +12,8 @@ import LandingFooter from "../components/LandingFooter";
 import { fadeIn } from "../animations/variants";
 import { Navigate } from "react-router-dom";
 import { isTenantDomain } from "@/shared/utils/tenant";
+import ExitIntentModal from "../components/ExitIntentModal";
+import WhatsAppFab from "../components/WhatsAppFab";
 
 
 export default function LandingPage() {
@@ -32,6 +34,8 @@ export default function LandingPage() {
         <CtaBanner />
       </main>
       <LandingFooter />
+      <ExitIntentModal />
+       <WhatsAppFab />
     </motion.div>
   );
 }
