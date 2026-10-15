@@ -2,34 +2,32 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, User, Layers, Tag, Calendar, Download, X } from "lucide-react";
 import Button from "@/shared/ui/Button";
+import StatusBadge from "./StatusBadge";
 import { useApproveLessonNote, useRejectLessonNote } from "../../hooks/useLearning";
-import type { LessonNote } from "../../types";
+import type { LessonNote, ReviewStatus } from "../../types";
 import { modalVariant } from "../../animations/variants";
 
 interface ViewLessonNoteModalProps {
   note: LessonNote;
   onClose: () => void;
-  onStatusChange: (noteId: string, status: "approved" | "rejected") => void;
+  onStatusChange: (noteId: string, status: ReviewStatus) => void;
 }
 
 const ViewLessonNoteModal: React.FC<ViewLessonNoteModalProps> = ({ note, onClose, onStatusChange }) => {
   const [review, setReview] = useState("");
   const approveMutation = useApproveLessonNote();
   const rejectMutation = useRejectLessonNote();
-
-  const handleApprove = () => {
-    approveMutation.mutate({ noteId: note.id, review }, {
-      onSuccess: () => { onStatusChange(note.id, "approved"); onClose(); },
-    });
-  };
-
-  const handleReject = () => {
-    rejectMutation.mutate({ noteId: note.id, review }, {
-      onSuccess: () => { onStatusChange(note.id, "rejected"); onClose(); },
-    });
-  };
-
   const isPending = approveMutation.isPending || rejectMutation.isPending;
+
+  const handleApprove = () =>
+    approveMutation.mutate({ noteId: note.id, review }, {
+      onSuccess: () => { onStatusChange(note.id, "Approved"); onClose(); },
+    });
+
+  const handleReject = () =>
+    rejectMutation.mutate({ noteId: note.id, review }, {
+      onSuccess: () => { onStatusChange(note.id, "Rejected"); onClose(); },
+    });
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -44,9 +42,7 @@ const ViewLessonNoteModal: React.FC<ViewLessonNoteModalProps> = ({ note, onClose
             </div>
             <div>
               <h2 className="text-lg font-semibold text-text-primary">{note.title}</h2>
-              <p className="text-sm text-text-secondary mt-0.5">
-                {note.subject} · {note.class} · {note.term}, {note.week}
-              </p>
+              <p className="text-sm text-text-secondary mt-0.5">{note.subject} · {note.class}</p>
             </div>
           </div>
           <button onClick={onClose} className="text-text-muted hover:text-text-primary"><X size={20} /></button>
@@ -54,17 +50,20 @@ const ViewLessonNoteModal: React.FC<ViewLessonNoteModalProps> = ({ note, onClose
 
         <div className="px-6 py-6 flex flex-col gap-5">
           <div className="grid grid-cols-2 gap-4">
-            <InfoBlock icon={<User size={15} />} label="Teacher" value={note.teacher.name} />
+            <InfoBlock icon={<User size={15} />} label="Uploaded by" value={note.teacher} />
             <InfoBlock icon={<Layers size={15} />} label="Class" value={note.class} />
             <InfoBlock icon={<Tag size={15} />} label="Subject" value={note.subject} />
             <InfoBlock icon={<Calendar size={15} />} label="Date Uploaded" value={note.dateUploaded} />
-            <InfoBlock icon={<FileText size={15} />} label="File Type" value={note.file.type} />
-            <InfoBlock icon={<FileText size={15} />} label="File Size" value={note.file.size} />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-text-muted tracking-wide">STATUS</span>
+            <StatusBadge status={note.status} />
           </div>
 
           <div className="bg-bg-input rounded-xl p-4">
             <p className="text-xs font-semibold text-text-muted tracking-wide mb-2">DESCRIPTION</p>
-            <p className="text-sm text-text-secondary">{note.description}</p>
+            <p className="text-sm text-text-secondary">{note.description || "No description provided."}</p>
           </div>
 
           <div>
@@ -84,17 +83,23 @@ const ViewLessonNoteModal: React.FC<ViewLessonNoteModalProps> = ({ note, onClose
             <div className="w-14 h-14 rounded-xl bg-red-50 flex-center mb-3">
               <FileText className="w-6 h-6 text-danger" />
             </div>
-            <p className="font-medium text-text-primary">{note.title}.{note.file.type.toLowerCase()}</p>
-            <p className="text-xs text-text-muted mt-0.5">{note.file.size} · {note.file.type} document</p>
-            <button
-              onClick={() => {
-                // TODO: Implement real file download
-                console.log("Downloading", note.file.url);
-              }}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-primary text-white text-sm font-medium mt-4 hover:bg-brand-hover transition-colors"
-            >
-              <Download size={15} /> Download File
-            </button>
+            {note.fileUrl && note.fileType ? (
+              <>
+                <p className="font-medium text-text-primary">{note.title}</p>
+                <p className="text-xs text-text-muted mt-0.5">{note.fileType} document</p>
+                {/* download attr is ignored cross-origin, so open in a new tab */}
+                <a
+                  href={note.fileUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-primary text-white text-sm font-medium mt-4 hover:bg-brand-hover transition-colors"
+                >
+                  <Download size={15} /> Open / Download File
+                </a>
+              </>
+            ) : (
+              <p className="text-sm text-text-muted">No file attached to this note.</p>
+            )}
           </div>
 
           <div className="flex items-center gap-3 pt-2">

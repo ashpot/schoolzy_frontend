@@ -1,9 +1,16 @@
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import type { ClassValues, ClassGroupValues, FormTeacherValues, DenominatorValues } from "../schemas";
-import type { ClassGroupPayload, ClassPayload, SectionPayload, SectionListItem, ClassListItem, ClassGroupResponse, ClassResponse, SectionResponse, ClassGroupListItem } from "../types";
+import type {
+  ClassGroupPayload, ClassPayload, SectionPayload, SectionListItem, ClassListItem,
+  ClassGroupResponse, ClassResponse, SectionResponse, ClassGroupListItem,
+  Denominator, DenominatorPayload, DenominatorResponse,
+  FormTeacherAssignment, AssignedClassPayload, AssignedClassResponse,
+} from "../types";
 import { apiRequest } from "@/shared/lib/apiClient";
 import { SECTIONS_ENDPOINTS } from "../api";
 import { USERS_ENDPOINTS } from "@/usersDashboard/admin/features/users/api";
+import { toDenominator } from "../utils/denominatorMapper";
+import { toAssignment } from "../utils/assignmentMapper";
 
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -106,22 +113,36 @@ export const useAddClassGroup = () => {
 export const useAssignFormTeacher = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: FormTeacherValues) => {
-      // TODO: Replace with actual API call
-      // return api.post("/form-teachers", payload);
-      await delay(800); return { success: true, data: payload };
+    mutationFn: async (values: FormTeacherValues) => {
+      const payload: AssignedClassPayload = {
+        class_group: Number(values.classValue),
+        teacher: Number(values.teacherId),
+      };
+      return apiRequest<AssignedClassResponse>(SECTIONS_ENDPOINTS.ASSIGN_CLASS_TEACHER, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["form-teachers"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["form-teachers"] });
+      // class groups carry form_teacher_name, so refresh them too
+      qc.invalidateQueries({ queryKey: ["class-groups"] });
+    },
   });
 };
 
 export const useAddDenominator = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: DenominatorValues) => {
-      // TODO: Replace with actual API call
-      // return api.post("/denominators", payload);
-      await delay(800); return { success: true, data: payload };
+    mutationFn: async (values: DenominatorValues) => {
+      const payload: DenominatorPayload = {
+        denominator: values.denominator,
+        target_class: Number(values.classValue),
+      };
+      return apiRequest<DenominatorResponse>(SECTIONS_ENDPOINTS.CREATE_DENOMINATOR, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["denominators"] }),
   });
@@ -147,6 +168,42 @@ export const useClassGroupsList = () => {
   return useQuery({
     queryKey: ["class-groups", "list"],
     queryFn: async () => apiRequest<ClassGroupListItem[]>(SECTIONS_ENDPOINTS.LIST_CLASS_GROUPS),
+  });
+};
+
+export const useDenominatorsList = () => {
+  return useQuery({
+    queryKey: ["denominators", "list"],
+    queryFn: async (): Promise<Denominator[]> => {
+      const raw = await apiRequest<DenominatorResponse[]>(SECTIONS_ENDPOINTS.LIST_DENOMINATORS);
+      return raw.map(toDenominator);
+    },
+  });
+};
+
+interface NamedUser {
+  id: number;
+  first_name: string;
+  last_name: string;
+}
+
+// The backend returns ids only, so fetch assignments + class groups + users
+// together and resolve names in one query. Newest first.
+export const useAssignmentsList = () => {
+  return useQuery({
+    queryKey: ["form-teachers", "list"],
+    queryFn: async (): Promise<FormTeacherAssignment[]> => {
+      const [raw, groups, users] = await Promise.all([
+        apiRequest<AssignedClassResponse[]>(SECTIONS_ENDPOINTS.LIST_ASSIGNED_CLASSES),
+        apiRequest<ClassGroupListItem[]>(SECTIONS_ENDPOINTS.LIST_CLASS_GROUPS),
+        apiRequest<NamedUser[]>(USERS_ENDPOINTS.LIST_ALL),
+      ]);
+      const groupMap = new Map(groups.map((g) => [g.id, g]));
+      const userMap = new Map(users.map((u) => [u.id, `${u.first_name} ${u.last_name}`]));
+      return [...raw]
+        .sort((a, b) => b.id - a.id)
+        .map((r) => toAssignment(r, groupMap, userMap));
+    },
   });
 };
 

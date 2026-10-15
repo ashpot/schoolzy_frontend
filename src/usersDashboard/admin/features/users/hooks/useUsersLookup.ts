@@ -7,7 +7,7 @@ export const useUsersLookup = () => {
   return useQuery({
     queryKey: ["users", "lookup"],
     queryFn: async () => {
-      const raw = await apiRequest<UserResponse[]>(USERS_ENDPOINTS.LIST_ALL);
+      const raw = await apiRequest<UserResponse[]>(USERS_ENDPOINTS.LIST_ALL); //   LIST_ALL: `${API_BASE_URL}/users/`,
       const map = new Map<number, string>();
       raw.forEach((u) => map.set(u.id, `${u.first_name} ${u.last_name}`));
       return map;

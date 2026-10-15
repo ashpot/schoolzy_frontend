@@ -18,7 +18,6 @@ export default function OnboardingPage() {
 
   const { steps, progress } = data.onboarding;
   const activeIndex = getActiveStepIndex(steps);
-
   return (
     <motion.div
       variants={fadeUp}

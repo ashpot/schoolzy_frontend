@@ -1,112 +1,6 @@
-import type { AttendanceStudent, LessonNote } from "../types";
+import type { AttendanceStudent } from "../types";
 
-export const mockLessonNotes: LessonNote[] = [
-  {
-    id: "ln-001",
-    title: "Introduction to Quadratic Equations",
-    term: "Second Term",
-    week: "Week 3",
-    subject: "Mathematics",
-    class: "SS 2",
-    teacher: { name: "Mr. Adebayo Oluwaseun" },
-    dateUploaded: "01 Mar 2026",
-    file: { type: "PDF", size: "1.2 MB", url: "#" },
-    description: "A comprehensive introduction to quadratic equations, covering factorisation, completing the square, and the quadratic formula. Includes worked examples and practice exercises for students.",
-    status: "pending",
-  },
-  {
-    id: "ln-002",
-    title: "Comprehension & Summary",
-    term: "Second Term",
-    week: "Week 3",
-    subject: "English Language",
-    class: "JSS 3",
-    teacher: { name: "Mrs. Chidinma Okonkwo" },
-    dateUploaded: "03 Mar 2026",
-    file: { type: "DOC", size: "890 KB", url: "#" },
-    description: "A structured lesson on comprehension strategies and summary writing techniques for junior secondary students.",
-    status: "pending",
-  },
-  {
-    id: "ln-003",
-    title: "Newton's Law of Motion",
-    term: "Second Term",
-    week: "Week 4",
-    subject: "Physics",
-    class: "SS 1",
-    teacher: { name: "Mr. Emeka Nwosu" },
-    dateUploaded: "05 Mar 2026",
-    file: { type: "PDF", size: "2.4 MB", url: "#" },
-    description: "An introduction to Newton's three laws of motion with real-world examples and diagrams.",
-    status: "pending",
-  },
-  {
-    id: "ln-004",
-    title: "Organic Chemistry Hydrocarbons",
-    term: "Second Term",
-    week: "Week 4",
-    subject: "Chemistry",
-    class: "SS 2",
-    teacher: { name: "Mrs. Fatima Bayo" },
-    dateUploaded: "06 Mar 2026",
-    file: { type: "DOC", size: "1.7 MB", url: "#" },
-    description: "Covers the structure, naming and properties of alkanes, alkenes and alkynes.",
-    status: "pending",
-  },
-  {
-    id: "ln-005",
-    title: "Photosynthesis and Plant Nutrition",
-    term: "Second Term",
-    week: "Week 5",
-    subject: "Biology",
-    class: "JSS 2",
-    teacher: { name: "Mr. Tunde Adeyemi" },
-    dateUploaded: "08 Mar 2026",
-    file: { type: "PDF", size: "3.1 MB", url: "#" },
-    description: "Explains the process of photosynthesis and how plants obtain and use nutrients.",
-    status: "pending",
-  },
-  {
-    id: "ln-006",
-    title: "Supply and Demand Analysis",
-    term: "Second Term",
-    week: "Week 5",
-    subject: "Economics",
-    class: "SS 3",
-    teacher: { name: "Mrs. Ngozi Eze" },
-    dateUploaded: "10 Mar 2026",
-    file: { type: "PPT", size: "5.8 MB", url: "#" },
-    description: "A breakdown of market equilibrium, price elasticity, and supply-demand curve shifts.",
-    status: "pending",
-  },
-  {
-    id: "ln-007",
-    title: "Nigerian Constitutional History",
-    term: "Second Term",
-    week: "Week 6",
-    subject: "Government",
-    class: "SS 2",
-    teacher: { name: "Mr. Ibrahim Mustafa" },
-    dateUploaded: "12 Mar 2026",
-    file: { type: "PDF", size: "1.9 MB", url: "#" },
-    description: "Traces the evolution of Nigeria's constitution from colonial rule to the present republic.",
-    status: "pending",
-  },
-  {
-    id: "ln-008",
-    title: "Poetry Analysis: Wole Soyinka",
-    term: "Second Term",
-    week: "Week 6",
-    subject: "Literature",
-    class: "SS 1",
-    teacher: { name: "Mrs. Aisha Bello" },
-    dateUploaded: "13 Mar 2026",
-    file: { type: "DOC", size: "760 KB", url: "#" },
-    description: "A close reading of selected poems by Wole Soyinka, focusing on theme, tone and literary devices.",
-    status: "pending",
-  },
-];
-
+// Attendance is still mocked. Remove this file once Attendance is wired.
 export const mockAttendanceStudents: AttendanceStudent[] = [
   { id: "s-001", name: "Chidinma Harold",   admNo: "SCH/2025/001", status: "unmarked", timeMarked: null },
   { id: "s-002", name: "Kelechi Igwe",      admNo: "SCH/2025/002", status: "unmarked", timeMarked: null },
@@ -120,7 +14,6 @@ export const mockAttendanceStudents: AttendanceStudent[] = [
   { id: "s-010", name: "James Ude",         admNo: "SCH/2025/010", status: "unmarked", timeMarked: null },
 ];
 
-// Select options
 export const classOptions = [
   { value: "nursery-1", label: "Nursery 1" },
   { value: "nursery-2", label: "Nursery 2" },
@@ -140,26 +33,4 @@ export const classGroupOptions = [
   { value: "b", label: "B" },
   { value: "c", label: "C" },
   { value: "d", label: "D" },
-];
-
-export const subjectOptions = [
-  { value: "mathematics",      label: "Mathematics" },
-  { value: "english-language", label: "English Language" },
-  { value: "physics",          label: "Physics" },
-  { value: "chemistry",        label: "Chemistry" },
-  { value: "biology",          label: "Biology" },
-  { value: "economics",        label: "Economics" },
-  { value: "government",       label: "Government" },
-  { value: "literature",       label: "Literature" },
-];
-
-export const teacherOptions = [
-  { value: "t-001", label: "Mr. Adebayo Oluwaseun" },
-  { value: "t-002", label: "Mrs. Chidinma Okonkwo" },
-  { value: "t-003", label: "Mr. Emeka Nwosu" },
-  { value: "t-004", label: "Mrs. Fatima Bayo" },
-  { value: "t-005", label: "Mr. Tunde Adeyemi" },
-  { value: "t-006", label: "Mrs. Ngozi Eze" },
-  { value: "t-007", label: "Mr. Ibrahim Mustafa" },
-  { value: "t-008", label: "Mrs. Aisha Bello" },
 ];

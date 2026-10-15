@@ -109,7 +109,7 @@ function UserListPanel<T extends FieldValues & { id: string }>({
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto flex-1">
+      <div className="overflow-x-auto flex-1 whitespace-nowrap">
         <table className="w-full min-w-max text-sm font-lato">
           <thead>
             <tr className="bg-bg-soft border-b border-border-line02">

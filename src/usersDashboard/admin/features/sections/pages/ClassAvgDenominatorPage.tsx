@@ -1,19 +1,14 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { Percent } from "lucide-react";
 import { fadeUp } from "../animations/variants";
-import type { Denominator } from "../types";
-import { mockDenominators } from "../data/mockData";
+import { useDenominatorsList } from "../hooks/useSections";
 import SplitLayout      from "../components/shared/SplitLayout";
 import StatPill         from "../components/shared/StatPill";
 import DenominatorForm  from "../components/class-avg-denominator/DenominatorForm";
 import DenominatorTable from "../components/class-avg-denominator/DenominatorTable";
 
 export default function ClassAvgDenominatorPage() {
-  const [denominators, setDenominators] = useState<Denominator[]>(mockDenominators);
-
-  const handleAdd    = (d: Denominator) => setDenominators((p) => [d, ...p]);
-  const handleDelete = (id: string)     => setDenominators((p) => p.filter((d) => d.id !== id));
+  const { data: denominators = [], isLoading, isError, refetch } = useDenominatorsList();
 
   return (
     <motion.div variants={fadeUp} initial="hidden" animate="show" className="dashboard-p space-y-6">
@@ -27,8 +22,15 @@ export default function ClassAvgDenominatorPage() {
         <StatPill icon={Percent} label={`${denominators.length} configured`} />
       </div>
       <SplitLayout
-        left={<DenominatorForm onSuccess={handleAdd} />}
-        right={<DenominatorTable denominators={denominators} onDelete={handleDelete} />}
+        left={<DenominatorForm />}
+        right={
+          <DenominatorTable
+            denominators={denominators}
+            isLoading={isLoading}
+            isError={isError}
+            onRetry={() => refetch()}
+          />
+        }
       />
     </motion.div>
   );

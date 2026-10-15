@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/shared/lib/apiClient";
 import type { OnboardingHealth } from "../types";
 
-// TODO: swap for your shared API base constant if you have one
 const API_BASE = "https://api.schoolzy.com.ng/api/v1";
 export const ONBOARDING_ENDPOINT = `${API_BASE}/configurations/health/`;
 

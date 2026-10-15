@@ -1,22 +1,15 @@
 import { z } from "zod";
 
-// Upload Lesson Note
+// Upload Lesson Note (teacher is taken from the auth token by the backend)
 export const uploadLessonNoteSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  class: z.string().min(1, "Class is required"),
+  classGroup: z.string().min(1, "Class is required"),
   subject: z.string().min(1, "Subject is required"),
-  teacher: z.string().min(1, "Teacher is required"),
   file: z
     .any()
+    .refine((val) => val instanceof FileList && val.length > 0, "Please upload a file")
     .refine(
-      (val) => val instanceof FileList && val.length > 0,
-      "Please upload a file"
-    )
-    .refine(
-      (val) =>
-        !(val instanceof FileList) ||
-        val.length === 0 ||
-        val[0].size <= 20 * 1024 * 1024,
+      (val) => !(val instanceof FileList) || val.length === 0 || val[0].size <= 20 * 1024 * 1024,
       "File must be under 20 MB"
     ),
   description: z.string().optional(),

@@ -4,6 +4,32 @@ interface RequestOptions extends RequestInit {
   skipAuth?: boolean;
 }
 
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
+// Handles {message}, {error}, {detail} and DRF field errors like {"field": ["msg"]}
+function extractErrorMessage(body: any): string {
+  if (!body || typeof body !== "object") return "Request failed";
+  const direct = body.message || body.error || body.detail;
+  if (direct) return String(direct);
+
+  const parts = Object.entries(body)
+    .map(([key, value]) => {
+      const msg = Array.isArray(value) ? value.join(" ") : typeof value === "string" ? value : null;
+      if (!msg) return null;
+      return key === "non_field_errors" ? msg : `${key}: ${msg}`;
+    })
+    .filter(Boolean);
+
+  return parts.length ? parts.join(" · ") : "Request failed";
+}
+
 export async function apiRequest<T>(url: string, options: RequestOptions = {}): Promise<T> {
   const { skipAuth, headers, body, ...rest } = options;
 
@@ -20,7 +46,6 @@ export async function apiRequest<T>(url: string, options: RequestOptions = {}): 
   };
 
   const res = await fetch(url, { ...rest, body, headers: finalHeaders });
-  // console.log(url, { ...rest, body, headers: finalHeaders })
 
   if (res.status === 401) {
     localStorage.removeItem("schoolzy_token");
@@ -30,8 +55,8 @@ export async function apiRequest<T>(url: string, options: RequestOptions = {}): 
 
   if (!res.ok) {
     const errorBody = await res.json().catch(() => ({}));
-    throw new Error(errorBody.message || errorBody.error || errorBody.detail || "Request failed");
+    throw new ApiError(extractErrorMessage(errorBody), res.status);
   }
-  // console.log("apiRequest response:", res.json());
+
   return res.json();
 }
