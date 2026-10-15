@@ -7,7 +7,17 @@ export const FILE_TYPE_STYLES: Record<FileType, string> = {
   DOC:  "bg-blue-50 text-blue-600",
   DOCX: "bg-blue-50 text-blue-600",
   PPT:  "bg-orange-50 text-orange-600",
+  PPTX: "bg-orange-50 text-orange-600",
+  FILE: "bg-gray-100 text-gray-600",
 };
+
+// Keys are lowercase. Only "under review" is confirmed from the backend so far.
+export const LESSON_STATUS_STYLES: Record<string, string> = {
+  "under review": "bg-amber-50 text-amber-700 border-amber-100",
+  approved:       "bg-green-50 text-green-700 border-green-100",
+  rejected:       "bg-red-50 text-red-600 border-red-100",
+};
+export const LESSON_STATUS_FALLBACK = "bg-gray-100 text-gray-500 border-gray-200";
 
 export const AVATAR_COLORS = [
   "bg-purple-100 text-purple-700",
@@ -24,7 +34,7 @@ export const STATUS_ACTIVE: Record<string, string> = {
 };
 
 export const STATUS_IDLE =
-  "bg-white text-[var(--color-text-secondary)] border-[var(--color-border-line02)] hover:border-gray-300";
+  "bg-white text-text-secondary border-border-line02 hover:border-gray-300";
 
 export const STATUS_PILLS = [
   { label: "Present",  key: "present",  dot: "bg-green-500", pill: "border-green-200 bg-green-50 text-green-700" },

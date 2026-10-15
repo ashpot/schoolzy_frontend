@@ -29,7 +29,9 @@ export type FormTeacherValues = z.infer<typeof formTeacherSchema>;
 
 export const denominatorSchema = z.object({
   denominator: z.coerce.number()
-    .min(1, "Must be at least 1").max(1000, "Max 1000"),
+    .int("Must be a whole number")
+    .min(1, "Must be at least 1")
+    .max(50, "Max 50"),
   classValue:  z.string().min(1, "Target class is required"),
 });
 export type DenominatorValues = z.infer<typeof denominatorSchema>;

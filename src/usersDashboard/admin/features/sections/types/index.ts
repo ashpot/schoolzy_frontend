@@ -77,19 +77,51 @@ export interface Teacher {
   subject: string;
 }
 
+// Row shown in the form teacher table
 export interface FormTeacherAssignment {
-  id:          string;
-  className:   string;
-  teacherName: string;
-  subject:     string;
-  assignedBy:  string;
-  assignedAt:  string;
+  id:               string;
+  classGroupId:     number;
+  teacherId:        number;
+  className:        string;       // class group name
+  classFormTeacher: string | null; // class group's own form_teacher_name
+  teacherName:      string;
+  assignedBy:       string;
+  assignedAt:       string;
 }
 
+export interface AssignedClassPayload {
+  class_group: number;
+  teacher:     number;
+}
+
+export interface AssignedClassResponse {
+  id:           number;
+  date_created: string;
+  class_group:  number;
+  teacher:      number;
+  assigned_by:  number;
+}
+
+// Row shown in the denominator table
 export interface Denominator {
   id:          string;
   denominator: number;
   className:   string;
+  classId:     number;
+  sectionName: string;
+}
+
+export interface DenominatorPayload {
+  denominator:  number;
+  target_class: number;
+}
+
+export interface DenominatorResponse {
+  id:           number;
+  class_name:   string;
+  section_name: string;
+  denominator:  number;
+  target_class: number;
 }
 
 export interface SectionListItem {
@@ -106,4 +138,3 @@ export interface ClassListItem {
   code: string;
   section: number;
 }
-

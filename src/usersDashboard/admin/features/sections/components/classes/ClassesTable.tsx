@@ -48,7 +48,7 @@ export default function ClassesTable({ classes }: Props) {
   };
 
   return (
-    <div className="bg-white rounded-2xl card-shadow overflow-hidden uppercase">
+    <div className="bg-white rounded-2xl card-shadow overflow-hidden uppercase whitespace-nowrap">
       <div className="flex items-center justify-between px-5 py-4 border-b border-border-line02">
         <div className="flex items-center gap-2">
           <School size={16} className="text-brand-primary" />
@@ -64,7 +64,7 @@ export default function ClassesTable({ classes }: Props) {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="min-w-max">
           <thead>
             <tr className="bg-gray-50/80 border-b border-border-line02">
               {["#", "Name", "Code", "Section", "Actions"].map((h) => (

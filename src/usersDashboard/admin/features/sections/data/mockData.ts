@@ -1,4 +1,4 @@
-import type { Section, Class, ClassGroup, Teacher, FormTeacherAssignment, Denominator } from "../types";
+import type { Section, Class, ClassGroup, Teacher} from "../types";
 
 export const mockSections: Section[] = [
   { id: "1",  title: "Sciences",        code: "SCI",  showPosition: true  },
@@ -55,25 +55,7 @@ export const mockTeachers: Teacher[] = [
   { id: "12", name: "Mr. Dauda Musa",      subject: "Agricultural Sci" },
 ];
 
-export const mockAssignments: FormTeacherAssignment[] = [
-  { id: "1", className: "JSS 1",     teacherName: "Mrs. Adaeze Okonkwo", subject: "Mathematics",      assignedBy: "Admin", assignedAt: "01 Sept 2025" },
-  { id: "2", className: "JSS 2",     teacherName: "Mr. Emeka Nwosu",     subject: "English Language", assignedBy: "Admin", assignedAt: "01 Sept 2025" },
-  { id: "3", className: "JSS 3",     teacherName: "Ms. Fatima Bello",    subject: "Biology",          assignedBy: "Admin", assignedAt: "01 Sept 2025" },
-  { id: "4", className: "SS 1",      teacherName: "Mr. Chukwudi Eze",    subject: "Physics",          assignedBy: "Admin", assignedAt: "02 Sept 2025" },
-  { id: "5", className: "SS 2",      teacherName: "Mrs. Ngozi Amara",    subject: "Chemistry",        assignedBy: "Admin", assignedAt: "02 Sept 2025" },
-  { id: "6", className: "SS 3",      teacherName: "Mr. Tunde Adesanya",  subject: "Economics",        assignedBy: "Admin", assignedAt: "02 Sept 2025" },
-  { id: "7", className: "Primary 1", teacherName: "Ms. Amina Yusuf",     subject: "Geography",        assignedBy: "Admin", assignedAt: "03 Sept 2025" },
-  { id: "8", className: "Primary 2", teacherName: "Mr. Segun Adewale",   subject: "Government",       assignedBy: "Admin", assignedAt: "03 Sept 2025" },
-];
 
-export const mockDenominators: Denominator[] = [
-  { id: "1", denominator: 100, className: "JSS 1"     },
-  { id: "2", denominator: 100, className: "JSS 2"     },
-  { id: "3", denominator: 100, className: "JSS 3"     },
-  { id: "4", denominator: 100, className: "SS 1"      },
-  { id: "5", denominator:  50, className: "Primary 1" },
-  { id: "6", denominator:  50, className: "Primary 2" },
-];
 
 export const sectionSelectOptions = mockSections.map((s) => ({ value: s.title, label: s.title }));
 export const classSelectOptions   = mockClasses.map((c)   => ({ value: c.name,  label: c.name  }));

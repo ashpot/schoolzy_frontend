@@ -49,7 +49,7 @@ function AcademicsListPanel<T extends { id: string }>({
   const endItem = Math.min(page * perPage, total);
 
   return (
-    <div className="bg-white rounded-2xl card-shadow flex flex-col overflow-hidden">
+    <div className="bg-white rounded-2xl border border-border-line02 card-shadow overflow-hidden flex flex-col whitespace-nowrap">
       {/* Header */}
       <div className="px-5 pt-5 pb-4 border-b border-border-line02">
         <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -78,14 +78,14 @@ function AcademicsListPanel<T extends { id: string }>({
       </div>
 
       {/* Table */}
-      <div className="flex-1 overflow-x-auto">
-        <table className="w-full ">
+      <div className="overflow-x-auto whitespace-nowrap">
+        <table className="min-w-max text-sm font-lato">
           <thead>
             <tr className="border-b border-border-line02 bg-border-line02/40">
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`px-5 py-3 text-left text-[11px] font-semibold text-text-muted uppercase tracking-wider font-lato ${col.className ?? ""}`}
+                  className={`px-5 py-3 text-left text-[11px] font-semibold text-text-muted uppercase whitespace-nowrap tracking-wider font-lato  ${col.className ?? ""}`}
                 >
                   {col.header}
                 </th>
@@ -112,7 +112,7 @@ function AcademicsListPanel<T extends { id: string }>({
                 ))
               ) : data.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length} className="px-5 py-12 text-center text-text-muted text-sm">
+                  <td colSpan={columns.length} className="px-5 py-12 text-center whitespace-nowrap text-text-muted text-sm">
                     No records found.
                   </td>
                 </tr>
@@ -121,12 +121,12 @@ function AcademicsListPanel<T extends { id: string }>({
                   <motion.tr
                     key={row.id}
                     variants={rowFadeUp}
-                    className="border-b border-border-line02 hover:bg-bg-soft/50 transition-colors"
+                    className="border-b border-border-line02 hover:bg-bg-soft/50 transition-colors whitespace-nowrap"
                   >
                     {columns.map((col) => (
                       <td
                         key={col.key}
-                        className={`px-5 py-4 text-sm text-text-primary font-lato ${col.className ?? ""}`}
+                        className={`px-5 py-4 text-sm text-text-primary font-lato whitespace-nowrap  ${col.className ?? ""}`}
                       >
                         {col.render(row, index)}
                       </td>

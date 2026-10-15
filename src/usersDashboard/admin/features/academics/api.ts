@@ -13,4 +13,5 @@ export const ACADEMICS_ENDPOINTS = {
   `${API_BASE_URL}/results/classes/${classGroupId}/?term=${termId}`,
   ASSIGN_SUBJECTS_TO_TEACHER: (teacherId: string) =>
   `${API_BASE_URL}/academics/teachers/${teacherId}/assign-subjects/`,
+  LIST_PSYCHOMOTIVE: `${API_BASE_URL}/academics/psychomotive-evaluation/`,
 } as const;

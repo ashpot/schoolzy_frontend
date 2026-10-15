@@ -122,7 +122,7 @@ const AssessmentTypesPage: React.FC = () => {
           onAdd={() => document.getElementById("at-name-input")?.focus()}
       />
 
-      <div className="grid xl:grid-cols-[380px_1fr] gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-6 items-start">
         {/* Form */}
         <motion.div variants={slideFromLeft} initial="hidden" animate="show" className="bg-white rounded-2xl card-shadow h-fit">
             <FormHeader
@@ -215,7 +215,7 @@ const AssessmentTypesPage: React.FC = () => {
         </motion.div>
 
         {/* List */}
-        <motion.div variants={slideFromRight} initial="hidden" animate="show">
+        <motion.div variants={slideFromRight} initial="hidden" animate="show" className="min-w-0">
           <AcademicsListPanel
             title="Assessment Types List"
             count={data?.total ?? 0}

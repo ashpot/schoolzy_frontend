@@ -1,66 +1,69 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, Plus, Search, Filter, XCircle, CheckCircle2 } from "lucide-react";
-import type { LessonNote } from "../types";
-import { fadeUp, rowVariant, staggerContainer } from "../animations/variants";
-import { classOptions, mockLessonNotes, subjectOptions, teacherOptions } from "../data/mockData";
+import { Plus } from "lucide-react";
 import Button from "@/shared/ui/Button";
-import { FILE_TYPE_STYLES, ITEMS_PER_PAGE } from "../shared/utils/constants";
-import FilterPill from "../components/Lesson/FilterPill";
-import { avatarColor, getInitials } from "../shared/utils/helpers";
+import { useTeacherOptionsList } from "@/usersDashboard/admin/features/sections/hooks/useSections";
+import type { LessonNote, LessonNoteFilters, ReviewStatus } from "../types";
+import { fadeUp } from "../animations/variants";
+import {
+  useApproveLessonNote, useClassGroupOptions, useLessonNotesList, useLessonSubjects, useRejectLessonNote,
+} from "../hooks/useLearning";
+import { EMPTY_FILTERS, filterLessonNotes } from "../shared/utils/filterLessonNotes";
+import { titleCase } from "../shared/utils/lessonNoteMapper";
+import { ITEMS_PER_PAGE } from "../shared/utils/constants";
+import LessonNotesFilters from "../components/Lesson/LessonNotesFilters";
+import LessonNotesTable from "../components/Lesson/LessonNotesTable";
 import UploadModal from "../components/Lesson/UploadModal";
 import ViewLessonNoteModal from "../components/Lesson/ViewLessonNoteModal";
-import { useApproveLessonNote, useRejectLessonNote } from "../hooks/useLearning";
 
 export default function LessonNotesPage() {
-  const [isModalOpen,   setIsModalOpen]   = useState(false);
-  const [selectedNote,  setSelectedNote]  = useState<LessonNote | null>(null);
-  const [filterClass,   setFilterClass]   = useState("");
-  const [filterSubject, setFilterSubject] = useState("");
-  const [filterTeacher, setFilterTeacher] = useState("");
-  const [searchQuery,   setSearchQuery]   = useState("");
-  const [currentPage,   setCurrentPage]   = useState(1);
-  const [notes,         setNotes]         = useState<LessonNote[]>(mockLessonNotes);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedNote, setSelectedNote] = useState<LessonNote | null>(null);
+  const [filters, setFilters] = useState<LessonNoteFilters>(EMPTY_FILTERS);
+  const [page, setPage] = useState(1);
+  // Backend has no approve/reject yet → local status overrides until endpoints land
+  const [overrides, setOverrides] = useState<Record<string, string>>({});
 
+  const notesQuery = useLessonNotesList();
+  const subjectsQuery = useLessonSubjects();
+  const teachersQuery = useTeacherOptionsList();
+  const { options: classOptions } = useClassGroupOptions();
   const approveMutation = useApproveLessonNote();
-  const rejectMutation  = useRejectLessonNote();
+  const rejectMutation = useRejectLessonNote();
 
-  const filteredNotes = notes.filter((note) => {
-    const matchClass   = filterClass   === "" || note.class        === classOptions.find((o) => o.value === filterClass)?.label;
-    const matchSubject = filterSubject === "" || note.subject      === subjectOptions.find((o) => o.value === filterSubject)?.label;
-    const matchTeacher = filterTeacher === "" || note.teacher.name === teacherOptions.find((o) => o.value === filterTeacher)?.label;
-    const matchSearch  = searchQuery   === "" || note.title.toLowerCase().includes(searchQuery.toLowerCase()) || note.subject.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchClass && matchSubject && matchTeacher && matchSearch;
-  });
+  const subjectOptions = (subjectsQuery.data ?? []).map((s) => ({ value: String(s.id), label: titleCase(s.name) }));
+  const teacherOptions = (teachersQuery.data ?? []).map((t) => ({
+    value: String(t.id),
+    label: `${t.first_name} ${t.last_name}`,
+  }));
 
-  const totalPages     = Math.ceil(filteredNotes.length / ITEMS_PER_PAGE);
-  const paginatedNotes = filteredNotes.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const filtered = useMemo(() => {
+    const withStatus = (notesQuery.data ?? []).map((n) => ({ ...n, status: overrides[n.id] ?? n.status }));
+    return filterLessonNotes(withStatus, filters);
+  }, [notesQuery.data, overrides, filters]);
 
-  const handleStatusChange = (noteId: string, status: "approved" | "rejected") => {
-    setNotes((prev) => prev.map((n) => (n.id === noteId ? { ...n, status } : n)));
+  const pageNotes = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+
+  const handleFilterChange = (key: keyof LessonNoteFilters, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+    setPage(1);
   };
+
+  const handleStatusChange = (noteId: string, status: ReviewStatus) =>
+    setOverrides((prev) => ({ ...prev, [noteId]: status }));
 
   const handleQuickApprove = (e: React.MouseEvent, noteId: string) => {
     e.stopPropagation();
-    approveMutation.mutate({ noteId }, { onSuccess: () => handleStatusChange(noteId, "approved") });
+    approveMutation.mutate({ noteId }, { onSuccess: () => handleStatusChange(noteId, "Approved") });
   };
 
   const handleQuickReject = (e: React.MouseEvent, noteId: string) => {
     e.stopPropagation();
-    rejectMutation.mutate({ noteId }, { onSuccess: () => handleStatusChange(noteId, "rejected") });
-  };
-
-  const resetPage = (setter: (v: string) => void) => (val: string) => {
-    setter(val);
-    setCurrentPage(1);
+    rejectMutation.mutate({ noteId }, { onSuccess: () => handleStatusChange(noteId, "Rejected") });
   };
 
   return (
     <motion.div variants={fadeUp} initial="hidden" animate="show" className="dashboard-p space-y-6">
-      {/* Header */}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="page-title">Lesson Notes</h1>
@@ -68,180 +71,31 @@ export default function LessonNotesPage() {
             View and manage lesson notes uploaded by teachers across all classes
           </p>
         </div>
-        <Button
-          variant="primary"
-          size="md"
-          leftIcon={<Plus className="w-4 h-4" />}
-          onClick={() => setIsModalOpen(true)}
-        >
+        <Button variant="primary" size="md" leftIcon={<Plus className="w-4 h-4" />} onClick={() => setIsModalOpen(true)}>
           Upload Lesson Note
         </Button>
       </div>
 
-      {/* Filter Bar */}
-      <div className="bg-white rounded-2xl card-shadow p-4">
-        <div className="flex items-center gap-3 flex-wrap">
-          <FilterPill label="All Classes"   value={filterClass}   options={classOptions}   onChange={resetPage(setFilterClass)} />
-          <FilterPill label="All Subjects"  value={filterSubject} options={subjectOptions} onChange={resetPage(setFilterSubject)} />
-          <FilterPill label="All Teachers"  value={filterTeacher} options={teacherOptions} onChange={resetPage(setFilterTeacher)} />
-          <div className="flex-1 min-w-45 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-            <input
-              type="text"
-              placeholder="Search notes..."
-              value={searchQuery}
-              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-              className="w-full pl-9 pr-4 py-2 rounded-lg border border-border-line02 bg-bg-input text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all"
-            />
-          </div>
-          <Button variant="primary" size="sm" leftIcon={<Filter className="w-3.5 h-3.5" />}>
-            Filter
-          </Button>
-        </div>
-      </div>
+      <LessonNotesFilters
+        filters={filters}
+        onChange={handleFilterChange}
+        classOptions={classOptions}
+        subjectOptions={subjectOptions}
+        teacherOptions={teacherOptions}
+      />
 
-      {/* Table */}
-      <div className="bg-white rounded-2xl card-shadow overflow-hidden">
-        <div className="px-6 py-4 border-b border-border-line02">
-          <div className="flex items-center gap-2">
-            <h2 className="section-title">All Lesson Notes</h2>
-            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-xs font-semibold text-brand-primary">
-              {filteredNotes.length}
-            </span>
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-border-line02">
-                {["Title", "Subject", "Class", "Teacher", "Date Uploaded", "File", "Actions"].map((col) => (
-                  <th
-                    key={col}
-                    className={`py-3 text-xs font-semibold text-text-muted uppercase tracking-wide text-left ${col === "Title" ? "px-6" : "px-4"}`}
-                  >
-                    {col}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <motion.tbody variants={staggerContainer} initial="hidden" animate="show">
-              {paginatedNotes.map((note) => (
-                <motion.tr
-                  key={note.id}
-                  variants={rowVariant}
-                  onClick={() => setSelectedNote(note)}
-                  className="border-b border-border-line02 last:border-0 hover:bg-gray-50/50 transition-colors cursor-pointer"
-                >
-                  <td className="px-6 py-4">
-                    <p className="text-sm font-medium text-text-nav max-w-50 truncate">
-                      {note.title}
-                    </p>
-                    <p className="text-xs text-text-muted mt-0.5">
-                      {note.term} · {note.week}
-                    </p>
-                  </td>
-                  <td className="px-4 py-4 text-sm text-text-secondary">{note.subject}</td>
-                  <td className="px-4 py-4 text-sm font-medium text-text-nav">{note.class}</td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-8 h-8 rounded-full flex-center text-xs font-semibold shrink-0 ${avatarColor(note.teacher.name)}`}>
-                        {getInitials(note.teacher.name)}
-                      </div>
-                      <span className="text-sm text-text-secondary whitespace-nowrap">
-                        {note.teacher.name}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-sm text-text-muted">{note.dateUploaded}</td>
-                  <td className="px-4 py-4">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold ${FILE_TYPE_STYLES[note.file.type]}`}>
-                      {note.file.type}
-                    </span>
-                    <p className="text-xs text-text-muted mt-0.5">{note.file.size}</p>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        title="Approve"
-                        onClick={(e) => handleQuickApprove(e, note.id)}
-                        disabled={approveMutation.isPending}
-                        className="w-8 h-8 rounded-lg flex-center text-white bg-success hover:bg-green-600 transition-colors disabled:opacity-50"
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        title="Reject"
-                        onClick={(e) => handleQuickReject(e, note.id)}
-                        disabled={rejectMutation.isPending}
-                        className="w-8 h-8 rounded-lg flex-center text-white bg-danger hover:bg-red-600 transition-colors disabled:opacity-50"
-                      >
-                        <XCircle className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </motion.tr>
-              ))}
-            </motion.tbody>
-          </table>
-        </div>
-
-        {/* Empty state */}
-        {filteredNotes.length === 0 && (
-          <div className="py-16 flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 rounded-full bg-blue-50 flex-center mb-4">
-              <BookOpen className="w-7 h-7 text-brand-primary" />
-            </div>
-            <h3 className="text-base font-semibold text-text-nav mb-1">No lesson notes found</h3>
-            <p className="text-sm text-text-muted">Try adjusting your filters or search query</p>
-          </div>
-        )}
-
-        {/* Pagination */}
-        {filteredNotes.length > 0 && (
-          <div className="px-6 py-4 border-t border-border-line02 flex items-center justify-between">
-            <p className="text-sm text-text-muted">
-              Showing{" "}
-              <span className="font-medium text-text-nav">
-                {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filteredNotes.length)}
-              </span>{" "}
-              of{" "}
-              <span className="font-medium text-text-nav">{filteredNotes.length}</span> notes
-            </p>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className="w-8 h-8 rounded-lg flex-center hover:bg-gray-100 disabled:opacity-30 transition-colors text-text-secondary"
-              >
-                ‹
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setCurrentPage(p)}
-                  className={`w-8 h-8 rounded-lg flex-center text-sm font-medium transition-colors ${
-                    p === currentPage
-                      ? "bg-brand-primary text-white"
-                      : "text-text-secondary hover:bg-gray-100"
-                  }`}
-                >
-                  {p}
-                </button>
-              ))}
-              <button
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="w-8 h-8 rounded-lg flex-center hover:bg-gray-100 disabled:opacity-30 transition-colors text-text-secondary"
-              >
-                ›
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+      <LessonNotesTable
+        notes={pageNotes}
+        total={filtered.length}
+        page={page}
+        isLoading={notesQuery.isLoading}
+        error={notesQuery.error}
+        actionPending={approveMutation.isPending || rejectMutation.isPending}
+        onPageChange={setPage}
+        onOpen={setSelectedNote}
+        onApprove={handleQuickApprove}
+        onReject={handleQuickReject}
+      />
 
       <AnimatePresence>
         {isModalOpen && <UploadModal onClose={() => setIsModalOpen(false)} />}

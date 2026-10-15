@@ -1,20 +1,14 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Plus } from "lucide-react";
+import { Plus, Trash2, Info } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { slideFromRight, slideFromLeft } from "../animations/variants";
 import { useSectionsList } from "../hooks/useAcademics";
-import {
-  useAddPsychomotiveMetric,
-  useDeletePsychomotiveMetric,
-  useEditPsychomotiveMetric,
-} from "../hooks/usePsychomotive";
+import { useAddPsychomotiveMetric, usePsychomotiveList } from "../hooks/usePsychomotive";
 import { psychomotiveMetricSchema, type PsychomotiveMetricFormValues } from "../schemas";
 import type { PsychomotiveItem } from "../types/psychomotive";
 import AcademicsListPanel from "../components/shared/AcademicsListPanel";
-import DeleteButton from "../components/shared/DeleteButton";
-import EditModal, { type EditField } from "@/shared/modal/EditModal";
 import PageHeader from "@/shared/ui/PageHeader";
 import FormHeader from "../components/shared/FormHeader";
 import FormInput from "@/shared/ui/FormInput";
@@ -26,21 +20,21 @@ import EditButton from "@/shared/ui/EditButton";
 
 const PER_PAGE = 8;
 
-const PSYCH_EDIT_FIELDS: EditField<PsychomotiveItem>[] = [
-  { key: "title", label: "Title" },
-];
-
 const PsychomotivePage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [section, setSection] = useState<string>("All"); // section id as string, or "All"
-  const [items, setItems] = useState<PsychomotiveItem[]>([]); // session-only: GET list is broken (500)
-  const [editingMetric, setEditingMetric] = useState<PsychomotiveItem | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const sectionsQuery = useSectionsList();
+  const { data, isLoading, isError, refetch } = usePsychomotiveList(page, search, section);
   const addMutation = useAddPsychomotiveMetric();
-  const deleteMutation = useDeletePsychomotiveMetric();
-  const editMutation = useEditPsychomotiveMetric();
+
+  useEffect(() => {
+    if (!notice) return;
+    const t = setTimeout(() => setNotice(null), 3500);
+    return () => clearTimeout(t);
+  }, [notice]);
 
   const sectionOptions = useMemo(
     () => (sectionsQuery.data ?? []).map((s) => ({ value: String(s.id), label: s.title })),
@@ -54,44 +48,9 @@ const PsychomotivePage: React.FC = () => {
 
   const onSubmit = (values: PsychomotiveMetricFormValues) => {
     addMutation.mutate(values, {
-      onSuccess: (res) => {
-        const title = sectionsQuery.data?.find((s) => s.id === res.section)?.title ?? "Unknown";
-        setItems((prev) => [
-          { id: String(res.id), title: res.title, section: title, sectionId: res.section },
-          ...prev,
-        ]);
-        reset();
-        setPage(1);
-      },
+      onSuccess: () => { reset(); setPage(1); },
     });
   };
-
-  const handleSaveEdit = (updated: PsychomotiveItem) => {
-    editMutation.mutate(
-      { id: updated.id, title: updated.title },
-      {
-        onSuccess: () => {
-          setItems((prev) => prev.map((i) => (i.id === updated.id ? { ...i, title: updated.title } : i)));
-          setEditingMetric(null);
-        },
-      }
-    );
-  };
-
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id, {
-      onSuccess: () => setItems((prev) => prev.filter((i) => i.id !== id)),
-    });
-  };
-
-  // Client-side filter + pagination over the session list
-  const filtered = useMemo(() => {
-    let list = section === "All" ? items : items.filter((i) => String(i.sectionId) === section);
-    if (search) list = list.filter((i) => i.title.toLowerCase().includes(search.toLowerCase()));
-    return list;
-  }, [items, section, search]);
-
-  const pageItems = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   const columns = [
     {
@@ -114,10 +73,18 @@ const PsychomotivePage: React.FC = () => {
       key: "action",
       header: "Action",
       className: "text-right",
-      render: (row: PsychomotiveItem) => (
+      render: () => (
         <div className="flex justify-end items-center gap-1">
-          <EditButton onClick={() => setEditingMetric(row)} />
-          <DeleteButton onConfirm={() => handleDelete(row.id)} isLoading={deleteMutation.isPending} />
+          {/* TODO: no update endpoint yet. Wire api.patch once available */}
+          <EditButton onClick={() => setNotice("Editing metrics isn't available yet.")} />
+          {/* TODO: no delete endpoint yet. Wire api.delete once available */}
+          <button
+            type="button"
+            onClick={() => setNotice("Deleting metrics isn't available yet.")}
+            className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-red-50 transition-colors"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
         </div>
       ),
     },
@@ -132,8 +99,16 @@ const PsychomotivePage: React.FC = () => {
         onAdd={() => document.getElementById("psych-title-input")?.focus()}
       />
 
+      {notice && (
+        <motion.div
+          initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-2 px-4 py-2.5 mb-4 rounded-xl bg-amber-50 border border-amber-100 text-xs text-amber-700"
+        >
+          <Info size={14} /> {notice}
+        </motion.div>
+      )}
+
       <div className="grid xl:grid-cols-[380px_1fr] gap-5">
-        {/* Form */}
         <motion.div
           variants={slideFromLeft}
           initial="hidden" animate="show"
@@ -161,41 +136,44 @@ const PsychomotivePage: React.FC = () => {
               {...register("section")}
             />
 
+            {addMutation.isError && (
+              <p className="text-xs text-danger">{addMutation.error.message}</p>
+            )}
+
             <motion.div variants={fieldFadeUp}>
               <SubmitButton label="Add Metric" isLoading={addMutation.isPending} />
             </motion.div>
           </form>
         </motion.div>
 
-        {/* List (session-only until GET works) */}
         <motion.div variants={slideFromRight} initial="hidden" animate="show">
-          <AcademicsListPanel
-            title="Metrics List"
-            count={filtered.length}
-            columns={columns}
-            data={pageItems}
-            total={filtered.length}
-            page={page}
-            perPage={PER_PAGE}
-            search={search}
-            section={section}
-            isLoading={false}
-            onSearch={setSearch}
-            onPageChange={setPage}
-            onSectionChange={setSection}
-            searchPlaceholder="Search metrics…"
-          />
+          {isError ? (
+            <div className="bg-white rounded-2xl card-shadow py-16 text-center">
+              <p className="text-sm text-danger">Couldn't load metrics.</p>
+              <button type="button" onClick={() => refetch()} className="text-xs text-brand-primary hover:underline mt-1">
+                Try again
+              </button>
+            </div>
+          ) : (
+            <AcademicsListPanel
+              title="Metrics List"
+              count={data?.total ?? 0}
+              columns={columns}
+              data={data?.items ?? []}
+              total={data?.total ?? 0}
+              page={page}
+              perPage={PER_PAGE}
+              search={search}
+              section={section}
+              isLoading={isLoading}
+              onSearch={setSearch}
+              onPageChange={setPage}
+              onSectionChange={setSection}
+              searchPlaceholder="Search metrics…"
+            />
+          )}
         </motion.div>
       </div>
-
-      <EditModal<PsychomotiveItem>
-        isOpen={editingMetric !== null}
-        title="Psychomotive Metric"
-        fields={PSYCH_EDIT_FIELDS}
-        initialData={editingMetric}
-        onSave={handleSaveEdit}
-        onCancel={() => setEditingMetric(null)}
-      />
     </div>
   );
 };

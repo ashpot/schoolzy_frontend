@@ -1,52 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Percent, Search, Trash2 } from "lucide-react";
+import { Percent, Search, Trash2, Info } from "lucide-react";
 import { staggerContainer, rowVariant } from "../../animations/variants";
 import { getClassBadgeColor } from "../../utils/colors";
 import type { Denominator } from "../../types";
-import { useDeleteDenominator } from "../../hooks/useSections";
 import NumberSpan from "../shared/NumberSpan";
-import EditModal, { type EditField } from "@/shared/modal/EditModal";
 import EditButton from "@/shared/ui/EditButton";
-import DeleteConfirmModal from "../../../users/components/shared/DeleteConfirmModal";
 
-interface Props { denominators: Denominator[]; onDelete: (id: string) => void; }
+interface Props {
+  denominators: Denominator[];
+  isLoading: boolean;
+  isError: boolean;
+  onRetry: () => void;
+}
 
 const PAGE_SIZE = 10;
 
-const DENOMINATOR_EDIT_FIELDS: EditField<Denominator>[] = [
-  { key: "denominator", label: "Denominator", type: "number" },
-  { key: "className", label: "Class" },
-];
-
-export default function DenominatorTable({ denominators, onDelete }: Props) {
+export default function DenominatorTable({ denominators, isLoading, isError, onRetry }: Props) {
   const [search, setSearch] = useState("");
-  const [page,   setPage]   = useState(1);
-  const [editingDenominator, setEditingDenominator] = useState<Denominator | null>(null);
-  const [pendingDelete, setPendingDelete] = useState<Denominator | null>(null);
+  const [page, setPage] = useState(1);
+  const [notice, setNotice] = useState<string | null>(null);
 
-  const deleteMutation = useDeleteDenominator();
+  // Auto-hide the notice
+  useEffect(() => {
+    if (!notice) return;
+    const t = setTimeout(() => setNotice(null), 3500);
+    return () => clearTimeout(t);
+  }, [notice]);
 
-  const filtered   = denominators.filter((d) => d.className.toLowerCase().includes(search.toLowerCase()));
+  const filtered = denominators.filter((d) => d.className.toLowerCase().includes(search.toLowerCase()));
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  const handleConfirmDelete = () => {
-    if (pendingDelete) {
-      deleteMutation.mutate(pendingDelete.id, {
-        onSuccess: () => {
-          onDelete(pendingDelete.id);
-          setPendingDelete(null);
-        },
-      });
-    }
-  };
-
-  const handleSaveEdit = (updated: Denominator) => {
-    // TODO: Replace with actual API call e.g. api.patch(`/academics/denominators/${updated.id}/`, updated)
-    console.log("Saving edited denominator:", updated);
-    setEditingDenominator(null);
-  };
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const from = filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const to = Math.min(page * PAGE_SIZE, filtered.length);
 
   return (
     <div className="bg-white rounded-2xl card-shadow overflow-hidden">
@@ -64,6 +50,15 @@ export default function DenominatorTable({ denominators, onDelete }: Props) {
         </div>
       </div>
 
+      {notice && (
+        <motion.div
+          initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-2 px-5 py-2.5 bg-amber-50 border-b border-amber-100 text-xs text-amber-700"
+        >
+          <Info size={14} /> {notice}
+        </motion.div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
@@ -73,45 +68,77 @@ export default function DenominatorTable({ denominators, onDelete }: Props) {
               ))}
             </tr>
           </thead>
-          <motion.tbody variants={staggerContainer} initial="hidden" animate="show" key={page}>
-            {paginated.map((d, i) => (
-              <motion.tr key={d.id} variants={rowVariant} className="border-b border-border-line02 hover:bg-gray-50/50">
-                <td className="py-3.5 px-4 text-sm text-text-muted">
-                  <NumberSpan number={(page - 1) * PAGE_SIZE + i + 1}/>
+          <motion.tbody variants={staggerContainer} initial="hidden" animate="show" key={`${page}-${isLoading}-${isError}`}>
+            {isLoading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <tr key={i} className="border-b border-border-line02">
+                  {[0, 1, 2, 3].map((c) => (
+                    <td key={c} className="py-4 px-4"><div className="h-3 bg-gray-100 rounded animate-pulse w-3/4" /></td>
+                  ))}
+                </tr>
+              ))
+            ) : isError ? (
+              <tr>
+                <td colSpan={4} className="py-12 text-center">
+                  <p className="text-sm text-danger">Couldn't load denominators.</p>
+                  <button type="button" onClick={onRetry} className="text-xs text-brand-primary hover:underline mt-1">Try again</button>
                 </td>
-                <td className="py-4 px-4">
-                  <div className="flex items-center gap-2">
-                    <Percent size={16} className="text-brand-primary" />
-                    <span className="text-2xl font-bold text-text-primary">{d.denominator}</span>
-                    <span className="text-sm text-text-muted font-medium">pts</span>
+              </tr>
+            ) : paginated.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="py-12 text-center">
+                  <div className="w-12 h-12 rounded-full bg-blue-50 flex-center mx-auto mb-3">
+                    <Percent size={20} className="text-brand-primary" />
                   </div>
+                  <p className="text-sm font-medium text-text-primary">
+                    {search ? "No matching denominators" : "No denominators yet"}
+                  </p>
+                  <p className="text-xs text-text-muted mt-0.5">
+                    {search ? "Try a different search" : "Add one using the form"}
+                  </p>
                 </td>
-                <td className="py-4 px-4">
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${getClassBadgeColor(d.className)}`}>
-                    {d.className}
-                  </span>
-                </td>
-                <td className="py-4 px-4" onClick={(e) => e.stopPropagation()}>
-                  <div className="flex items-center gap-1">
-                    <EditButton onClick={() => setEditingDenominator(d)} />
-                    <button
-                      type="button"
-                      onClick={() => setPendingDelete(d)}
-                      disabled={deleteMutation.isPending}
-                      className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-red-50 transition-colors disabled:opacity-40"
-                    >
-                      <Trash2 size={15} />
-                    </button>
-                  </div>
-                </td>
-              </motion.tr>
-            ))}
+              </tr>
+            ) : (
+              paginated.map((d, i) => (
+                <motion.tr key={d.id} variants={rowVariant} className="border-b border-border-line02 hover:bg-gray-50/50">
+                  <td className="py-3.5 px-4 text-sm text-text-muted">
+                    <NumberSpan number={(page - 1) * PAGE_SIZE + i + 1} />
+                  </td>
+                  <td className="py-4 px-4">
+                    <div className="flex items-center gap-2">
+                      <Percent size={16} className="text-brand-primary" />
+                      <span className="text-2xl font-bold text-text-primary">{d.denominator}</span>
+                      <span className="text-sm text-text-muted font-medium">pts</span>
+                    </div>
+                  </td>
+                  <td className="py-4 px-4">
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border ${getClassBadgeColor(d.className)}`}>
+                      {d.className}
+                    </span>
+                  </td>
+                  <td className="py-4 px-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center gap-1">
+                      {/* TODO: no update endpoint yet. Wire api.patch once the backend adds it */}
+                      <EditButton onClick={() => setNotice("Editing denominators isn't available yet.")} />
+                      {/* TODO: no delete endpoint yet. Wire api.delete once the backend adds it */}
+                      <button
+                        type="button"
+                        onClick={() => setNotice("Deleting denominators isn't available yet.")}
+                        className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-red-50 transition-colors"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </td>
+                </motion.tr>
+              ))
+            )}
           </motion.tbody>
         </table>
       </div>
 
       <div className="flex items-center justify-between px-5 py-3 border-t border-border-line02">
-        <p className="text-xs text-text-muted">Showing {Math.min((page - 1) * PAGE_SIZE + 1, filtered.length)}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length} entries</p>
+        <p className="text-xs text-text-muted">Showing {from}–{to} of {filtered.length} entries</p>
         {totalPages > 1 && (
           <div className="flex items-center gap-1">
             <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="w-7 h-7 flex-center rounded-lg text-sm hover:bg-gray-100 disabled:opacity-30">‹</button>
@@ -122,23 +149,6 @@ export default function DenominatorTable({ denominators, onDelete }: Props) {
           </div>
         )}
       </div>
-
-      <EditModal<Denominator>
-        isOpen={editingDenominator !== null}
-        title="Denominator"
-        fields={DENOMINATOR_EDIT_FIELDS}
-        initialData={editingDenominator}
-        onSave={handleSaveEdit}
-        onCancel={() => setEditingDenominator(null)}
-      />
-
-      <DeleteConfirmModal
-        isOpen={pendingDelete !== null}
-        itemLabel={pendingDelete ? `${pendingDelete.className} denominator` : ""}
-        isDeleting={deleteMutation.isPending}
-        onConfirm={handleConfirmDelete}
-        onCancel={() => setPendingDelete(null)}
-      />
     </div>
   );
 }
