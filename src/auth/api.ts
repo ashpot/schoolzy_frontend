@@ -4,4 +4,5 @@ export const AUTH_ENDPOINTS = {
   REGISTER_SCHOOL: `${API_BASE_URL}/platform/auth/register-school/`,
   SIGNIN: `${API_BASE_URL}/auth/signin/`,
   SIGNOUT: `${API_BASE_URL}/auth/signout/`,
+  LOCATION_API: "https://countriesnow.space/api/v0.1/countries",
 } as const;

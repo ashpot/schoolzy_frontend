@@ -1,101 +1,62 @@
-import { useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircle2 } from "lucide-react";
-import type { AttendanceStatus, AttendanceStudent } from "../types";
-import { useLoadAttendanceStudents, useSaveAttendance } from "../hooks/useLearning";
+import { CheckCircle2, History } from "lucide-react";
 import { loadAttendanceSchema, type LoadAttendanceValues } from "../schemas";
+import { useClassGroupOptions } from "../hooks/useLearning";
+import { useAttendanceSession } from "../hooks/useAttendanceSession";
+import { localDateString } from "../shared/utils/attendanceMapper";
 import { fadeUp } from "../animations/variants";
-import { nowTime } from "../shared/utils/helpers";
-import { ITEMS_PER_PAGE } from "../shared/utils/constants";
 import AttendanceSetupForm from "../components/attendance/AttendanceSetupForm";
-import AttendancePanel, { AttendanceEmptyState } from "../components/attendance/AttendancePanel";
+import AttendancePanel from "../components/attendance/AttendancePanel";
+import AttendanceEmptyState from "../components/attendance/AttendanceEmptyState";
+import ChangeClassModal from "../components/attendance/ChangeClassModal";
 
 export default function AttendancePage() {
-  const [students,     setStudents]     = useState<AttendanceStudent[]>([]);
-  const [loadedClass,  setLoadedClass]  = useState<{ className: string; totalStudents: number } | null>(null);
-  const [loadedValues, setLoadedValues] = useState<LoadAttendanceValues | null>(null);
-  const [searchQuery,  setSearchQuery]  = useState("");
-  const [currentPage,  setCurrentPage]  = useState(1);
-  const [draftSaved,   setDraftSaved]   = useState(false);
-
-  const loadMutation = useLoadAttendanceStudents();
-  const saveMutation = useSaveAttendance();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const restored = useRef(false);
+  const { options, isLoading: optionsLoading } = useClassGroupOptions();
+  const s = useAttendanceSession();
 
   const methods = useForm<LoadAttendanceValues>({
     resolver: zodResolver(loadAttendanceSchema),
-    defaultValues: { class: "", classGroup: "", date: "" },
+    defaultValues: { classGroup: "" },
   });
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
-  const onLoad = methods.handleSubmit((values) => {
-    loadMutation.mutate(values, {
-      onSuccess: (data) => {
-        setStudents(data.students);
-        setLoadedClass({ className: data.className, totalStudents: data.totalStudents });
-        setLoadedValues(values);
-        setSearchQuery("");
-        setCurrentPage(1);
-        setDraftSaved(false);
-      },
-    });
-  });
-
-  const flashDraft = () => {
-    setDraftSaved(true);
-    setTimeout(() => setDraftSaved(false), 3000);
-  };
-
-  const toggleStatus = useCallback((studentId: string, status: AttendanceStatus) => {
-    setStudents((prev) =>
-      prev.map((s) => {
-        if (s.id !== studentId) return s;
-        const newStatus = s.status === status ? "unmarked" : status;
-        return { ...s, status: newStatus, timeMarked: newStatus !== "unmarked" ? nowTime() : null };
-      })
-    );
-    flashDraft();
-  }, []);
-
-  const markAllPresent = () => {
-    const time = nowTime();
-    setStudents((prev) => prev.map((s) => ({ ...s, status: "present", timeMarked: time })));
-    flashDraft();
-  };
-
-  const resetAll = () => {
-    setStudents((prev) => prev.map((s) => ({ ...s, status: "unmarked", timeMarked: null })));
-    setDraftSaved(false);
-  };
-
-  const handleSave = () => {
-    if (!loadedValues) return;
-    saveMutation.mutate({ ...loadedValues, students });
-  };
-
-  // ── Derived stats ─────────────────────────────────────────────────────────
-  const presentCount  = students.filter((s) => s.status === "present").length;
-  const absentCount   = students.filter((s) => s.status === "absent").length;
-  const lateCount     = students.filter((s) => s.status === "late").length;
-  const unmarkedCount = students.filter((s) => s.status === "unmarked").length;
-  const markedCount   = presentCount + absentCount + lateCount;
-
-  const filteredStudents = students.filter(
-    (s) =>
-      searchQuery === "" ||
-      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.admNo.toLowerCase().includes(searchQuery.toLowerCase())
+  const onLoad = methods.handleSubmit(({ classGroup }) =>
+    s.load(classGroup, options.find((o) => o.value === classGroup)?.label ?? "")
   );
-  const totalPages       = Math.ceil(filteredStudents.length / ITEMS_PER_PAGE);
-  const paginatedStudents = filteredStudents.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+
+  // Resume an unsaved session left behind when the user navigated away
+  useEffect(() => {
+    const draft = s.initialDraft;
+    if (!draft || restored.current || optionsLoading || options.length === 0) return;
+    restored.current = true;
+    if (options.some((o) => o.value === draft.classGroupId)) s.load(draft.classGroupId, draft.className, draft);
+    else s.discard(); // class group no longer exists
+  }, [optionsLoading, options.length]);
+
+  // Keep the dropdown showing the class being marked while the form is locked
+  useEffect(() => {
+    if (s.locked && s.session) methods.setValue("classGroup", s.session.classGroupId);
+  }, [s.locked, s.session]);
+
+  const clearSession = () => {
+    s.discard();
+    methods.reset({ classGroup: "" });
+    setConfirmOpen(false);
+  };
+  const onChangeClass = () => (s.dirty ? setConfirmOpen(true) : clearSession());
+
+  const pill = s.saved
+    ? { text: "Attendance saved", cls: "bg-green-50 border-green-200 text-green-700", Icon: CheckCircle2 }
+    : s.resumed
+    ? { text: "Resumed where you left off", cls: "bg-blue-50 border-blue-200 text-brand-primary", Icon: History }
+    : null;
 
   return (
     <motion.div variants={fadeUp} initial="hidden" animate="show" className="dashboard-p space-y-6">
-      {/* Header */}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="page-title">Attendance</h1>
@@ -104,54 +65,62 @@ export default function AttendancePage() {
           </p>
         </div>
         <AnimatePresence>
-          {draftSaved && (
+          {pill && (
             <motion.div
+              key={pill.text}
               initial={{ opacity: 0, y: -8, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0,  scale: 1 }}
-              exit={{ opacity: 0,   y: -8,  scale: 0.95 }}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200 text-xs font-medium text-green-700"
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.95 }}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium ${pill.cls}`}
             >
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              Draft auto-saved
+              <pill.Icon className="w-3.5 h-3.5" />
+              {pill.text}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Two-panel layout */}
       <div className="grid grid-cols-[300px_1fr] gap-6 items-start">
         <FormProvider {...methods}>
-          <AttendanceSetupForm isLoading={loadMutation.isPending} onSubmit={onLoad} />
+          <AttendanceSetupForm
+            options={options}
+            optionsLoading={optionsLoading}
+            isLoading={s.isLoading}
+            locked={s.locked}
+            date={s.session?.date ?? localDateString()}
+            error={s.loadError}
+            onSubmit={onLoad}
+            onChangeClass={onChangeClass}
+          />
         </FormProvider>
 
         <AnimatePresence mode="wait">
-          {!loadedClass ? (
-            <AttendanceEmptyState />
+          {!s.session ? (
+            <AttendanceEmptyState key="empty" />
           ) : (
             <AttendancePanel
-              loadedClass={loadedClass}
-              paginatedStudents={paginatedStudents}
-              filteredCount={filteredStudents.length}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              searchQuery={searchQuery}
-              presentCount={presentCount}
-              absentCount={absentCount}
-              lateCount={lateCount}
-              unmarkedCount={unmarkedCount}
-              markedCount={markedCount}
-              total={students.length}
-              isSaving={saveMutation.isPending}
-              onSearchChange={(val) => { setSearchQuery(val); setCurrentPage(1); }}
-              onPageChange={setCurrentPage}
-              onToggleStatus={toggleStatus}
-              onMarkAllPresent={markAllPresent}
-              onReset={resetAll}
-              onSave={handleSave}
+              key="loaded"
+              session={s.session}
+              students={s.students}
+              search={s.search}
+              page={s.page}
+              prefilled={s.prefilled}
+              isSaving={s.isSaving}
+              saveError={s.saveError}
+              onSearchChange={s.setSearch}
+              onPageChange={s.setPage}
+              onToggleStatus={s.toggleStatus}
+              onMarkAllPresent={s.markAllPresent}
+              onReset={s.resetAll}
+              onSave={s.save}
             />
           )}
         </AnimatePresence>
       </div>
+
+      <AnimatePresence>
+        {confirmOpen && <ChangeClassModal onKeep={() => setConfirmOpen(false)} onDiscard={clearSession} />}
+      </AnimatePresence>
     </motion.div>
   );
 }

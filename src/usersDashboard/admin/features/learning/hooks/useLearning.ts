@@ -2,11 +2,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/shared/lib/apiClient";
 import { USERS_ENDPOINTS } from "@/usersDashboard/admin/features/users/api";
 import { useClassGroupsList, useClassesList } from "@/usersDashboard/admin/features/sections/hooks/useSections";
-import type { LoadAttendanceValues, UploadLessonNoteValues } from "../schemas";
+import type {UploadLessonNoteValues } from "../schemas";
 import type {
-  AttendanceStudent, ClassGroupOption, LessonNote, LessonNoteResponse, SubjectResponse, UserNameResponse,
+  ClassGroupOption, LessonNote, LessonNoteResponse, SubjectResponse, UserNameResponse,
 } from "../types";
-import { mockAttendanceStudents } from "../data/mockData";
 import { LEARNING_ENDPOINTS } from "../api";
 import { titleCase, toLessonNote } from "../shared/utils/lessonNoteMapper";
 
@@ -89,30 +88,5 @@ export const useRejectLessonNote = () => {
       return { success: true, data: payload };
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["lesson-notes"] }),
-  });
-};
-
-// ─── Attendance (still mocked) ────────────────────────────────────────────────
-export const useLoadAttendanceStudents = () =>
-  useMutation({
-    mutationFn: async (_payload: LoadAttendanceValues) => {
-      // TODO: Replace with actual API call
-      // return api.get(`/attendance/students?class=${payload.class}&group=${payload.classGroup}&date=${payload.date}`);
-      await delay(1000);
-      return { className: "Nursery 1A", totalStudents: 34, students: mockAttendanceStudents };
-    },
-  });
-
-export const useSaveAttendance = () => {
-  const qc = useQueryClient();
-  return useMutation({
-    // @ts-ignore
-    mutationFn: async (payload: { class: string; classGroup: string; date: string; students: AttendanceStudent[] }) => {
-      // TODO: Replace with actual API call
-      // return api.post("/attendance/save", payload);
-      await delay(1000);
-      return { success: true };
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["attendance"] }),
   });
 };

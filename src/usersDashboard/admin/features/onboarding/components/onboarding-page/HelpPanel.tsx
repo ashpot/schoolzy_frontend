@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, MessageCircle } from "lucide-react";
 import type { OnboardingRecommendation } from "../../types";
 import { mapRoute } from "../../utils/routeMap";
+import PlanBadge from "./PlanBadge";
 
 // TODO: export these from WhatsAppFab and import here to avoid duplication
 const WHATSAPP_URL = `https://wa.me/2348127870201?text=${encodeURIComponent(
@@ -15,14 +16,15 @@ interface Props {
 export default function HelpPanel({ recommendations }: Props) {
   return (
     <aside className="space-y-5">
-      <div>
-        <h2 className="section-title">Need help</h2>
+       <div>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="section-title">Need help</h2>
+          <PlanBadge />
+        </div>
         <p className="text-body-small text-text-secondary mt-1">
           Set up your school as quickly as possible.
         </p>
       </div>
-
-      {/* TODO: replace with the Getting Started video when it's ready */}
       <a
         href={WHATSAPP_URL}
         target="_blank"

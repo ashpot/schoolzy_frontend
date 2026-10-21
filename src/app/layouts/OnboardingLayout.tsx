@@ -1,6 +1,6 @@
 import { Link, Navigate, Outlet, useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
-import logo from "@/assets/brand/schoolzy_logo.svg";
+import Logo from "@/assets/brand/schoolzy_logo.svg";
 
 export default function OnboardingLayout() {
   const navigate = useNavigate();
@@ -23,12 +23,12 @@ export default function OnboardingLayout() {
     localStorage.removeItem("schoolzy_user");
     navigate("/auth/signin", { replace: true });
   };
-
+  const logo = localStorage.getItem("school_details") ? JSON.parse(localStorage.getItem("school_details") || "{}").logo : null;
   return (
     <div className="min-h-screen bg-bg-input">
       <header className="sticky top-0 z-30 border-b border-border-line02 bg-white">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <img src={logo} alt="Schoolzy" className="h-8" />
+          <img src={logo || Logo} alt="Schoolzy" className="h-8" />
           <div className="flex items-center gap-4 text-sm">
             {user?.fullname && (
               <span className="hidden sm:block text-text-secondary">{user.fullname}</span>

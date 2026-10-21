@@ -1,18 +1,3 @@
-import type { AttendanceStudent } from "../types";
-
-// Attendance is still mocked. Remove this file once Attendance is wired.
-export const mockAttendanceStudents: AttendanceStudent[] = [
-  { id: "s-001", name: "Chidinma Harold",   admNo: "SCH/2025/001", status: "unmarked", timeMarked: null },
-  { id: "s-002", name: "Kelechi Igwe",      admNo: "SCH/2025/002", status: "unmarked", timeMarked: null },
-  { id: "s-003", name: "Femi Ade",          admNo: "SCH/2025/003", status: "unmarked", timeMarked: null },
-  { id: "s-004", name: "Emeka Okeke",       admNo: "SCH/2025/004", status: "unmarked", timeMarked: null },
-  { id: "s-005", name: "Zainab Yusuf",      admNo: "SCH/2025/005", status: "unmarked", timeMarked: null },
-  { id: "s-006", name: "Chinedu Obi",       admNo: "SCH/2025/006", status: "unmarked", timeMarked: null },
-  { id: "s-007", name: "Ngozi Anthony",     admNo: "SCH/2025/007", status: "unmarked", timeMarked: null },
-  { id: "s-008", name: "Hassan Jibril",     admNo: "SCH/2025/008", status: "unmarked", timeMarked: null },
-  { id: "s-009", name: "Chidinma Lawrence", admNo: "SCH/2025/009", status: "unmarked", timeMarked: null },
-  { id: "s-010", name: "James Ude",         admNo: "SCH/2025/010", status: "unmarked", timeMarked: null },
-];
 
 export const classOptions = [
   { value: "nursery-1", label: "Nursery 1" },

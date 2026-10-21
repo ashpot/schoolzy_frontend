@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 import type { NavItem } from "@/shared/types/navigation";
-import brandLogo from "@/assets/brand/schoolzy_brand_name.svg";
+import brandLogo from "@/assets/brand/schoolzy_logo.svg";
 const school_details = JSON.parse(localStorage.getItem("school_details") || "{}");
 
 const UserAvatar = ({ initials }: { initials: string }) => (
@@ -46,7 +46,6 @@ const initials = name
     >
       {/* Brand */}
       <div className="px-5 py-5.5 border-b border-border-line02 flex items-center gap-2.5">
-        {/* <img src={brandLogo} alt="My School" className="h-8 md:h-9" /> */}
         <img src={school_details.logo || brandLogo}
           alt={school_details.slug || ""}
           className="h-10 md:h-12" />
