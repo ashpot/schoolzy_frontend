@@ -8,7 +8,13 @@ export interface TenantInfo {
   school_name: string;
   logo: string | null;
   favicon: string | null;
-  school_slug: string;
+  school_slug: string | null;
+  subscription: {
+    plan: {
+      name: string;
+      price: string;
+    };
+  };
 }
 
 async function fetchTenant(tenant: string): Promise<TenantInfo> {

@@ -4,18 +4,17 @@ import { motion, type Variants } from 'framer-motion';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import FormInput from '@/shared/ui/FormInput';
-import { BrandIcon, LoginIcon } from '@/shared/lib/SvgLib';
+import { LoginIcon } from '@/shared/lib/SvgLib';
 import Button from '@/shared/ui/Button';
 import Sponsor from '@/shared/ui/Sponsor';
 import { Link } from 'react-router';
 import { useLogin } from '../hooks/useLogin';
 import type { TenantInfo } from '@/shared/hooks/useTenantCheck';
 import { getRootDomainUrl } from '@/shared/utils/tenant';
+import { loginSchema } from '../schema/loginSchema';
+import brandLogo from "@/assets/brand/schoolzy_logo.svg";
 
-const loginSchema = z.object({
-  username: z.string().min(1, 'Username or email is required'),
-  password: z.string().min(1, 'Password is required'),
-});
+
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 interface LoginFormProps {
@@ -54,7 +53,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ tenant }) => {
     logo: tenant?.logo ?? '',
     favicon: tenant?.favicon ?? '',
     school_slug: tenant?.school_slug ?? '',
-  };
+    subscription_plan: tenant?.subscription.plan.name ?? '',
+    subscription_price: tenant?.subscription.plan.price ?? '',
+  }
   localStorage.setItem('school_details', JSON.stringify(school_details));
 
   return (
@@ -69,7 +70,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ tenant }) => {
             {tenant?.logo ? (
               <img src={tenant.logo} alt={`${schoolName} logo`} className="w-full h-full object-cover" />
             ) : (
-              <BrandIcon className="text-bg-main w-8 h-8 md:w-10 md:h-10" />
+              <img src={brandLogo} alt={`${schoolName} logo`} className="w-full h-full object-cover" />
             )}
           </motion.div>
           <h1 className="capitalize text-center text-2xl md:text-3xl font-black text-text-primary tracking-wide font-jakarta">
@@ -84,8 +85,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ tenant }) => {
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
           <motion.div variants={itemVariants}>
             <FormInput
-              label="Username"
-              placeholder="Enter username"
+              label="Email"
+              placeholder="Enter your email"
               error={errors.username?.message}
               isLoading={mutation.isPending}
               {...register('username')}

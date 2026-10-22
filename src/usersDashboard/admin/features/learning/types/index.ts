@@ -1,18 +1,73 @@
 export type FileType = "PDF" | "DOC" | "DOCX" | "PPT" | "PPTX" | "FILE";
 
-// Attendance
+// ─── Attendance — UI shapes ───────────────────────────────────────────────────
+// "unmarked" is client-only; the backend only knows Present / Absent / Late
 export type AttendanceStatus = "present" | "absent" | "late" | "unmarked";
 
 export interface AttendanceStudent {
   id: string;
   name: string;
-  admNo: string;
-  avatar?: string;
+  admNo: string; // "" when the backend has none
+  photo: string | null;
   status: AttendanceStatus;
-  timeMarked: string | null;
 }
 
-// Lesson notes — backend shapes
+export interface AttendanceSession {
+  classGroupId: string;
+  className: string;
+  date: string; // YYYY-MM-DD, captured when the class was loaded
+}
+
+export interface AttendanceDraft extends AttendanceSession {
+  marks: Record<string, AttendanceStatus>; // studentId → status
+  dirty: boolean;
+  search: string;
+  page: number;
+}
+
+export interface LoadedAttendance {
+  students: AttendanceStudent[];
+  prefilled: boolean; // true when attendance already existed for that date
+}
+
+// ─── Attendance — backend shapes ──────────────────────────────────────────────
+export type ApiAttendanceStatus = "Present" | "Absent" | "Late";
+
+export interface StudentResponse {
+  id: number;
+  first_name: string;
+  last_name: string;
+  admission_number: string | null;
+  photo: string | null;
+  role: string;
+  is_active: boolean;
+  class_group: { id: number; name: string } | null; // nested object, not an id
+}
+
+export interface AttendanceRecordResponse {
+  id: number;
+  status: ApiAttendanceStatus;
+  remark: string;
+  date: string;
+  date_created: string;
+  student: number;
+  class_group: number;
+  taken_by: number;
+}
+
+export interface AttendanceBulkPayload {
+  class_group: number;
+  date: string;
+  attendance: { student: number; status: ApiAttendanceStatus }[];
+}
+
+export interface AttendanceBulkResponse {
+  message: string;
+  count: number;
+  attendance: AttendanceRecordResponse[];
+}
+
+// ─── Lesson notes — backend shapes ────────────────────────────────────────────
 export interface LessonNoteResponse {
   id: number;
   subject_name?: string; // absent when subject is null
@@ -41,7 +96,7 @@ export interface UserNameResponse {
   last_name: string;
 }
 
-// Lesson notes — UI shapes
+// ─── Lesson notes — UI shapes ─────────────────────────────────────────────────
 export interface LessonNote {
   id: string;
   title: string;

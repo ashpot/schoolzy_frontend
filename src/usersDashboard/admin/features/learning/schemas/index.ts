@@ -16,10 +16,8 @@ export const uploadLessonNoteSchema = z.object({
 });
 export type UploadLessonNoteValues = z.infer<typeof uploadLessonNoteSchema>;
 
-// Load Attendance
+// Load Attendance (date is applied automatically, class comes from the group)
 export const loadAttendanceSchema = z.object({
-  class: z.string().min(1, "Class is required"),
-  classGroup: z.string().min(1, "Class group is required"),
-  date: z.string().min(1, "Date is required"),
+  classGroup: z.string().min(1, "Please select a class group"),
 });
 export type LoadAttendanceValues = z.infer<typeof loadAttendanceSchema>;
