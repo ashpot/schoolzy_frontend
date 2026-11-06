@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { BarChart3, RotateCcw } from "lucide-react";
+import { AlertCircle, BarChart3, Info, Loader2, RotateCcw } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { slideFromLeft } from "../animations/variants";
-import { useAttendanceSummary } from "../hooks/useAcademics";
+import { useAttendanceAnalytics, useTermOptions } from "../hooks/useAttendanceSummary";
+import type { AttendanceSummaryFilters } from "../types/attendanceSummary";
+import { useClassGroupsList } from "@/usersDashboard/admin/features/sections/hooks/useSections";
+import { titleCase } from "@/usersDashboard/admin/features/learning/shared/utils/lessonNoteMapper";
 import PageHeader from "@/shared/ui/PageHeader";
 import FormSelect from "@/shared/ui/FormSelect";
 import SubmitButton from "@/shared/ui/SubmitButton";
@@ -15,50 +17,81 @@ import AttendanceStatCards from "../components/attendance-summaries/AttendanceSt
 import WeeklyTrendChart from "../components/attendance-summaries/WeeklyTrendChart";
 import AttendanceDistributionChart from "../components/attendance-summaries/AttendanceDistributionChart";
 import StudentBreakdownTable from "../components/attendance-summaries/StudentBreakdownTable";
-import { mockAttendanceSummary } from "../data/mockData";
-import type { AttendanceSummaryData } from "../types/attendanceSummary";
-
-const schema = z.object({
-  term: z.string().min(1, "Please select a term"),
-  session: z.string().min(1, "Please select a session"),
-  class: z.string().min(1, "Please select a class"),
-  class_group: z.string().min(1, "Please select a class group"),
-});
-type FormValues = z.infer<typeof schema>;
+import SummaryPlaceholder from "../components/attendance-summaries/SummaryPlaceholder";
+import { attendanceSummaryFilterSchema, type AttendanceSummaryFilterValues } from "../schemas";
 
 const AttendanceSummariesPage: React.FC = () => {
-  const [summary, setSummary] = useState<AttendanceSummaryData | null>(null);
-  const loadMutation = useAttendanceSummary();
+  const [filters, setFilters] = useState<AttendanceSummaryFilters | null>(null);
+  const termDefaulted = useRef(false);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { term: "", session: "", class: "", class_group: "" },
+  const groupsQuery = useClassGroupsList();
+  const termsQuery = useTermOptions();
+  const query = useAttendanceAnalytics(filters);
+
+  const groupOptions = (groupsQuery.data ?? []).map((g) => ({ value: String(g.id), label: titleCase(g.name) }));
+  const termOptions = termsQuery.data ?? [];
+  const defaultTerm = termOptions[0]?.value ?? ""; // active term is sorted first
+
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<AttendanceSummaryFilterValues>({
+    resolver: zodResolver(attendanceSummaryFilterSchema),
+    defaultValues: { classGroup: "", term: "" },
   });
 
-  const onSubmit = (values: FormValues) => {
-    loadMutation.mutate(values, {
-      onSuccess: () => {
-        setSummary(mockAttendanceSummary);
-      },
-    });
+  // Pre-select the active term once the options arrive
+  useEffect(() => {
+    if (defaultTerm && !termDefaulted.current) {
+      termDefaulted.current = true;
+      setValue("term", defaultTerm);
+    }
+  }, [defaultTerm, setValue]);
+
+  const onSubmit = (values: AttendanceSummaryFilterValues) => {
+    const next = { classGroupId: values.classGroup, termId: values.term };
+    if (filters?.classGroupId === next.classGroupId && filters?.termId === next.termId) query.refetch();
+    else setFilters(next);
   };
 
   const handleReset = () => {
-    reset();
-    setSummary(null);
+    reset({ classGroup: "", term: defaultTerm });
+    setFilters(null);
   };
 
-  const termOptions = [
-    { value: "First Term", label: "First Term" },
-    { value: "Second Term", label: "Second Term" },
-    { value: "Third Term", label: "Third Term" },
-  ];
+  const data = query.data;
+  const busy = query.isFetching || groupsQuery.isLoading || termsQuery.isLoading;
 
-  const sessionOptions = [
-    { value: "2025/2026", label: "2025/2026" },
-    { value: "2024/2025", label: "2024/2025" },
-    { value: "2023/2024", label: "2023/2024" },
-  ];
+  const renderBody = () => {
+    if (!filters) {
+      return (
+        <SummaryPlaceholder
+          icon={<BarChart3 className="w-9 h-9 text-brand-primary" />}
+          title="No data loaded yet"
+          text={<>Select a class group and term above then click <span className="font-semibold text-text-nav">Load Summary</span></>}
+        />
+      );
+    }
+    if (query.isLoading) {
+      return <SummaryPlaceholder icon={<Loader2 className="w-9 h-9 text-brand-primary animate-spin" />} title="Loading summary..." text="Crunching attendance records" />;
+    }
+    if (query.error || !data) {
+      return <SummaryPlaceholder icon={<AlertCircle className="w-9 h-9 text-danger" />} title="Couldn't load summary" text={query.error?.message ?? "Something went wrong"} />;
+    }
+    return (
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-6">
+        {!data.hasData && (
+          <div className="flex items-start gap-2 px-4 py-3 rounded-xl bg-amber-50 border border-amber-100 text-sm text-amber-700">
+            <Info className="w-4 h-4 mt-0.5 shrink-0" />
+            No attendance has been recorded for {data.className} between {data.termRange}.
+          </div>
+        )}
+        <AttendanceStatCards data={data} />
+        <div className="flex gap-6 items-stretch">
+          <WeeklyTrendChart data={data} />
+          <AttendanceDistributionChart data={data} />
+        </div>
+        <StudentBreakdownTable data={data} />
+      </motion.div>
+    );
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -79,49 +112,24 @@ const AttendanceSummariesPage: React.FC = () => {
       <motion.div variants={slideFromLeft} initial="hidden" animate="show" className="bg-white rounded-2xl card-shadow">
         <FormHeader title="Attendance Filters" icon={<BarChart3 className="w-4 h-4 text-brand-primary" />} />
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="p-6">
-          <div className="grid md:grid-cols-4 gap-4 mb-5">
-            <FormSelect label="Class" placeholder="Select class" options={termOptions}
-              isLoading={loadMutation.isPending} error={errors.class?.message} {...register("class")} />
-            <FormSelect label="Class Group" placeholder="Select class group" options={sessionOptions}
-              isLoading={loadMutation.isPending} error={errors.class_group?.message} {...register("class_group")} />
-            <FormSelect label="Session" placeholder="Select session" options={termOptions}
-              isLoading={loadMutation.isPending} error={errors.session?.message} {...register("session")} />
-            <FormSelect label="Term" placeholder="Select term" options={termOptions}
-              isLoading={loadMutation.isPending} error={errors.term?.message} {...register("term")} />
+          <div className="grid md:grid-cols-2 gap-4 mb-5">
+            <FormSelect label="Class Group" placeholder={groupsQuery.isLoading ? "Loading class groups..." : "Select class group"}
+              options={groupOptions} isLoading={busy}
+              error={errors.classGroup?.message ?? (groupsQuery.error ? "Couldn't load class groups" : undefined)}
+              {...register("classGroup")} />
+            <FormSelect label="Term" placeholder={termsQuery.isLoading ? "Loading terms..." : "Select term"}
+              options={termOptions} isLoading={busy}
+              error={errors.term?.message ?? (termsQuery.error ? "Couldn't load terms" : undefined)}
+              {...register("term")} />
           </div>
           <div className="flex items-center gap-4">
-            <SubmitButton label="Load Summary" isLoading={loadMutation.isPending} className="w-50" />
-            {summary && (
-              <ActiveFiltersBar filters={[{ label: summary.className }, { label: summary.term }, { label: summary.session }]} />
-            )}
+            <SubmitButton label="Load Summary" isLoading={busy} className="w-50" />
+            {data && <ActiveFiltersBar filters={[{ label: data.className }, { label: data.term }]} />}
           </div>
         </form>
       </motion.div>
 
-      {!summary && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl card-shadow p-16 flex flex-col items-center justify-center text-center">
-          <div className="w-20 h-20 rounded-full bg-blue-50 flex-center mb-4">
-            <BarChart3 className="w-9 h-9 text-brand-primary" />
-          </div>
-          <h3 className="text-lg font-semibold text-text-nav mb-2">No data loaded yet</h3>
-          <p className="text-sm text-text-muted max-w-md">
-            Select a class, group, term and session above then click{" "}
-            <span className="font-semibold text-text-nav">Load Summary</span>
-          </p>
-        </motion.div>
-      )}
-
-      {summary && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-6">
-          <AttendanceStatCards data={summary} />
-          <div className="flex gap-6 items-stretch">
-            <WeeklyTrendChart data={summary} />
-            <AttendanceDistributionChart data={summary} />
-          </div>
-          <StudentBreakdownTable data={summary} />
-        </motion.div>
-      )}
+      {renderBody()}
     </div>
   );
 };

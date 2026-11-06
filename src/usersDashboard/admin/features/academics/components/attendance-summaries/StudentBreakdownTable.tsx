@@ -3,24 +3,18 @@ import { Search } from "lucide-react";
 import StudentAttendanceRow from "./StudentAttendanceRow";
 import type { AttendanceSummaryData } from "../../types/attendanceSummary";
 
-interface StudentBreakdownTableProps {
-  data: AttendanceSummaryData;
-}
-
 const PER_PAGE = 8;
 
-const StudentBreakdownTable: React.FC<StudentBreakdownTableProps> = ({ data }) => {
+const StudentBreakdownTable: React.FC<{ data: AttendanceSummaryData }> = ({ data }) => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
 
-  const filtered = data.students.filter(
-    (s) =>
-      s.fullName.toLowerCase().includes(search.toLowerCase()) ||
-      s.admissionNumber.toLowerCase().includes(search.toLowerCase())
-  );
-  const start = (page - 1) * PER_PAGE;
-  const paged = filtered.slice(start, start + PER_PAGE);
+  const q = search.trim().toLowerCase();
+  const filtered = data.students.filter((s) => !q || s.fullName.toLowerCase().includes(q));
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  const current = Math.min(page, totalPages);
+  const start = (current - 1) * PER_PAGE;
+  const paged = filtered.slice(start, start + PER_PAGE);
 
   return (
     <div className="bg-white rounded-2xl card-shadow overflow-hidden">
@@ -42,39 +36,41 @@ const StudentBreakdownTable: React.FC<StudentBreakdownTableProps> = ({ data }) =
         </div>
       </div>
 
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="text-left text-text-muted text-xs">
-            <th className="px-6 py-3 font-medium">#</th>
-            <th className="px-6 py-3 font-medium">STUDENT NAME</th>
-            <th className="px-6 py-3 font-medium">TOTAL PRESENT</th>
-            <th className="px-6 py-3 font-medium">TOTAL ABSENT</th>
-            <th className="px-6 py-3 font-medium">LATE ENTRIES</th>
-            <th className="px-6 py-3 font-medium">ATTENDANCE %</th>
-            <th className="px-6 py-3 font-medium">STATUS</th>
-          </tr>
-        </thead>
-        <tbody>
-          {paged.map((row, i) => (
-            <StudentAttendanceRow key={row.id} row={row} rowNumber={start + i + 1} />
-          ))}
-        </tbody>
-      </table>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left text-text-muted text-xs">
+              {["#", "STUDENT NAME", "TOTAL PRESENT", "TOTAL ABSENT", "LATE ENTRIES", "ATTENDANCE %", "STATUS"].map((h) => (
+                <th key={h} className="px-6 py-3 font-medium whitespace-nowrap">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {paged.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="px-6 py-12 text-center text-text-muted">No students found</td>
+              </tr>
+            ) : (
+              paged.map((row, i) => <StudentAttendanceRow key={row.id} row={row} rowNumber={start + i + 1} />)
+            )}
+          </tbody>
+        </table>
+      </div>
 
       <div className="flex items-center justify-between px-6 py-4 border-t border-border-line02">
         <p className="text-body-small text-text-secondary">
           Showing {filtered.length === 0 ? 0 : start + 1}–{Math.min(start + PER_PAGE, filtered.length)} of {filtered.length}
         </p>
         <div className="flex items-center gap-1">
-          <button disabled={page === 1} onClick={() => setPage((p) => p - 1)}
+          <button disabled={current === 1} onClick={() => setPage(current - 1)}
             className="w-8 h-8 rounded-lg border border-border-line02 flex-center text-text-muted disabled:opacity-40">‹</button>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
             <button key={p} onClick={() => setPage(p)}
-              className={`w-8 h-8 rounded-lg text-sm font-medium ${p === page ? "bg-brand-primary text-white" : "text-text-secondary hover:bg-bg-soft"}`}>
+              className={`w-8 h-8 rounded-lg text-sm font-medium ${p === current ? "bg-brand-primary text-white" : "text-text-secondary hover:bg-bg-soft"}`}>
               {p}
             </button>
           ))}
-          <button disabled={page === totalPages} onClick={() => setPage((p) => p + 1)}
+          <button disabled={current === totalPages} onClick={() => setPage(current + 1)}
             className="w-8 h-8 rounded-lg border border-border-line02 flex-center text-text-muted disabled:opacity-40">›</button>
         </div>
       </div>

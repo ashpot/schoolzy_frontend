@@ -75,7 +75,7 @@ const StudentForm: React.FC = () => {
         state: values.state,
         country: values.country,
         date_of_admission: values.dateOfAdmission,
-        class_group: values.classGroup,
+        class_group_id: values.classGroup,
         admission_number: values.admission_number,
         photo: values.photo,
       },

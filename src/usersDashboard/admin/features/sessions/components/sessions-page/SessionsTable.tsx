@@ -2,9 +2,10 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { CalendarDays, Layers, Search, Trash2 } from "lucide-react";
 import { staggerContainer, rowVariant } from "../../animations/variants";
-import { useDeleteSession } from "../../hooks/useSessions";
+import { useDeleteSession, useUpdateSession } from "../../hooks/useSessions";
 import type { Session } from "../../types";
 import { dateFormat } from "../../utils/dateFormat";
+import { buildSessionPatch } from "../../utils/buildSessionPatch";
 import EditModal, { type EditField } from "@/shared/modal/EditModal";
 import EditButton from "@/shared/ui/EditButton";
 import DeleteConfirmModal from "../../../users/components/shared/DeleteConfirmModal";
@@ -20,6 +21,12 @@ const SESSION_EDIT_FIELDS: EditField<Session>[] = [
   { key: "name", label: "Session Name" },
   { key: "startDate", label: "Start Date", type: "date" },
   { key: "endDate", label: "End Date", type: "date" },
+  {
+    key: "isActive",
+    label: "Active session",
+    type: "checkbox",
+    hint: "Make this the current session for the school",
+  },
 ];
 
 export default function SessionsTable({ sessions, onDelete }: Props) {
@@ -28,6 +35,7 @@ export default function SessionsTable({ sessions, onDelete }: Props) {
   const [editingSession, setEditingSession] = useState<Session | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Session | null>(null);
   const deleteMutation      = useDeleteSession();
+  const updateMutation      = useUpdateSession();
 
   const filtered = sessions.filter((s) =>
     s.name.toLowerCase().includes(search.toLowerCase())
@@ -48,9 +56,18 @@ export default function SessionsTable({ sessions, onDelete }: Props) {
     }
   };
 
-  const handleSaveEdit = (updated: Session) => {
-    // TODO: Replace with actual API call e.g. api.patch(`/academics/session/${updated.id}/`, updated)
-    console.log("Saving edited session:", updated);
+  // Async on purpose: EditModal awaits this, stays open while saving,
+  // and shows the backend error if it throws.
+  const handleSaveEdit = async (updated: Session) => {
+    if (!editingSession) return;
+
+    const changes = buildSessionPatch(editingSession, updated);
+    if (Object.keys(changes).length === 0) {
+      setEditingSession(null); // nothing changed, so no request
+      return;
+    }
+
+    await updateMutation.mutateAsync({ id: editingSession.id, changes });
     setEditingSession(null);
   };
 
@@ -186,6 +203,7 @@ export default function SessionsTable({ sessions, onDelete }: Props) {
         title="Session"
         fields={SESSION_EDIT_FIELDS}
         initialData={editingSession}
+        isSaving={updateMutation.isPending}
         onSave={handleSaveEdit}
         onCancel={() => setEditingSession(null)}
       />

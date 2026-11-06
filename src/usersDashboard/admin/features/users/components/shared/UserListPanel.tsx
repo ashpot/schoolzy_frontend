@@ -26,7 +26,8 @@ interface UserListPanelProps<T extends FieldValues & { id: string }> {
   editTitle?: string;
   onSearch: (q: string) => void;
   onPageChange: (p: number) => void;
-  onDelete: (id: string) => void;
+  // May return a promise: the modal then stays open until it settles and shows any error
+  onDelete: (id: string) => void | Promise<unknown>;
   onEdit?: (updated: T) => void;
 }
 
@@ -38,6 +39,7 @@ function UserListPanel<T extends FieldValues & { id: string }>({
 }: UserListPanelProps<T>) {
   const [search, setSearch] = useState("");
   const [pendingDelete, setPendingDelete] = useState<T | null>(null);
+  const [deleteError, setDeleteError] = useState("");
   const [editingRow, setEditingRow] = useState<T | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
@@ -48,10 +50,24 @@ function UserListPanel<T extends FieldValues & { id: string }>({
     onSearch(e.target.value);
   };
 
-  const handleConfirmDelete = () => {
-    if (pendingDelete) {
-      onDelete(pendingDelete.id);
-      setPendingDelete(null);
+  const openDelete = (row: T) => {
+    setDeleteError("");
+    setPendingDelete(row);
+  };
+
+  const closeDelete = () => {
+    setPendingDelete(null);
+    setDeleteError("");
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!pendingDelete) return;
+    setDeleteError("");
+    try {
+      await onDelete(pendingDelete.id);
+      closeDelete();
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : "Could not delete. Please try again.");
     }
   };
 
@@ -163,7 +179,7 @@ function UserListPanel<T extends FieldValues & { id: string }>({
                           <motion.button
                             whileHover={{ scale: 1.18 }}
                             whileTap={{ scale: 0.88 }}
-                            onClick={() => setPendingDelete(row)}
+                            onClick={() => openDelete(row)}
                             className="p-1.5 rounded-lg text-danger hover:bg-danger/10 transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -225,8 +241,9 @@ function UserListPanel<T extends FieldValues & { id: string }>({
         isOpen={pendingDelete !== null}
         itemLabel={pendingDelete ? resolveLabel(pendingDelete) : ""}
         isDeleting={isDeleting}
+        error={deleteError}
         onConfirm={handleConfirmDelete}
-        onCancel={() => setPendingDelete(null)}
+        onCancel={closeDelete}
       />
 
       {canEdit && (

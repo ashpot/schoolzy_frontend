@@ -13,7 +13,7 @@ export interface CreateUserPayload {
   country?: string;
   date_of_birth?: string;
   date_of_admission?: string; // Student only
-  class_group?: number; // Student only
+  class_group_id?: number; // Student only
   admission_number?: string; // Student only
   employment_number?: string; // Teacher only
   date_of_employment?: string; // Teacher only

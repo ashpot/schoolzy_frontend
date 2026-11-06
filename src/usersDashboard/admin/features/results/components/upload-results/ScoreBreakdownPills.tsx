@@ -1,20 +1,33 @@
-import { FileText, BookOpen, FlaskConical, Sigma } from "lucide-react";
+import { Sigma } from "lucide-react";
+import type { SheetColumn } from "../../types/uploadResults";
 
-const PILLS = [
-  { label: "Assignment /30", icon: FileText,    cls: "bg-purple-50 text-purple-700 border-purple-200" },
-  { label: "Test /20",       icon: BookOpen,    cls: "bg-blue-50   text-blue-700   border-blue-200"   },
-  { label: "Exam /50",       icon: FlaskConical, cls: "bg-amber-50  text-amber-700  border-amber-200"  },
-  { label: "Total /100",     icon: Sigma,       cls: "bg-gray-100  text-gray-600   border-gray-200"   },
+const TONES = [
+  "bg-purple-50 text-purple-700 border-purple-200",
+  "bg-blue-50 text-blue-700 border-blue-200",
+  "bg-amber-50 text-amber-700 border-amber-200",
+  "bg-green-50 text-green-700 border-green-200",
 ];
 
-export default function ScoreBreakdownPills() {
+export default function ScoreBreakdownPills({ columns }: { columns: SheetColumn[] }) {
+  const total = columns.every((c) => c.weight !== null)
+    ? columns.reduce((s, c) => s + (c.weight as number), 0)
+    : null;
+  const base = "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border";
+
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      {PILLS.map(({ label, icon: Icon, cls }) => (
-        <span key={label} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border ${cls}`}>
-          <Icon size={12} />{label}
+      {columns.map((c, i) => (
+        <span key={c.id} className={`${base} ${TONES[i % TONES.length]}`}>
+          {c.name}
+          {c.max !== null ? ` /${c.max}` : ""}
+          {c.weight !== null ? ` · ${c.weight}%` : ""}
         </span>
       ))}
+      {total !== null && (
+        <span className={`${base} bg-gray-100 text-gray-600 border-gray-200`}>
+          <Sigma size={12} />Total /{total}
+        </span>
+      )}
     </div>
   );
 }

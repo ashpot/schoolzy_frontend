@@ -39,7 +39,6 @@ import ScrollToTop from "./ScrollToTop";
 import { OnboardingPage } from "@/usersDashboard/admin/features/onboarding";
 
 
-
 const AppRouter = () => {
   const location = useLocation();
   const ADMIN_ROOT_ROUTE = "admin-dashboard";

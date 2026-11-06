@@ -471,5 +471,3 @@ export const useUndoPromotion = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["promote-students"] }),
   });
 };
-
-

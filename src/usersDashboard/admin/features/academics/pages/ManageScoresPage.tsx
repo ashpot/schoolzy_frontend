@@ -219,3 +219,4 @@ const handleSaveAll = () => {
 };
 
 export default ManageScoresPage;
+

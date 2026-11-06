@@ -57,3 +57,9 @@ export const resultCommentSchema = z.object({
   principalComment: z.string().optional(),
 });
 export type ResultCommentFormValues = z.infer<typeof resultCommentSchema>;
+
+export const attendanceSummaryFilterSchema = z.object({
+  classGroup: z.string().min(1, "Please select a class group"),
+  term: z.string().min(1, "Please select a term"),
+});
+export type AttendanceSummaryFilterValues = z.infer<typeof attendanceSummaryFilterSchema>;
