@@ -1,9 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { apiRequest } from "@/shared/lib/apiClient";
 import { AUTH_ENDPOINTS } from "../api";
 import type { LoginPayload, LoginResponse, UserRole } from "../types";
 import { fetchOnboardingHealth } from "@/usersDashboard/admin/features/onboarding";
+import { setSession } from "@/shared/auth/authStorage";
+import { safeRedirect } from "@/shared/auth/roleHome";
 
 const ROLE_ROUTE_MAP: Record<UserRole, string> = {
   Admin: "/admin-dashboard",
@@ -16,6 +18,7 @@ const DEFAULT_ROUTE = "/admin-dashboard";
 
 export const useLogin = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   return useMutation({
     mutationFn: async (payload: LoginPayload) => {
@@ -26,8 +29,8 @@ export const useLogin = () => {
       });
     },
     onSuccess: async (data) => {
-      localStorage.setItem("schoolzy_token", data.token);
-      localStorage.setItem("schoolzy_user", JSON.stringify(data.user));
+      // Replaces the two raw localStorage.setItem calls (same keys, so nothing else breaks)
+      setSession(data.token, data.user);
 
       const role = data.user.role;
       const destination = role && ROLE_ROUTE_MAP[role] ? ROLE_ROUTE_MAP[role] : DEFAULT_ROUTE;
@@ -44,7 +47,13 @@ export const useLogin = () => {
           /* health check failed, don't block login */
         }
       }
-      navigate(destination, { replace: true });
+
+      // If a guard sent them here from a page they wanted, return them to it.
+      // Only if it's allowed for their role (e.g. a teacher shouldn't be sent to /admin-...).
+      const from = (location.state as { from?: string } | null)?.from;
+      const back = safeRedirect(from, destination);
+      const prefix = destination.split("-")[0]; // "/admin", "/teacher", ...
+      navigate(back.startsWith(prefix) ? back : destination, { replace: true });
     },
   });
 };

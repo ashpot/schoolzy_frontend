@@ -1,29 +1,29 @@
-import { Link, Navigate, Outlet, useNavigate } from "react-router-dom";
+import { Link, Navigate, Outlet } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import Logo from "@/assets/brand/schoolzy_logo.svg";
+import { getToken, getUser } from "@/shared/auth/authStorage";
+import { useSignout } from "@/auth/hooks/useSignout";
+
+// Read once per render, never throws on corrupt storage
+const readSchoolLogo = (): string | null => {
+  try {
+    return JSON.parse(localStorage.getItem("school_details") ?? "null")?.logo ?? null;
+  } catch {
+    return null;
+  }
+};
 
 export default function OnboardingLayout() {
-  const navigate = useNavigate();
-  const token = localStorage.getItem("schoolzy_token");
-
-  let user: { fullname?: string; role?: string } | null = null;
-  try {
-    user = JSON.parse(localStorage.getItem("schoolzy_user") ?? "null");
-  } catch {
-    /* ignore corrupt storage */
-  }
+  const { mutate: signout, isPending: isSigningOut } = useSignout();
+  const token = getToken();
+  const user = getUser();
 
   if (!token) return <Navigate to="/auth/signin" replace />;
   // Superuser accounts come back with role "" so treat that as admin too
   if (user?.role && user.role !== "Admin") return <Navigate to="/" replace />;
 
-  const logout = () => {
-    // TODO: call POST /auth/signout/ before clearing
-    localStorage.removeItem("schoolzy_token");
-    localStorage.removeItem("schoolzy_user");
-    navigate("/auth/signin", { replace: true });
-  };
-  const logo = localStorage.getItem("school_details") ? JSON.parse(localStorage.getItem("school_details") || "{}").logo : null;
+  const logo = readSchoolLogo();
+
   return (
     <div className="min-h-screen bg-bg-input">
       <header className="sticky top-0 z-30 border-b border-border-line02 bg-white">
@@ -38,9 +38,10 @@ export default function OnboardingLayout() {
             </Link>
             <button
               type="button"
-              onClick={logout}
+              onClick={() => signout()}
+              disabled={isSigningOut}
               aria-label="Log out"
-              className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-red-50 transition-colors"
+              className="p-1.5 rounded-lg text-text-muted hover:text-danger hover:bg-red-50 transition-colors disabled:opacity-40"
             >
               <LogOut size={18} />
             </button>

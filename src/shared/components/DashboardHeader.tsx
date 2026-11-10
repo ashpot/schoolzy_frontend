@@ -9,7 +9,8 @@ import HeaderPlanChip from "./HeaderPlanChip";
 import HeaderTermChip from "./HeaderTermChip";
 import Button from "../ui/Button";
 import { BellIcon } from "../lib/SvgLib";
-import { useNavigate } from "react-router";
+import { getUser } from "@/shared/auth/authStorage";
+import { useSignout } from "@/auth/hooks/useSignout";
 
 type OpenMenu = "user" | "bell" | null;
 
@@ -29,15 +30,14 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const [query, setQuery] = useState("");
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
   const [hasNotification, setHasNotification] = useState(true);
-  const user = JSON.parse(localStorage.getItem("schoolzy_user") || "{}");
-  const navigate = useNavigate();
+  const user = getUser();
+  const { mutate: signout, isPending: isSigningOut } = useSignout();
 
   const toggle = (menu: OpenMenu) => setOpenMenu((prev) => (prev === menu ? null : menu));
   const close = () => setOpenMenu(null);
   const handleLogout = () => {
-    localStorage.removeItem("schoolzy_user");
-    localStorage.removeItem("schoolzy_token");
-    navigate("/auth/signin");
+    close();
+    signout(); // clears session + query cache, then redirects to /auth/signin
   };
 
   const userRef = useOutsideClick(() => openMenu === "user" && close());
@@ -97,10 +97,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               onClick={() => toggle("user")}
               className="flex items-center gap-2 md:gap-2.5 pl-2 md:pl-3 border-l border-border-line02 hover:bg-bg-soft rounded-lg px-2 py-1 transition-colors"
             >
-              <UserAvatar name={user.fullname || userName} />
+              <UserAvatar name={user?.fullname || userName} />
               <div className="hidden md:block text-left">
-                <p className="capitalize text-sm font-semibold text-text-primary leading-tight">{user.fullname || userName}</p>
-                <p className="capitalize text-xs text-text-muted">{user.role || roleLabel}</p>
+                <p className="capitalize text-sm font-semibold text-text-primary leading-tight">{user?.fullname || userName}</p>
+                <p className="capitalize text-xs text-text-muted">{user?.role || roleLabel}</p>
               </div>
               <ChevronDown className={cn("hidden md:block w-4 h-4 text-text-muted transition-transform duration-200", openMenu === "user" && "rotate-180")} />
             </button>
@@ -109,7 +109,12 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               className="right-0 min-w-45"
               items={[
                 { icon: <User className="w-4 h-4" />, label: "Profile", onClick: close },
-                { icon: <LogOut className="w-4 h-4" />, label: "Logout", danger: true, onClick: handleLogout },
+                {
+                  icon: <LogOut className="w-4 h-4" />,
+                  label: isSigningOut ? "Signing out..." : "Logout",
+                  danger: true,
+                  onClick: handleLogout,
+                },
               ]}
             />
           </div>

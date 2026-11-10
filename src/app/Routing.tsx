@@ -37,6 +37,8 @@ import NotFoundPage from "@/shared/components/NotFoundPage";
 import { CheckResultsPage } from "@/usersDashboard/parent/features/results";
 import ScrollToTop from "./ScrollToTop";
 import { OnboardingPage } from "@/usersDashboard/admin/features/onboarding";
+import GuestRoute from "@/shared/auth/GuestRoute";
+import ProtectedRoute from "@/shared/auth/ProtectedRoute";
 
 
 const AppRouter = () => {
@@ -62,9 +64,11 @@ const AppRouter = () => {
 
         {/* Auth */}
         <Route element={<AuthLayout />}>
-          <Route path="/auth/signup" element={<SignupPage />} />
-          <Route path="/auth/signin" element={<SigninPage />} />
-          <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+          <Route element={<GuestRoute />}>
+            <Route path="/auth/signup" element={<SignupPage />} />
+            <Route path="/auth/signin" element={<SigninPage />} />
+            <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+          </Route>
           <Route path="/auth/registration-success" element={<RegistrationSuccessPage />} />
         </Route>
 
@@ -73,6 +77,7 @@ const AppRouter = () => {
         </Route>
 
         {/*____________________ School Admin Dashboard __________________*/}
+        <Route element={<ProtectedRoute allowedRoles={["Admin"]} />}>
         <Route element={<AdminDashboardLayout />}>
           <Route path={`${ADMIN_ROOT_ROUTE}`} element={<DashboardHome />} />
 
@@ -171,10 +176,12 @@ const AppRouter = () => {
             <Route path="news-events" element={<NewsEventsPage />} />
           </Route>
         </Route>
+        </Route>
         {/*____________________ End of School Admin Dashboard __________________*/}
 
       <Route element={<DashboardLayout/>} >
       {/* parent's dashboard */}
+      <Route element={<ProtectedRoute allowedRoles={["Parent"]} />}>
         <Route path={`/${PARENT_ROOT_ROUTE}`} element={<ParentDashboardPage />} />
         <Route path={`/${PARENT_ROOT_ROUTE}/results`} element={<CheckResultsPage />} />
         <Route path={`/${PARENT_ROOT_ROUTE}/fees`}>
@@ -182,16 +189,20 @@ const AppRouter = () => {
           <Route path="pay-fees" element={<PayFeesPage/>} />
           <Route path="payment-history" element={<PaymentHistoryPage/>}/>
         </Route>
+      </Route>
       {/* end of parent's dashboard */}
 
       {/* student's dashboard */}
+      <Route element={<ProtectedRoute allowedRoles={["Student"]} />}>
       <Route path={`/${STUDENT_ROOT_ROUTE}`} element={<StudentDashboardPage />} />
       <Route path={`/${STUDENT_ROOT_ROUTE}/my-class`} element={<MyClassPage />} />
       <Route path={`/${STUDENT_ROOT_ROUTE}/my-results`} element={<MyResultsPage />} />
       <Route path={`/${STUDENT_ROOT_ROUTE}/my-fees`} element={<MyFeesPage />} />
+      </Route>
       {/* end of student's dashboard page */}
 
       {/* teacher's dashboard */}
+      <Route element={<ProtectedRoute allowedRoles={["Teacher"]} />}>
       <Route path={`/${TEACHER_ROOT_ROUTE}`} element={<TeacherDashboardPage />} />
       <Route path={`/${TEACHER_ROOT_ROUTE}/my-classes`} >
         <Route index element={<ClassListPage/>} />
@@ -212,6 +223,7 @@ const AppRouter = () => {
         <Route path="import-scores" element={<ImportScoresPage/>}/>
         <Route path="view-subject-results" element={<ViewSubjectResultsPage/>}/>
         <Route path="view-uploaded-scores" element={<ViewUploadedScoresPage/>}/>
+      </Route>
       </Route>
       {/* end of teacher's dashboard */}
       </Route>
