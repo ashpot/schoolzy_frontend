@@ -80,8 +80,8 @@ export const sidebarNavItems: NavItem[] = [
     path: `/${ADMIN_ROOT_ROUTE}/results`,
     icon: ResultsIcon,
     children: [
-      { id: "upload-assessment", label: "Upload Results (By Assessment Type)", path: `/${ADMIN_ROOT_ROUTE}/results/upload-assessment`, },
-      { id: "upload-omitted", label: "Upload Omitted", path: `/${ADMIN_ROOT_ROUTE}/results/upload-omitted`, },
+      // { id: "upload-assessment", label: "Upload Results (By Assessment Type)", path: `/${ADMIN_ROOT_ROUTE}/results/upload-assessment`, },
+      // { id: "upload-omitted", label: "Upload Omitted", path: `/${ADMIN_ROOT_ROUTE}/results/upload-omitted`, },
       { id: "upload-weekly", label: "Upload Weekly Assessment", path: `/${ADMIN_ROOT_ROUTE}/results/upload-weekly`, },
       { id: "upload-results", label: "Upload Results", path: `/${ADMIN_ROOT_ROUTE}/results/upload`, },
       { id: "view-scores", label: "View Uploaded Scores", path: `/${ADMIN_ROOT_ROUTE}/results/view-scores`, },

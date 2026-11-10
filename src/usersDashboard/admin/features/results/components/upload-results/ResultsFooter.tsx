@@ -1,46 +1,56 @@
-import { GraduationCap, BookOpen, RotateCcw, Save } from "lucide-react";
-import { useSaveResults } from "../../hooks/useUploadResults";
-import type { Student, ResultScoresMap } from "../../types";
-import type { ResultSetupValues } from "../../schemas/uploadResults";
+import { BookOpen, GraduationCap, RotateCcw, Save } from "lucide-react";
 import Button from "@/shared/ui/Button";
+import type { SaveSummary, Scoresheet } from "../../types/uploadResults";
 
-interface Props {
-  students:     Student[];
-  scores:       ResultScoresMap;
-  classLabel:   string;
-  groupLabel:   string;
-  subjectLabel: string;
-  activeSetup:  ResultSetupValues | null;
-  onReset:      () => void;
+interface ResultsFooterProps {
+  sheet: Scoresheet;
+  changedCount: number;
+  problemCount: number;
+  isSaving: boolean;
+  saveError?: string;
+  saved: SaveSummary | null;
+  onReset: () => void;
+  onSave: () => void;
 }
 
-export default function ResultsFooter({ students, scores, classLabel, groupLabel, subjectLabel, activeSetup, onReset }: Props) {
-  const saveResults = useSaveResults();
-  const complete    = students.filter((s) => {
-    const r = scores[s.id];
-    return r && typeof r.assignment === "number" && typeof r.test === "number" && typeof r.exam === "number";
-  }).length;
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
-  const handleSave = () => {
-    if (!activeSetup) return;
-    saveResults.mutate({ setup: activeSetup, scores });
-  };
+export default function ResultsFooter({
+  sheet, changedCount, problemCount, isSaving, saveError, saved, onReset, onSave,
+}: ResultsFooterProps) {
+  const status = saveError ? (
+    <span className="text-danger">{saveError}</span>
+  ) : problemCount > 0 ? (
+    <span className="text-danger">Fix {plural(problemCount, "invalid score")} to save</span>
+  ) : changedCount > 0 ? (
+    <span>{plural(changedCount, "unsaved change")}</span>
+  ) : saved ? (
+    <span className="text-green-600">Saved · {saved.created} added, {saved.updated} updated</span>
+  ) : (
+    <span>No changes</span>
+  );
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-border-line02 shadow-lg">
       <div className="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100 text-xs font-medium">
-            <GraduationCap size={12} />{classLabel} {groupLabel}
+            <GraduationCap size={12} />{sheet.classGroup}
           </span>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-100 text-xs font-medium">
-            <BookOpen size={12} />{subjectLabel}
+            <BookOpen size={12} />{sheet.subject}
           </span>
-          <span className="text-sm text-text-secondary">{complete}/{students.length} complete</span>
+          <span className="text-sm text-text-secondary">{status}</span>
         </div>
         <div className="flex items-center gap-3">
-          <Button type="button" variant="ghost"   leftIcon={<RotateCcw size={14} />} onClick={onReset}   disabled={saveResults.isPending}>Reset</Button>
-          <Button type="button" variant="primary" leftIcon={<Save size={14} />}      isLoading={saveResults.isPending} onClick={handleSave}>Save Results</Button>
+          <Button type="button" variant="ghost" leftIcon={<RotateCcw size={14} />}
+            onClick={onReset} disabled={isSaving || changedCount === 0}>
+            Reset changes
+          </Button>
+          <Button type="button" variant="primary" leftIcon={<Save size={14} />}
+            isLoading={isSaving} disabled={changedCount === 0 || problemCount > 0} onClick={onSave}>
+            Save Results
+          </Button>
         </div>
       </div>
     </div>

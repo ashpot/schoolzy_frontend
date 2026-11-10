@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Crown } from "lucide-react";
 import { useOutsideClick } from "@/shared/hooks/useOutsideClick";
-import { formatNaira, getPlanTone, getSchoolDetails } from "../../utils/planUtils";
+import { formatNaira, getPlanTone, getSchoolDetails } from "../../../../../../shared/utils/planUtils";
 
 export default function PlanBadge() {
   const [open, setOpen] = useState(false);

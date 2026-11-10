@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createUserMutation } from "./useCreateUser";
 import { apiRequest } from "@/shared/lib/apiClient";
 import type { ClassGroupListItem, UserResponse } from "../types";
@@ -13,7 +13,6 @@ export const useStudentsList = (page = 1, search = "") =>
     queryFn: async () => {
       // class_group now arrives embedded in each user, so no second request is needed
       const raw = await apiRequest<UserResponse[]>(USERS_ENDPOINTS.LIST_BY_ROLE("Student"));
-      // console.log("Fetched students:", raw);
       let mapped = raw.map((u) => toStudent(u));
       if (search) {
         const q = search.toLowerCase();
@@ -33,10 +32,23 @@ export const useStudentsList = (page = 1, search = "") =>
   });
 
 export const useDeleteStudent = () => {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (_id: string) => {
-      // TODO: no confirmed DELETE /users/:id/ endpoint yet — wire once backend confirms
-      throw new Error("Delete is not available yet");
+    mutationFn: async (id: string) => {
+      try {
+        // Confirmed working: DELETE /users/<pk>/ (students are users)
+        return await apiRequest<unknown>(`${USERS_ENDPOINTS.DELETE_USER(id)}`, { method: "DELETE" });
+      } catch (err) {
+        // A successful DELETE returns an empty body; if apiRequest tries to JSON-parse
+        // it, that SyntaxError is a success, not a failure.
+        if (err instanceof SyntaxError) return null;
+        throw err;
+      }
+    },
+    onSuccess: () => {
+      // All role lists share /users/, so refresh them plus class-group student counts
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["class-groups"] });
     },
   });
 };

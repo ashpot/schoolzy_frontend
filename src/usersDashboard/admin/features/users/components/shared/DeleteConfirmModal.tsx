@@ -6,6 +6,7 @@ interface DeleteConfirmModalProps {
   isOpen: boolean;
   itemLabel: string;
   isDeleting?: boolean;
+  error?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -14,6 +15,7 @@ export default function DeleteConfirmModal({
   isOpen,
   itemLabel,
   isDeleting,
+  error,
   onConfirm,
   onCancel,
 }: DeleteConfirmModalProps) {
@@ -26,7 +28,7 @@ export default function DeleteConfirmModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={onCancel}
+            onClick={isDeleting ? undefined : onCancel}
           />
           <motion.div
             variants={modalVariant}
@@ -43,6 +45,11 @@ export default function DeleteConfirmModal({
               This action cannot be undone. This will permanently remove{" "}
               <span className="font-medium text-text-primary">{itemLabel}</span> from the system.
             </p>
+            {error && (
+              <p className="text-xs text-danger text-center bg-danger/10 rounded-lg px-3 py-2 mb-4 break-words">
+                {error}
+              </p>
+            )}
             <div className="flex items-center gap-3">
               <button
                 type="button"
@@ -58,7 +65,7 @@ export default function DeleteConfirmModal({
                 disabled={isDeleting}
                 className="flex-1 py-2.5 rounded-lg bg-danger text-white text-sm font-medium hover:bg-danger/90 transition-colors disabled:opacity-50"
               >
-                {isDeleting ? "Deleting..." : "Delete"}
+                {isDeleting ? "Deleting..." : error ? "Try again" : "Delete"}
               </button>
             </div>
           </motion.div>

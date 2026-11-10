@@ -1,80 +1,92 @@
 import { motion } from "framer-motion";
+import { cn } from "@/shared/utils/cn";
+import { avatarColor, getInitials } from "@/usersDashboard/admin/features/learning/shared/utils/helpers";
 import { rowVariant } from "../../animations/variants";
-import { computeGrade, gradeStyles, gradeRemarks } from "../../utils/gradeUtils";
-import type { Student, ResultScoresMap } from "../../types";
+import { gradeRemarks, gradeStyles } from "../../utils/gradeUtils";
+import type { SheetColumn, SheetRow } from "../../types/uploadResults";
+import { cellError, summarizeRow } from "../../utils/scoreSheetMath";
 
-interface Props {
-  index:         number;
-  student:       Student;
-  row:           ResultScoresMap[string] | undefined;
-  onScoreChange: (id: string, field: "assignment" | "test" | "exam", value: number | "") => void;
+
+interface ResultsScoreRowProps {
+  index: number; // position in the visible list, used for Enter-key navigation
+  row: SheetRow;
+  columns: SheetColumn[];
+  values: Record<string, string> | undefined;
+  original: Record<string, string> | undefined;
+  onChange: (studentId: number, colId: number, value: string) => void;
 }
 
-type Field = "assignment" | "test" | "exam";
-const MAXES: Record<Field, number> = { assignment: 30, test: 20, exam: 50 };
+export default function ResultsScoreRow({ index, row, columns, values, original, onChange }: ResultsScoreRowProps) {
+  const sum = summarizeRow(columns, values);
 
-const AVATAR_COLORS = [
-  "bg-purple-100 text-purple-700", "bg-blue-100 text-blue-700",
-  "bg-green-100 text-green-700",   "bg-amber-100 text-amber-700",
-  "bg-pink-100 text-pink-700",     "bg-indigo-100 text-indigo-700",
-];
-
-const avatarColor = (name: string) => AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length];
-const getInitials = (name: string) => name.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase();
-
-const inputStyles: Record<Field, string> = {
-  assignment: "border-purple-200 focus:ring-purple-200/40 focus:border-purple-400",
-  test:       "border-blue-200   focus:ring-blue-200/40   focus:border-blue-400",
-  exam:       "border-amber-200  focus:ring-amber-200/40  focus:border-amber-400",
-};
-
-export default function ResultsScoreRow({ index, student, row, onScoreChange }: Props) {
-  const a = row?.assignment ?? "";
-  const t = row?.test       ?? "";
-  const e = row?.exam       ?? "";
-
-  const isComplete = typeof a === "number" && typeof t === "number" && typeof e === "number";
-  const total      = isComplete ? (a as number) + (t as number) + (e as number) : null;
-  const grade      = total !== null ? computeGrade(total, 100) : null;
-
-  const handleChange = (field: Field) => (ev: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = ev.target.value;
-    if (raw === "") { onScoreChange(student.id, field, ""); return; }
-    const num = Number(raw);
-    if (!isNaN(num) && num >= 0 && num <= MAXES[field]) onScoreChange(student.id, field, num);
+  const focusBelow = (e: React.KeyboardEvent<HTMLInputElement>, colId: number) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const next = document.querySelector<HTMLInputElement>(`input[data-col="${colId}"][data-row="${index + 1}"]`);
+    next?.focus();
+    next?.select();
   };
 
   return (
-    <motion.tr variants={rowVariant} className="border-b border-border-line02 hover:bg-gray-50/50">
-      <td className="py-3.5 px-4 text-sm text-text-muted">{index + 1}</td>
-      <td className="py-3.5 px-4">
+    <motion.tr variants={rowVariant} className="border-b border-border-line02 last:border-0 hover:bg-gray-50/40 transition-colors">
+      <td className="py-3 px-4 text-sm text-text-muted">{index + 1}</td>
+      <td className="py-3 px-4">
         <div className="flex items-center gap-3">
-          <div className={`w-9 h-9 rounded-full flex-center text-sm font-semibold shrink-0 ${avatarColor(student.name)}`}>{getInitials(student.name)}</div>
-          <div>
-            <p className="text-sm font-medium text-brand-primary">{student.name}</p>
-            <p className="text-xs text-text-muted">{student.studentId}</p>
+          <div className={`w-9 h-9 rounded-full flex-center text-xs font-semibold shrink-0 ${avatarColor(row.name)}`}>
+            {getInitials(row.name)}
           </div>
+          <span className="text-sm font-medium text-text-nav">{row.name}</span>
         </div>
       </td>
-      {(["assignment", "test", "exam"] as Field[]).map((field) => (
-        <td key={field} className="py-3.5 px-4 w-32">
-          <input type="number" min={0} max={MAXES[field]} value={row?.[field] ?? ""} onChange={handleChange(field)} placeholder={`/${MAXES[field]}`}
-            className={`w-full px-3 py-1.5 text-sm text-center rounded-lg bg-bg-input border outline-none focus:ring-2 transition-all ${inputStyles[field]}`} />
-        </td>
-      ))}
-      <td className="py-3.5 px-4 text-center">
-        {total !== null
-          ? <span className="px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-brand-primary">{total}</span>
-          : <span className="text-text-muted text-sm">—</span>}
-      </td>
-      <td className="py-3.5 px-4">
-        {grade ? (
-          <div>
-            <span className={`w-8 h-8 rounded-full flex-center text-xs font-bold ${gradeStyles[grade]}`}>{grade}</span>
-            <p className="text-xs text-text-muted mt-0.5">{gradeRemarks[grade]}</p>
-          </div>
+
+      {columns.map((c) => {
+        const v = values?.[String(c.id)] ?? "";
+        const was = original?.[String(c.id)] ?? "";
+        const err = cellError(v, c, was !== "");
+        return (
+          <td key={c.id} className="py-3 px-4 text-center">
+            <input
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={c.max ?? undefined}
+              step={1}
+              data-row={index}
+              data-col={c.id}
+              value={v}
+              title={err || undefined}
+              onChange={(e) => onChange(row.studentId, c.id, e.target.value)}
+              onKeyDown={(e) => focusBelow(e, c.id)}
+              onWheel={(e) => e.currentTarget.blur()} // scrolling must not change scores
+              className={cn(
+                "w-20 px-2 py-1.5 rounded-lg border text-sm text-center outline-none transition-all focus:ring-2",
+                err
+                  ? "border-danger bg-red-50 focus:ring-red-200"
+                  : v !== was
+                  ? "border-brand-primary bg-blue-50/50 focus:ring-brand-primary/20"
+                  : "border-border-line02 bg-bg-input focus:border-brand-primary focus:ring-brand-primary/20"
+              )}
+            />
+          </td>
+        );
+      })}
+
+      <td className="py-3 px-4 text-center" title={sum.filled < columns.length ? "Not all scores entered yet" : undefined}>
+        {sum.total !== null ? (
+          <span className="text-sm font-semibold text-text-primary">
+            {sum.total}<span className="font-normal text-text-muted">/{sum.max}</span>
+          </span>
         ) : (
-          <span className="w-8 h-8 rounded-full flex-center text-xs text-text-muted bg-gray-50 border border-gray-100">—</span>
+          <span className="text-text-muted">—</span>
+        )}
+      </td>
+      <td className="py-3 px-4">
+        {sum.grade ? (
+          <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${gradeStyles[sum.grade]}`}>
+            {sum.grade}<span className="font-normal">{gradeRemarks[sum.grade]}</span>
+          </span>
+        ) : (
+          <span className="text-text-muted">—</span>
         )}
       </td>
     </motion.tr>

@@ -5,4 +5,5 @@ export const USERS_ENDPOINTS = {
   LIST_ALL: `${API_BASE_URL}/users/`,
   LIST_BY_ROLE: (role: string) => `${API_BASE_URL}/users/?role=${role}`,
   LIST_CLASS_GROUPS: `${API_BASE_URL}/sections/class-groups/`,
+  DELETE_USER: (id: string) => `${API_BASE_URL}/users/${id}/`,
 } as const;

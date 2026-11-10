@@ -1,34 +1,36 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ClipboardList, Users, RotateCcw } from "lucide-react";
-import { resultSetupSchema, type ResultSetupValues } from "../../schemas/uploadResults";
-import { classOptions, classGroupOptions, subjectOptions } from "../../data/mockData";
-import { useLoadResultStudents } from "../../hooks/useUploadResults";
-import type { Student } from "../../types";
+import { ClipboardList, Lock } from "lucide-react";
 import FormSelect from "@/shared/ui/FormSelect";
-import Button     from "@/shared/ui/Button";
-import FilterPill from "../shared/FilterPill";
+import SubmitButton from "@/shared/ui/SubmitButton";
+import Button from "@/shared/ui/Button";
+import { resultSetupSchema, type ResultSetupValues } from "../../schemas/uploadResults";
+import { useResultSetupOptions } from "../../hooks/useUploadResults";
 
-interface Props {
-  isLoaded:     boolean;
-  activeSetup:  ResultSetupValues | null;
-  classLabel:   string;
-  groupLabel:   string;
-  subjectLabel: string;
-  onLoad:       (setup: ResultSetupValues, students: Student[]) => void;
-  onClear:      () => void;
+interface ResultSetupProps {
+  locked: boolean;
+  isLoading: boolean;
+  error?: string;
+  onLoad: (values: ResultSetupValues) => void;
+  onChangeSetup: () => void;
 }
 
-export default function ResultSetup({ isLoaded, activeSetup, classLabel, groupLabel, subjectLabel, onLoad, onClear }: Props) {
-  const loadStudents = useLoadResultStudents();
+export default function ResultSetup({ locked, isLoading, error, onLoad, onChangeSetup }: ResultSetupProps) {
+  const { register, handleSubmit, watch, setValue, getValues, formState: { errors } } =
+    useForm<ResultSetupValues>({
+      resolver: zodResolver(resultSetupSchema),
+      defaultValues: { term: "", classGroup: "", subject: "" },
+    });
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ResultSetupValues>({
-    resolver: zodResolver(resultSetupSchema),
-    defaultValues: { class: "", classGroup: "", subject: "" },
-  });
+  const classGroup = watch("classGroup");
+  const opts = useResultSetupOptions(classGroup);
+  const busy = isLoading || locked || opts.loading;
 
-  const onSubmit    = (v: ResultSetupValues) => loadStudents.mutate(v, { onSuccess: (s) => onLoad(v, s) });
-  const handleClear = () => { reset(); onClear(); };
+  // Pre-select the active term (sorted first) once the options arrive
+  useEffect(() => {
+    if (opts.termOptions[0] && !getValues("term")) setValue("term", opts.termOptions[0].value);
+  }, [opts.termOptions.length]);
 
   return (
     <div className="bg-white rounded-2xl card-shadow p-6">
@@ -39,32 +41,55 @@ export default function ResultSetup({ isLoaded, activeSetup, classLabel, groupLa
         <h2 className="section-title">Result Setup</h2>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+      <form onSubmit={handleSubmit(onLoad)} noValidate className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <FormSelect label="Class *"       error={errors.class?.message}      isLoading={loadStudents.isPending} options={classOptions}      placeholder="Select class"   {...register("class")}      />
-          <FormSelect label="Class Group *" error={errors.classGroup?.message} isLoading={loadStudents.isPending} options={classGroupOptions} placeholder="Select group"   {...register("classGroup")} />
-          <FormSelect label="Subject *"     error={errors.subject?.message}    isLoading={loadStudents.isPending} options={subjectOptions}    placeholder="Select subject" {...register("subject")}    />
+          <FormSelect
+            label="Term *"
+            placeholder="Select term"
+            options={opts.termOptions}
+            error={errors.term?.message}
+            isLoading={busy}
+            {...register("term")}
+          />
+          <FormSelect
+            label="Class Group *"
+            placeholder="Select class group"
+            options={opts.groupOptions}
+            error={errors.classGroup?.message}
+            isLoading={busy}
+            {...register("classGroup", { onChange: () => setValue("subject", "") })}
+          />
+          <FormSelect
+            label="Subject *"
+            placeholder={classGroup ? "Select subject" : "Select a class group first"}
+            options={opts.subjectOptions}
+            error={errors.subject?.message}
+            isLoading={busy}
+            {...register("subject")}
+          />
         </div>
 
         <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-gray-50 border border-border-line02 text-xs text-text-secondary">
           <span className="mt-0.5 shrink-0">ⓘ</span>
           <span>
-            Scores are entered as:
-            <strong className="text-purple-600">Assignment /30</strong> + <strong className="text-blue-600">Test /20</strong> + <strong className="text-amber-600">Exam /50</strong> = <strong className="text-text-primary">Total /100</strong>. Totals and grades are auto-calculated. Use <strong className="text-text-primary">Enter</strong> or <strong className="text-text-primary">Tab</strong> to navigate quickly.
+            Each score is out of its assessment's maximum and counts toward the term total by its percentage.
+            Totals and grades are previews. Use <strong className="text-text-primary">Enter</strong> to move down a
+            column and <strong className="text-text-primary">Tab</strong> to move across.
           </span>
         </div>
 
-        {isLoaded && activeSetup && (
-          <div className="flex flex-wrap gap-2">
-            <FilterPill label={`${classLabel} ${groupLabel}`} color="blue"   />
-            <FilterPill label={subjectLabel}                  color="purple" />
-          </div>
-        )}
+        {error && <p className="text-xs text-danger">{error}</p>}
 
-        <div className="flex items-center gap-3">
-          <Button type="submit" variant="primary" leftIcon={<Users size={16} />} isLoading={loadStudents.isPending}>Load Students</Button>
-          {isLoaded && <Button type="button" variant="ghost" leftIcon={<RotateCcw size={14} />} onClick={handleClear}>Clear All</Button>}
-        </div>
+        {locked ? (
+          <div className="flex items-center gap-3 flex-wrap">
+            <Button type="button" variant="outline" size="md" leftIcon={<Lock size={14} />} onClick={onChangeSetup}>
+              Change setup
+            </Button>
+            <span className="text-xs text-text-muted">Setup is locked while you enter scores</span>
+          </div>
+        ) : (
+          <SubmitButton label="Load Scoresheet" isLoading={isLoading} className="sm:w-56" />
+        )}
       </form>
     </div>
   );

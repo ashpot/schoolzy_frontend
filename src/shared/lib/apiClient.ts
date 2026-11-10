@@ -1,4 +1,5 @@
 import { getTenant } from "@/shared/utils/tenant";
+import { clearSession, getToken } from "../auth/authStorage";
 
 interface RequestOptions extends RequestInit {
   skipAuth?: boolean;
@@ -46,7 +47,15 @@ export async function apiRequest<T>(url: string, options: RequestOptions = {}): 
   };
 
   const res = await fetch(url, { ...rest, body, headers: finalHeaders });
-
+  // console.log("apiRequest response:", url, { ...rest, body, headers: finalHeaders });
+  if (res.status === 401 && getToken()) {
+  clearSession();
+  window.location.replace("/auth/signin?expired=1");
+  throw new Error("Your session has expired. Please sign in again.");
+}
+if (options.body instanceof FormData) {
+  console.log("FormData sent:", Object.fromEntries(options.body.entries()));
+}
   if (res.status === 401) {
     localStorage.removeItem("schoolzy_token");
     localStorage.removeItem("schoolzy_user");
@@ -57,6 +66,6 @@ export async function apiRequest<T>(url: string, options: RequestOptions = {}): 
     const errorBody = await res.json().catch(() => ({}));
     throw new ApiError(extractErrorMessage(errorBody), res.status);
   }
-
+  // console.log("apiRequest response:", res.body);
   return res.json();
 }

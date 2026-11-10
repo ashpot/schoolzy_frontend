@@ -8,10 +8,9 @@ import type {
   Subject, SubjectPayload, SubjectResponse,
   AssessmentType, AssessmentTypePayload, AssessmentTypeResponse,
 } from "../types";
-import type { GradeFormValues, SubjectFormValues, AssessmentTypeFormValues, ResultCommentFormValues, PsychomotiveFormValues, AttendanceFormValues } from "../schemas";
+import type { GradeFormValues, SubjectFormValues, AssessmentTypeFormValues, AttendanceFormValues } from "../schemas";
 import { apiRequest } from "@/shared/lib/apiClient";
 import { ACADEMICS_ENDPOINTS } from "../api";
-import type { ClassResultFilters, ClassResultResponse } from "../types/classResult";
 import type { AssignSubjectsPayload, AssignSubjectsResponse } from "../types";
 import { useClassGroupsList } from "@/usersDashboard/admin/features/sections/hooks/useSections";
 import { useTeacherOptionsList } from "@/usersDashboard/admin/features/sections/hooks/useSections";
@@ -315,28 +314,8 @@ export function useDeleteGrade() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// RESULTS / PROMOTION / SCORES / ATTENDANCE (unchanged, still mock)
+//  PROMOTION / SCORES / ATTENDANCE (unchanged, still mock)
 // ─────────────────────────────────────────────────────────────────────────────
-export const useLoadStudentResult = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: { studentName: string; term: string; session: string }) => {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      return { success: true, data: payload };
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["student-results"] }),
-  });
-};
-
-export const useClassResult = (filters: ClassResultFilters | null) =>
-  useQuery({
-    queryKey: ["class-results", filters?.classGroupId, filters?.termId],
-    enabled: filters !== null,
-    queryFn: () =>
-      apiRequest<ClassResultResponse>(
-        ACADEMICS_ENDPOINTS.CLASS_RESULT(filters!.classGroupId, filters!.termId)
-      ),
-  });
 
 export const usePromoteClass = () => {
   const queryClient = useQueryClient();
@@ -346,17 +325,6 @@ export const usePromoteClass = () => {
       return { success: true, data: payload };
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["promote-class"] }),
-  });
-};
-
-export const useManageScore = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: { subject: string; assessment_type: string; term: string; session: string; class: string; class_group: string }) => {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      return { success: true, data: payload };
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["manage-score"] }),
   });
 };
 
@@ -385,56 +353,6 @@ export const useSaveAttendance = () => {
   });
 };
 
-export const useSavePsychomotive = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: PsychomotiveFormValues) => {
-      // TODO: Replace with actual API call e.g. api.post(`/academics/psychomotive-scores/`, payload)
-      await new Promise((r) => setTimeout(r, 800));
-      return { success: true, data: payload };
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["student-result"] });
-    },
-  });
-};
-
-export const useSaveResultComment = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: ResultCommentFormValues) => {
-      // TODO: Replace with actual API call e.g. api.post(`/academics/result-comments/`, payload)
-      await new Promise((r) => setTimeout(r, 800));
-      return { success: true, data: payload };
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["student-result"] });
-    },
-  });
-};
-export const useSaveScore = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: { id: string; score: number }) => {
-      // TODO: Replace with actual API call e.g. api.post(`/academics/scores/${payload.id}/`, payload)
-      await new Promise((r) => setTimeout(r, 500));
-      return { success: true, data: payload };
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["manage-scores"] }),
-  });
-};
-
-export const useSaveAllScores = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: { id: string; score: number }[]) => {
-      // TODO: Replace with actual API call e.g. api.post(`/academics/scores/bulk-save/`, payload)
-      await new Promise((r) => setTimeout(r, 800));
-      return { success: true, data: payload };
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["manage-scores"] }),
-  });
-};
 
 export const usePromoteStudent = () => {
   const queryClient = useQueryClient();
@@ -471,5 +389,3 @@ export const useUndoPromotion = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["promote-students"] }),
   });
 };
-
-
