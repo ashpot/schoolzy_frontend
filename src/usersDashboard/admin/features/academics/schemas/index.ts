@@ -36,15 +36,6 @@ export const attendanceSchema = z.object({
 });
 export type AttendanceFormValues = z.infer<typeof attendanceSchema>;
 
-// Result-entry scores (unchanged)
-export const psychomotiveSchema = z.object({
-  scores: z.array(z.object({
-    skill: z.string(),
-    score: z.number().min(1).max(5),
-  })),
-});
-export type PsychomotiveFormValues = z.infer<typeof psychomotiveSchema>;
-
 // Add-metric form (title + section id)
 export const psychomotiveMetricSchema = z.object({
   title:   z.string().min(2, "Title is required"),
@@ -52,14 +43,40 @@ export const psychomotiveMetricSchema = z.object({
 });
 export type PsychomotiveMetricFormValues = z.infer<typeof psychomotiveMetricSchema>;
 
-export const resultCommentSchema = z.object({
-  classTeacherComment: z.string().optional(),
-  principalComment: z.string().optional(),
-});
-export type ResultCommentFormValues = z.infer<typeof resultCommentSchema>;
-
 export const attendanceSummaryFilterSchema = z.object({
   classGroup: z.string().min(1, "Please select a class group"),
   term: z.string().min(1, "Please select a term"),
 });
 export type AttendanceSummaryFilterValues = z.infer<typeof attendanceSummaryFilterSchema>;
+
+// Class is implied by the class group and session by the term
+export const manageScoreFilterSchema = z.object({
+  classGroup: z.string().min(1, "Please select a class group"),
+  subject: z.string().min(1, "Please select a subject"),
+  assessmentType: z.string().min(1, "Please select an assessment type"),
+  term: z.string().min(1, "Please select a term"),
+});
+export type ManageScoreFilterValues = z.infer<typeof manageScoreFilterSchema>;
+export const studentResultSearchSchema = z.object({
+  studentName: z.string().min(1, "Enter a student name"),
+  studentId: z.string().min(1, "Pick a student from the suggestions"),
+  sessionId: z.string().min(1, "Please select a session"),
+  termId: z.string().min(1, "Please select a term"),
+});
+export type StudentResultSearchValues = z.infer<typeof studentResultSearchSchema>;
+
+export const psychomotiveSchema2 = z.object({
+  scores: z.array(
+    z.object({
+      skill: z.string(),
+      score: z.number().min(0).max(5),
+    })
+  ),
+});
+export type PsychomotiveFormValues2 = z.infer<typeof psychomotiveSchema2>;
+
+export const resultCommentSchema = z.object({
+  classTeacherComment: z.string().max(500, "Keep it under 500 characters"),
+  principalComment: z.string().max(500, "Keep it under 500 characters"),
+});
+export type ResultCommentFormValues = z.infer<typeof resultCommentSchema>;

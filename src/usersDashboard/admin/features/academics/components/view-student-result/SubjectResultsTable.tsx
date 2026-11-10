@@ -1,23 +1,10 @@
 import React from "react";
-import { gradeStyles } from "@/shared/utils/gradeUtils";
-import type { StudentResultData } from "../../types/studentResult";
+import type { StudentResult } from "../../types/studentResult";
+import { fmt, gradeBadge, ordinal } from "../../utils/resultFormat";
 
-interface SubjectResultsTableProps {
-  result: StudentResultData;
-}
-
-const SubjectResultsTable: React.FC<SubjectResultsTableProps> = ({ result }) => {
-  const subjects = result?.subjects ?? [];
-
-  const totals = subjects.reduce(
-    (acc, s) => ({
-      assignment: acc.assignment + s.assignment,
-      test: acc.test + s.test,
-      exam: acc.exam + s.exam,
-      total: acc.total + s.total,
-    }),
-    { assignment: 0, test: 0, exam: 0, total: 0 }
-  );
+const SubjectResultsTable: React.FC<{ result: StudentResult }> = ({ result }) => {
+  const { subjects, assessments, summary } = result;
+  const th = "px-6 py-3 font-medium uppercase whitespace-nowrap";
 
   return (
     <div className="bg-white rounded-2xl card-shadow overflow-hidden">
@@ -27,46 +14,52 @@ const SubjectResultsTable: React.FC<SubjectResultsTableProps> = ({ result }) => 
           {subjects.length} Subjects
         </span>
       </div>
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="text-left text-text-muted text-xs">
-            <th className="px-6 py-3 font-medium">#</th>
-            <th className="px-6 py-3 font-medium">SUBJECT</th>
-            <th className="px-6 py-3 font-medium">ASSIGNMENT</th>
-            <th className="px-6 py-3 font-medium">TEST</th>
-            <th className="px-6 py-3 font-medium">EXAM</th>
-            <th className="px-6 py-3 font-medium">TOTAL</th>
-            <th className="px-6 py-3 font-medium">GRADE</th>
-            <th className="px-6 py-3 font-medium">SUBJECT POS.</th>
-          </tr>
-        </thead>
-        <tbody>
-          {subjects.map((s, i) => (
-            <tr key={s.id} className="border-t border-border-line02">
-              <td className="px-6 py-3.5 text-text-muted">{i + 1}</td>
-              <td className="px-6 py-3.5 font-medium text-text-primary">{s.subject}</td>
-              <td className="px-6 py-3.5 text-brand-primary">{s.assignment}<span className="text-text-muted">/{s.assignmentMax}</span></td>
-              <td className="px-6 py-3.5 text-success">{s.test}<span className="text-text-muted">/{s.testMax}</span></td>
-              <td className="px-6 py-3.5 text-brand-primary">{s.exam}<span className="text-text-muted">/{s.examMax}</span></td>
-              <td className="px-6 py-3.5 font-semibold text-text-primary">{s.total}<span className="text-text-muted font-normal">/{s.totalMax}</span></td>
-              <td className="px-6 py-3.5">
-                <span className={`px-2 py-0.5 rounded-md text-xs font-semibold ${gradeStyles[s.grade]}`}>{s.grade}{s.total >= 75 ? "1" : "4"}</span>
-              </td>
-              <td className="px-6 py-3.5 text-text-muted">{s.subjectPosition}</td>
-            </tr>
-          ))}
-          {subjects.length > 0 && (
-            <tr className="border-t-2 border-border-line02 bg-bg-input font-semibold">
-              <td className="px-6 py-3.5" colSpan={2}>Summary</td>
-              <td className="px-6 py-3.5">{totals.assignment}<span className="text-text-muted font-normal">/{subjects.length * 10}</span></td>
-              <td className="px-6 py-3.5">{totals.test}<span className="text-text-muted font-normal">/{subjects.length * 20}</span></td>
-              <td className="px-6 py-3.5">{totals.exam}<span className="text-text-muted font-normal">/{subjects.length * 70}</span></td>
-              <td className="px-6 py-3.5">{totals.total}<span className="text-text-muted font-normal">/{subjects.length * 100}</span></td>
-              <td className="px-6 py-3.5 text-brand-primary" colSpan={2}>Avg: {result.averageScore}% · {result.overallGrade}2</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+
+      {subjects.length === 0 ? (
+        <p className="px-6 py-12 text-center text-sm text-text-muted">No scores recorded for this term yet.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-max">
+            <thead>
+              <tr className="text-left text-text-muted text-xs">
+                <th className={th}>#</th>
+                <th className={th}>Subject</th>
+                <th className={th}>Teacher</th>
+                {assessments.map((a) => (
+                  <th key={a.id} className={th}>{a.name} <span className="normal-case">/{a.percentage}</span></th>
+                ))}
+                <th className={th}>Total</th>
+                <th className={th}>Grade</th>
+                <th className={th}>Position</th>
+              </tr>
+            </thead>
+            <tbody>
+              {subjects.map((s, i) => (
+                <tr key={s.key} className="border-t border-border-line02">
+                  <td className="px-6 py-3.5 text-text-muted">{i + 1}</td>
+                  <td className="px-6 py-3.5 font-medium text-text-primary capitalize">{s.name}</td>
+                  <td className="px-6 py-3.5 text-text-secondary capitalize">{s.teacher || "—"}</td>
+                  {assessments.map((a) => (
+                    <td key={a.id} className="px-6 py-3.5 text-brand-primary">{fmt(s.scores[a.code])}</td>
+                  ))}
+                  <td className="px-6 py-3.5 font-semibold text-text-primary">{fmt(s.total)}</td>
+                  <td className="px-6 py-3.5">
+                    <span className={`px-2 py-0.5 rounded-md text-xs font-semibold ${gradeBadge(s.grade)}`}>{s.grade || "—"}</span>
+                  </td>
+                  <td className="px-6 py-3.5 text-text-muted">{ordinal(s.position)}</td>
+                </tr>
+              ))}
+              <tr className="border-t-2 border-border-line02 bg-bg-input font-semibold">
+                <td className="px-6 py-3.5" colSpan={3 + assessments.length}>Summary</td>
+                <td className="px-6 py-3.5">{fmt(summary.total)}</td>
+                <td className="px-6 py-3.5 text-brand-primary" colSpan={2}>
+                  Avg: {summary.average === null ? "—" : `${fmt(summary.average)}%`} · {summary.grade || "—"}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };

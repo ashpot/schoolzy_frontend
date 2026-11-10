@@ -1,21 +1,25 @@
 import React from "react";
-import Button from "@/shared/ui/Button";
 
-interface ResultActionsBarProps {
-  onOpenAttendance: () => void;
+interface Props {
   onOpenComment: () => void;
   onOpenPsychomotive: () => void;
   onOpenPrintable: () => void;
 }
 
-const ResultActionsBar: React.FC<ResultActionsBarProps> = ({
-  onOpenAttendance, onOpenComment, onOpenPsychomotive, onOpenPrintable,
-}) => (
+const outline =
+  "px-4 py-2.5 rounded-lg border border-border-line02 bg-white text-sm font-medium text-text-secondary hover:bg-bg-soft transition-colors";
+
+const ResultActionsBar: React.FC<Props> = ({ onOpenComment, onOpenPsychomotive, onOpenPrintable }) => (
   <div className="flex items-center gap-3 flex-wrap">
-    <Button variant="outline" onClick={onOpenPsychomotive}>Add Psychomotive Evaluation Score</Button>
-    <Button variant="outline" onClick={onOpenComment}>Add Result Comment</Button>
-    <Button variant="outline" onClick={onOpenAttendance}>Add attendance Summary</Button>
-    <Button variant="primary" className="ml-auto" onClick={onOpenPrintable}>View Printable Format</Button>
+    <button type="button" className={outline} onClick={onOpenPsychomotive}>Add Psychomotive Evaluation Score</button>
+    <button type="button" className={outline} onClick={onOpenComment}>Add Result Comment</button>
+    <button
+      type="button"
+      onClick={onOpenPrintable}
+      className="ml-auto px-4 py-2.5 rounded-lg bg-brand-primary text-white text-sm font-medium hover:bg-brand-hover transition-colors"
+    >
+      View Printable Format
+    </button>
   </div>
 );
 

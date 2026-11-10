@@ -88,3 +88,36 @@
 .select-field {
   @apply px-3 py-2.5 text-sm rounded-xl border border-border-line02 bg-bg-input focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 min-w-[160px];
 }
+
+@media print {
+  @page { size: A4; margin: 12mm; }
+
+  /* Hide the whole app; only the portal'd printable sheet survives */
+  body > *:not(.print-root) { display: none !important; }
+
+  .print-root {
+    position: static !important;
+    inset: auto !important;
+    display: block !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+  .print-root .print-hide { display: none !important; }
+  .print-root .print-sheet {
+    width: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    transform: none !important;
+  }
+  .print-avoid-break, .print-root tr { break-inside: avoid; }
+  .print-root thead { display: table-header-group; }
+  .print-root * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

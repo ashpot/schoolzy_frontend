@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Users, Loader2, AlertCircle } from "lucide-react";
-import { useClassResult } from "../hooks/useAcademics";
+import { useClassResult } from "../hooks/useClassResult";
 import type { ClassResultFilters } from "../types/classResult";
 import PageHeader from "@/shared/ui/PageHeader";
-import Button from "@/shared/ui/Button";
 import ClassResultFilter from "../components/view-class-result/ClassResultFilter";
 import ClassResultStatCards from "../components/view-class-result/ClassResultStatCards";
 import ClassResultTable from "../components/view-class-result/ClassResultTable";
+import ClassPrintableModal from "../components/view-class-result/ClassPrintableModal";
 
 const ViewClassResultPage: React.FC = () => {
   const [filters, setFilters] = useState<ClassResultFilters | null>(null);
+  const [printOpen, setPrintOpen] = useState(false);
   const { data, isFetching, isError, error } = useClassResult(filters);
 
   return (
@@ -31,7 +32,7 @@ const ViewClassResultPage: React.FC = () => {
       )}
 
       {isError && !isFetching && (
-        <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 text-danger text-sm">
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 text-danger text-sm mt-6">
           <AlertCircle size={16} />
           {error instanceof Error ? error.message : "Failed to load class result."}
         </div>
@@ -39,10 +40,8 @@ const ViewClassResultPage: React.FC = () => {
 
       {!data && !isFetching && !isError && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl card-shadow p-16 flex flex-col items-center justify-center text-center"
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          className="bg-white rounded-2xl card-shadow p-16 flex flex-col items-center justify-center text-center mt-6"
         >
           <div className="w-20 h-20 rounded-full bg-blue-50 flex-center mb-4">
             <Users className="w-9 h-9 text-brand-primary" />
@@ -57,19 +56,18 @@ const ViewClassResultPage: React.FC = () => {
 
       {data && !isFetching && (
         <div className="flex flex-col gap-6 mt-6">
-          <ClassResultStatCards result={data} />
-          <ClassResultTable result={data} />
-          <div className="flex justify-end">
-            <Button
-              variant="primary"
-              onClick={() => {
-                // TODO: Implement printable class result format (UI not provided yet)
-                console.log("View printable format for", data.class.name);
-              }}
+          <ClassResultStatCards sheet={data} />
+          <ClassResultTable sheet={data} />
+          <div className="bg-white rounded-2xl card-shadow p-6 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setPrintOpen(true)}
+              className="px-6 py-3 rounded-lg bg-brand-primary text-white text-sm font-medium hover:bg-brand-hover transition-colors"
             >
               View Printable Format
-            </Button>
+            </button>
           </div>
+          <ClassPrintableModal isOpen={printOpen} sheet={data} onClose={() => setPrintOpen(false)} />
         </div>
       )}
     </div>

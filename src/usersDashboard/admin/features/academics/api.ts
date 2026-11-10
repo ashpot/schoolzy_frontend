@@ -18,4 +18,13 @@ export const ACADEMICS_ENDPOINTS = {
   LIST_PSYCHOMOTIVE: `${API_BASE_URL}/academics/psychomotive-evaluation/`,
   ATTENDANCE_ANALYTICS: (classGroupId: string, termId: string) =>
     `${API_BASE_URL}/academics/attendance/analytics/?class_group_id=${classGroupId}&term_id=${termId}`,
+  SCORES: (q: { termId: string; subjectId: string; assessmentTypeId: string; classGroupId: string }) =>
+    `${API_BASE_URL}/results/scores/?term=${q.termId}&subject=${q.subjectId}&assessment_type=${q.assessmentTypeId}&class_group=${q.classGroupId}`,
+
+  // View Student Result
+  LIST_USERS: `${API_BASE_URL}/users/`,
+  STUDENT_RESULT: (studentId: string, termId: string) =>
+    `${API_BASE_URL}/results/students/${studentId}/results/?term=${termId}`,
+  SCHOOL_TENANT: `${API_BASE_URL}/public/tenant/`,
+  SCHOOL_SETTINGS: `${API_BASE_URL}/public/settings/`,
 } as const;

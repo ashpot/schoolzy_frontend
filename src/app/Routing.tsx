@@ -8,7 +8,7 @@ import { AdminsPage, ParentsPage, StudentsPage, TeachersPage } from "@/usersDash
 import { AssessmentTypesPage, AttendanceSummariesPage, GradePage, ManageScoresPage, PromoteStudentsPage, PsychomotivePage, SubjectsPage, SubjectTeachersPage, ViewClassResultPage, ViewStudentResultPage } from "@/usersDashboard/admin/features/academics";
 import { AttendancePage, LessonNotesPage } from "@/usersDashboard/admin/features/learning";
 import { QuestionsPage, ResultsPage, ScheduledTestsPage, TestsPage } from "@/usersDashboard/admin/features/tests";
-import { UploadAssessmentPage, UploadOmittedPage, UploadResultsPage, UploadWeeklyPage, ViewScoresPage } from "@/usersDashboard/admin/features/results";
+import { /*UploadAssessmentPage, UploadOmittedPage,*/ UploadResultsPage, UploadWeeklyPage, ViewScoresPage } from "@/usersDashboard/admin/features/results";
 import { ClassAvgDenominatorPage, ClassesPage, ClassGroupsPage, SectionsPage } from "@/usersDashboard/admin/features/sections";
 import AssignFormTeacherPage from "@/usersDashboard/admin/features/sections/pages/AssignFormTeacherPage";
 import { AssignFeesPage, ExpensesPage, FeesPage, FeeTypePage, PaidListPage, PaymentsPage } from "@/usersDashboard/admin/features/finances";
@@ -119,8 +119,8 @@ const AppRouter = () => {
           {/* Results */}
           <Route path={`/${ADMIN_ROOT_ROUTE}/results`}>
             <Route index element={<UploadResultsPage />} />
-            <Route path="upload-assessment" element={<UploadAssessmentPage />} />
-            <Route path="upload-omitted" element={<UploadOmittedPage />} />
+            {/* <Route path="upload-assessment" element={<UploadAssessmentPage />} /> */}
+            {/* <Route path="upload-omitted" element={<UploadOmittedPage />} /> */}
             <Route path="upload-weekly" element={<UploadWeeklyPage />} />
             <Route path="upload" element={<UploadResultsPage />} />
             <Route path="view-scores" element={<ViewScoresPage />} />

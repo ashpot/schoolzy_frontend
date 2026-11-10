@@ -1,222 +1,71 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { FileEdit } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { slideFromLeft } from "../animations/variants";
-import { useManageScore, useSaveAllScores, useSaveScore } from "../hooks/useAcademics";
+import { AlertCircle, FileEdit, Info, Loader2, SearchX } from "lucide-react";
 import PageHeader from "@/shared/ui/PageHeader";
-import FormSelect from "@/shared/ui/FormSelect";
-import SubmitButton from "@/shared/ui/SubmitButton";
-import FormHeader from "../components/shared/FormHeader";
-import { mockScoreRows } from "../data/mockData";
 import ActiveFiltersBar from "../components/manage-scores/ActiveFiltersBar";
-import type { ScoreRow } from "../types/manageScores";
+import ScoreFilterForm from "../components/manage-scores/ScoreFilterForm";
 import ScoresTable from "../components/manage-scores/ScoresTable";
-
-const schema = z.object({
-  class: z.string().min(1, "Please select a class"),
-  class_group: z.string().min(1, "Please select a class group"),
-  subject: z.string().min(1, "Please select a subject"),
-  assessment_type: z.string().min(1, "Please select an assessment type"),
-  term: z.string().min(1, "Please select a term"),
-  session: z.string().min(1, "Please select a session"),
-});
-type FormValues = z.infer<typeof schema>;
+import SummaryPlaceholder from "../components/attendance-summaries/SummaryPlaceholder";
+import { useScoresList } from "../hooks/useManageScore";
+import { useScoreEditor } from "../hooks/useScoreEditor";
+import type { ScoreFilters } from "../types/manageScore";
 
 const ManageScoresPage: React.FC = () => {
-  const loadMutation = useManageScore();
-  const [scoreRows, setScoreRows] = useState<ScoreRow[] | null>(null);
-  const saveScoreMutation = useSaveScore();
-  const saveAllMutation = useSaveAllScores();
+  const [filters, setFilters] = useState<ScoreFilters | null>(null);
+  const query = useScoresList(filters);
+  const editor = useScoreEditor(query.data, filters?.max ?? null);
 
+  const handleLoad = (next: ScoreFilters) => {
+    const same =
+      filters?.classGroupId === next.classGroupId && filters?.termId === next.termId &&
+      filters?.subjectId === next.subjectId && filters?.assessmentTypeId === next.assessmentTypeId;
+    if (same) query.refetch();
+    else setFilters(next);
+  };
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { class: "", class_group: "", subject: "", assessment_type: "", term: "", session: "" },
-  });
-
-  const onSubmit = (values: FormValues) => {
-      loadMutation.mutate(values, {
-        onSuccess: () => {
-          setScoreRows(mockScoreRows);
-        },
-      });
-    };
-    const handleSaveRow = (id: string, score: number) => {
-  saveScoreMutation.mutate({ id, score }, {
-    onSuccess: () => {
-      setScoreRows((prev) => prev?.map((r) => (r.id === id ? { ...r, score, status: "saved" } : r)) ?? null);
-    },
-  });
-};
-
-const handleSaveAll = () => {
-  if (!scoreRows) return;
-  const payload = scoreRows.filter((r) => r.score !== null).map((r) => ({ id: r.id, score: r.score! }));
-  saveAllMutation.mutate(payload, {
-    onSuccess: () => {
-      setScoreRows((prev) => prev?.map((r) => (r.score !== null ? { ...r, status: "saved" as const } : r)) ?? null);
-    },
-  });
-};
-
-  const termOptions = [
-    { value: "First Term", label: "First Term" },
-    { value: "Second Term", label: "Second Term" },
-    { value: "Third Term", label: "Third Term" },
-  ];
-
-  const sessionOptions = [
-    { value: "2025/2026", label: "2025/2026" },
-    { value: "2024/2025", label: "2024/2025" },
-    { value: "2023/2024", label: "2023/2024" },
-  ];
+  const renderBody = () => {
+    if (!filters) {
+      return (
+        <SummaryPlaceholder icon={<FileEdit className="w-9 h-9 text-brand-primary" />} title="No scores loaded yet"
+          text={<>Fill in the filters above then click <span className="font-semibold text-text-nav">Load Scores</span> to get started</>} />
+      );
+    }
+    if (query.isLoading) {
+      return <SummaryPlaceholder icon={<Loader2 className="w-9 h-9 text-brand-primary animate-spin" />} title="Loading scores..." text="Fetching uploaded scores" />;
+    }
+    if (query.error) {
+      return <SummaryPlaceholder icon={<AlertCircle className="w-9 h-9 text-danger" />} title="Couldn't load scores" text={query.error.message} />;
+    }
+    if (editor.rows.length === 0) {
+      return (
+        <SummaryPlaceholder icon={<SearchX className="w-9 h-9 text-brand-primary" />} title="No scores found"
+          text="No scores have been uploaded for these filters yet. Use Upload Results to add them." />
+      );
+    }
+    return (
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-6 mt-6">
+        <ActiveFiltersBar filters={filters.labels.map((label) => ({ label }))} />
+        {/* TODO: remove this notice once the score update endpoint is wired */}
+        <div className="flex items-start gap-2 px-4 py-3 rounded-xl bg-amber-50 border border-amber-100 text-sm text-amber-700">
+          <Info className="w-4 h-4 mt-0.5 shrink-0" />
+          Score editing isn't connected to the server yet. Changes are kept on this page only and are lost when you leave or reload.
+        </div>
+        <ScoresTable editor={editor} max={filters.max} />
+      </motion.div>
+    );
+  };
 
   return (
     <div>
       <PageHeader
         title="Manage Scores"
-        subtitle="Load student scores by class, class group, subject and assessment type."
+        subtitle="View scores already uploaded, filtered by class group, subject, assessment type and term."
         showAdd={false}
       />
-
-      {/* Filter Card */}
-      <motion.div
-        variants={slideFromLeft}
-        initial="hidden"
-        animate="show"
-        className="bg-white rounded-2xl card-shadow mb-6"
-      >
-        <FormHeader
-            title="Search Student Result"
-            icon={<FileEdit className="w-4 h-4 text-brand-primary" />}
-
-          />
-        <form onSubmit={handleSubmit(onSubmit)} noValidate className="p-6">
-          <div className="grid md:grid-cols-6 gap-4 mb-5">
-            <div>
-              <FormSelect
-                label="Class"
-                placeholder="Select class"
-                options={sessionOptions}
-                isLoading={loadMutation.isPending}
-                error={errors.class?.message}
-                {...register("class")}
-              />
-            </div>
-
-            <div>
-              <FormSelect
-                label="Class Group"
-                placeholder="Select class group"
-                options={sessionOptions}
-                isLoading={loadMutation.isPending}
-                error={errors.class_group?.message}
-                {...register("class_group")}
-              />
-            </div>
-
-            <div>
-              <FormSelect
-                label="Subject"
-                placeholder="Select subject"
-                options={sessionOptions}
-                isLoading={loadMutation.isPending}
-                error={errors.subject?.message}
-                {...register("subject")}
-              />
-            </div>
-
-            <div>
-              <FormSelect
-                label="Assessment Type"
-                placeholder="Select assessment"
-                options={sessionOptions}
-                isLoading={loadMutation.isPending}
-                error={errors.assessment_type?.message}
-                {...register("assessment_type")}
-              />
-            </div>
-
-            <div>
-              <FormSelect
-                label="Session"
-                placeholder="Select session"
-                options={sessionOptions}
-                isLoading={loadMutation.isPending}
-                error={errors.session?.message}
-                {...register("session")}
-              />
-            </div>
-
-            <div>
-              <FormSelect
-                label="Term"
-                placeholder="Select term"
-                options={termOptions}
-                isLoading={loadMutation.isPending}
-                error={errors.term?.message}
-                {...register("term")}
-              />
-
-            </div>
-
-
-          </div>
-
-          {/* Load Button */}
-          <SubmitButton
-            label="Load Search Results"
-            isLoading={loadMutation.isPending}
-            className="w-50"
-          />
-        </form>
-      </motion.div>
-
-      {/* Empty State */}
-      {!scoreRows && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl card-shadow p-16 flex flex-col items-center justify-center text-center"
-        >
-          <div className="w-20 h-20 rounded-full bg-blue-50 flex-center mb-4">
-            <FileEdit className="w-9 h-9 text-brand-primary" />
-          </div>
-          <h3 className="text-lg font-semibold text-text-nav mb-2">
-            No scores loaded yet
-          </h3>
-          <p className="text-sm text-text-muted max-w-md">
-            Fill in the filters above then click{" "}
-            <span className="font-semibold text-text-nav">Load Scores</span>
-            {" "} to get started
-          </p>
-        </motion.div>
-      )}
-
-      {scoreRows && (
-        <div className="flex flex-col gap-6 mt-6">
-          <ActiveFiltersBar
-            filters={[
-              { label: "SS 1 A" }, { label: "Mathematics" }, { label: "Exam (100 marks)" },
-              { label: "First Term" }, { label: "2025/2026" },
-            ]}
-          />
-          <ScoresTable
-            rows={scoreRows}
-            onSaveRow={handleSaveRow}
-            onSaveAll={handleSaveAll}
-            isSavingRow={saveScoreMutation.isPending}
-            isSavingAll={saveAllMutation.isPending}
-          />
-        </div>
-      )}
+      <ScoreFilterForm isLoading={query.isFetching} onLoad={handleLoad} />
+      {renderBody()}
     </div>
   );
 };
 
 export default ManageScoresPage;
-
