@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
-import logo from "@/assets/brand/schoolzy_logo.svg";
-import brandName from "@/assets/brand/schoolzy_brand_name.svg";
+import logo_sa from "@/assets/brand/schoolzy_logo_sa.svg";
 import { SA_PATHS } from "../config/saPaths";
 import { saNav, SA_APP_VERSION } from "../config/saNav";
 import SaSidebarItem from "./SaSidebarItem";
@@ -37,8 +36,7 @@ export default function SaSidebar({ onNavigate, className }: { onNavigate?: () =
       <div className="px-5 py-5.5 border-b border-sa-sidebar-border flex items-center gap-2.5">
         <Link to={SA_PATHS.dashboard} onClick={onNavigate} aria-label="Schoolzy platform console" className="block w-full">
           <span className="flex items-center gap-2">
-            <img src={logo} alt="" className="h-9 w-9 shrink-0" />
-            <img src={brandName} alt="schoolzy" className="h-6 brightness-0 invert" />
+            <img src={logo_sa} alt="schoolzy" className="h-7" />
           </span>
           <span className="mt-1 block text-[11px] font-semibold uppercase tracking-widest text-text-inverse-muted">
             Platform Console
