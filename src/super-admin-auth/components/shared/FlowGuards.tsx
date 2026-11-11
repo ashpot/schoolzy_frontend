@@ -20,3 +20,6 @@ export function RequireResetToken() {
 export function RedirectIfAuthenticated() {
   return tokenStorage.get() ? <Navigate to={SA_ROUTES.dashboard} replace /> : <Outlet />;
 }
+export function RequireSuperAdmin() {
+  return tokenStorage.get() ? <Outlet /> : <Navigate to={SA_ROUTES.login} replace />;
+}

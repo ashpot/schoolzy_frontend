@@ -55,3 +55,13 @@ export const useSetNewPassword = () =>
       return { success: true };
     },
   });
+
+  export const useSuperAdminLogout = () =>
+  useMutation({
+    mutationFn: async () => {
+      // TODO: Replace with actual API call
+      // return api.post("/auth/signout/");
+      await new Promise((r) => setTimeout(r, 500));
+      return { success: true };
+    },
+  });

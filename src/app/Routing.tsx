@@ -1,7 +1,7 @@
 import { AnimatePresence } from "framer-motion";
-import { Route, Routes, useLocation } from "react-router";
+import { Navigate, Route, Routes, useLocation } from "react-router";
 import { ForgotPasswordPage, RegistrationSuccessPage, SigninPage, SignupPage } from "@/auth";
-import { AdminDashboardLayout, AuthLayout, DashboardLayout, OnboardingLayout, PublicLayout } from "./layouts";
+import { AdminDashboardLayout, AuthLayout, DashboardLayout, OnboardingLayout, PublicLayout, SuperAdminDashboardLayout } from "./layouts";
 import { CookiePolicyPage, LandingPage, PrivacyPolicyPage, TermsOfServicePage } from "@/landing";
 import { DashboardHome } from "@/usersDashboard/admin/features/dashboard";
 import { AdminsPage, ParentsPage, StudentsPage, TeachersPage } from "@/usersDashboard/admin/features/users";
@@ -40,7 +40,8 @@ import { OnboardingPage } from "@/usersDashboard/admin/features/onboarding";
 import GuestRoute from "@/shared/auth/GuestRoute";
 import ProtectedRoute from "@/shared/auth/ProtectedRoute";
 import SuperAdminAuthLayout from "./layouts/SuperAdminAuthLayout";
-import { RedirectIfAuthenticated, RequireEmail, RequireResetToken, SA_ROUTES, SuperAdminForgotPasswordPage, SuperAdminLoginPage, SuperAdminSetPasswordPage, SuperAdminVerifyCodePage } from "@/super-admin-auth";
+import { RedirectIfAuthenticated, RequireEmail, RequireResetToken, RequireSuperAdmin, SA_ROUTES, SuperAdminForgotPasswordPage, SuperAdminLoginPage, SuperAdminSetPasswordPage, SuperAdminVerifyCodePage } from "@/super-admin-auth";
+import { DashboardPage } from "@/usersDashboard/super-admin/features/dashboard";
 
 
 const AppRouter = () => {
@@ -84,6 +85,13 @@ const AppRouter = () => {
             <Route element={<RequireResetToken />}>
               <Route path={SA_ROUTES.setPassword} element={<SuperAdminSetPasswordPage />} />
             </Route>
+          </Route>
+        </Route>
+        <Route path="/super-admin" element={<Navigate to={SA_ROUTES.dashboard} replace />} />
+        <Route element={<RequireSuperAdmin />}>
+          <Route element={<SuperAdminDashboardLayout />}>
+            <Route path={SA_ROUTES.dashboard} element={<DashboardPage />} />
+            {/* more super-admin pages go here as they get built */}
           </Route>
         </Route>
 
