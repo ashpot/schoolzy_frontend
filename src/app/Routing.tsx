@@ -39,6 +39,8 @@ import ScrollToTop from "./ScrollToTop";
 import { OnboardingPage } from "@/usersDashboard/admin/features/onboarding";
 import GuestRoute from "@/shared/auth/GuestRoute";
 import ProtectedRoute from "@/shared/auth/ProtectedRoute";
+import SuperAdminAuthLayout from "./layouts/SuperAdminAuthLayout";
+import { RedirectIfAuthenticated, RequireEmail, RequireResetToken, SA_ROUTES, SuperAdminForgotPasswordPage, SuperAdminLoginPage, SuperAdminSetPasswordPage, SuperAdminVerifyCodePage } from "@/super-admin-auth";
 
 
 const AppRouter = () => {
@@ -70,6 +72,19 @@ const AppRouter = () => {
             <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
           </Route>
           <Route path="/auth/registration-success" element={<RegistrationSuccessPage />} />
+        </Route>
+
+        <Route element={<SuperAdminAuthLayout />}>
+          <Route element={<RedirectIfAuthenticated />}>
+            <Route path={SA_ROUTES.login} element={<SuperAdminLoginPage />} />
+            <Route path={SA_ROUTES.forgotPassword} element={<SuperAdminForgotPasswordPage />} />
+            <Route element={<RequireEmail />}>
+              <Route path={SA_ROUTES.verifyCode} element={<SuperAdminVerifyCodePage />} />
+            </Route>
+            <Route element={<RequireResetToken />}>
+              <Route path={SA_ROUTES.setPassword} element={<SuperAdminSetPasswordPage />} />
+            </Route>
+          </Route>
         </Route>
 
         <Route element={<OnboardingLayout />}>
