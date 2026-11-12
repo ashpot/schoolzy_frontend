@@ -1,12 +1,14 @@
 export interface SuperAdminUser {
-  id: number;
-  fullname: string;
+  uuid: string;
   email: string;
-  role: "SuperAdmin";
+  first_name: string;
+  last_name: string;
+  role: "SUPER_ADMIN";
 }
 
 export interface LoginResponse {
   success: boolean;
+  message?: string;
   token: string;
   user: SuperAdminUser;
 }

@@ -3,3 +3,4 @@ export {default as AuthLayout} from "@/app/layouts/AuthLayout"
 export {default as DashboardLayout} from "@/app/layouts/DashboardLayout"
 export {default as AdminDashboardLayout} from "@/app/layouts/AdminDashboardLayout"
 export { default as OnboardingLayout } from "./OnboardingLayout";
+export { default as SuperAdminDashboardLayout } from "./SuperAdminDashboardLayout";

@@ -1,6 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import logo from "@/assets/brand/schoolzy_logo.svg";
-import brandName from "@/assets/brand/schoolzy_brand_name.svg";
+import logo_sa_auth from "@/assets/brand/schoolzy_logo_sa_auth.svg";
 import { SA_ROUTES } from "../../utils/constants";
 import { resetFlow } from "../../utils/resetFlow";
 
@@ -16,8 +15,7 @@ export default function AuthHeader() {
         className="flex flex-col gap-1"
       >
         <span className="flex items-center gap-2">
-          <img src={logo} alt="" className="h-10 w-10" />
-          <img src={brandName} alt="schoolzy" className="h-7" />
+          <img src={logo_sa_auth} alt="schoolzy" className="h-7" />
         </span>
         <span className="text-xs font-semibold uppercase tracking-widest text-text-secondary">
           Platform Console
