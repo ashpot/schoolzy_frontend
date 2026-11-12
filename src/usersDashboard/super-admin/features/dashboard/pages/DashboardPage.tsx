@@ -34,7 +34,7 @@ export default function DashboardPage() {
         <PlatformActivity items={data.activity} />
         <UpcomingRenewals renewals={data.renewals} />
         <div className="space-y-6">
-          <SystemHealth metrics={data.health} />
+          <SystemHealth metrics={data.health} status={data.healthStatus} />
           <QuickActions />
         </div>
       </div>

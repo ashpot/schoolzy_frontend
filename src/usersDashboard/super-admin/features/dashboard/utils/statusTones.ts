@@ -1,22 +1,32 @@
 import type { Tone } from "@/usersDashboard/super-admin/shared/utils/tones";
-import type { Plan, SchoolStatus, PaymentStatus } from "../types";
 
 export const RENEWAL_URGENT_DAYS = 7;
 
-export const planTone: Record<Plan, Tone> = {
-  Premium: "blue",
-  Standard: "green",
-  Basic: "gray",
+const planMap: Record<string, Tone> = {
+  premium: "blue",
+  standard: "green",
+  basic: "gray",
 };
 
-export const schoolStatusTone: Record<SchoolStatus, Tone> = {
-  Active: "green",
-  Trial: "amber",
-  Suspended: "red",
+const schoolStatusMap: Record<string, Tone> = {
+  active: "green",
+  trial: "amber",
+  provisioning: "amber",
+  pending: "amber",
+  suspended: "red",
 };
 
-export const paymentStatusTone: Record<PaymentStatus, Tone> = {
-  Paid: "green",
-  Pending: "amber",
-  Failed: "red",
+const paymentStatusMap: Record<string, Tone> = {
+  paid: "green",
+  success: "green",
+  successful: "green",
+  pending: "amber",
+  failed: "red",
 };
+
+// Unknown values fall back to grey so a new backend status never breaks the UI.
+const lookup = (map: Record<string, Tone>, key: string): Tone => map[key.toLowerCase()] ?? "gray";
+
+export const planTone = (plan: string) => lookup(planMap, plan);
+export const schoolStatusTone = (status: string) => lookup(schoolStatusMap, status);
+export const paymentStatusTone = (status: string) => lookup(paymentStatusMap, status);

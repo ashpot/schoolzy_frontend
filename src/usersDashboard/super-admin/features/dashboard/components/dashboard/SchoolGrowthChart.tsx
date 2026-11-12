@@ -5,21 +5,19 @@ import { CHART, axisTick, tooltipStyle } from "../../utils/chartTheme";
 import type { ChartPoint } from "../../types";
 
 export default function SchoolGrowthChart({ data }: { data: ChartPoint[] }) {
-  const last = data.length - 1;
-
   return (
     <SectionCard
       title="School Growth"
-      subtitle="Cumulative registered schools per month"
+      subtitle="New schools registered per month"
       action={<StatusBadge label={String(new Date().getFullYear())} tone="purple" />}
     >
-      <div className="h-[280px]" role="img" aria-label="Bar chart of cumulative registered schools per month">
+      <div className="h-[280px]" role="img" aria-label="Bar chart of new schools registered per month">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 10, right: 16, left: -8, bottom: 0 }}>
             <XAxis dataKey="label" tickLine={false} axisLine={false} tick={axisTick} />
             <YAxis
-              domain={[160, 250]}
-              ticks={[160, 200, 240]}
+              domain={[0, (max: number) => Math.max(max, 5)]}
+              allowDecimals={false}
               tickLine={false}
               axisLine={false}
               tick={axisTick}
@@ -28,11 +26,11 @@ export default function SchoolGrowthChart({ data }: { data: ChartPoint[] }) {
             <Tooltip
               contentStyle={tooltipStyle}
               cursor={{ fill: CHART.cursor }}
-              formatter={(v) => [v, "Schools"]}
+              formatter={(v) => [v, "New schools"]}
             />
-            <Bar dataKey="value" radius={[6, 6, 0, 0]} barSize={36}>
-              {data.map((_, i) => (
-                <Cell key={i} fill={i === last ? CHART.primary : CHART.primarySoft} />
+            <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={28}>
+              {data.map((p) => (
+                <Cell key={p.label} fill={p.highlight ? CHART.primary : CHART.primarySoft} />
               ))}
             </Bar>
           </BarChart>

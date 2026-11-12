@@ -7,7 +7,8 @@ import SubmitButton from "@/shared/ui/SubmitButton";
 import { loginSchema, type LoginValues } from "../../schemas";
 import { useSuperAdminLogin } from "../../hooks/useSuperAdminAuth";
 import { useCountdown } from "../../hooks/useCountdown";
-import { tokenStorage } from "../../utils/tokenStorage";
+import { tokenStorage, userStorage } from "../../utils/tokenStorage";
+import { ApiError } from "../../api";
 import { SA_ROUTES, MAX_ATTEMPTS, LOCKOUT_SECONDS } from "../../utils/constants";
 
 export default function LoginForm() {
@@ -34,11 +35,18 @@ export default function LoginForm() {
     mutation.mutate(values, {
       onSuccess: (res) => {
         tokenStorage.save(res.token, values.remember);
+        userStorage.save(res.user, values.remember);
         navigate(SA_ROUTES.dashboard, { replace: true });
       },
-      onError: () => {
-        // Generic message: never reveal which field was wrong.
+      onError: (err) => {
         reset({ email: values.email, password: "", remember: values.remember });
+        const status = err instanceof ApiError ? err.status : 0;
+
+        // Network and server problems aren't the user's fault: don't count them toward lockout.
+        if (status === 0) return setFormError("Network error. Check your connection.");
+        if (status >= 500) return setFormError("Something went wrong on our side. Please try again.");
+
+        // Generic on purpose: never reveal which field was wrong.
         setFormError("Invalid email or password.");
         const next = failed + 1;
         if (next >= MAX_ATTEMPTS) {
@@ -89,9 +97,7 @@ export default function LoginForm() {
 
         {(formError || lock.isActive) && (
           <p role="alert" className="text-sm text-danger">
-            {lock.isActive
-              ? `Too many attempts. Try again in ${lock.seconds}s.`
-              : formError}
+            {lock.isActive ? `Too many attempts. Try again in ${lock.seconds}s.` : formError}
           </p>
         )}
 
