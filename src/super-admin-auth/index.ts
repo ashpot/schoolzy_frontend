@@ -14,5 +14,5 @@ export { authPanels } from "./data/authPanels";
 export { SA_ROUTES } from "./utils/constants";
 export { useSuperAdminLogout } from "./hooks/useSuperAdminAuth";
 export { tokenStorage, userStorage } from "./utils/tokenStorage";
-export { apiFetch, ApiError } from "./api";
+export { apiFetch, ApiError } from "./apiClient";
 export { debugLog } from "./utils/debug";

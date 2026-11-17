@@ -3,6 +3,7 @@ import { SA_ROUTES } from "@/super-admin-auth";
 export const SA_PATHS = {
   dashboard: SA_ROUTES.dashboard,
   schools: "/super-admin/schools",
+  schoolDetail: (id: string) => `/super-admin/schools/${id}`,
   pendingSchools: "/super-admin/schools/pending",
   suspendedSchools: "/super-admin/schools/suspended",
   students: "/super-admin/users/students",

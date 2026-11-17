@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
-import { apiFetch, ApiError } from "../api";
+import { apiFetch, ApiError } from "../apiClient";
+import { SA_AUTH_ENDPOINTS } from "../api";
 import type {
   LoginValues,
   ForgotPasswordValues,
@@ -13,7 +14,7 @@ import type { LoginResponse } from "../types";
 export const useSuperAdminLogin = () =>
   useMutation({
     mutationFn: async ({ email, password }: LoginValues): Promise<LoginResponse> => {
-      const res = await apiFetch<LoginResponse>("/platform/auth/login/", {
+      const res = await apiFetch<LoginResponse>(SA_AUTH_ENDPOINTS.LOGIN, {
         method: "POST",
         body: { email, password },
         auth: false,
@@ -28,8 +29,7 @@ export const useSuperAdminLogin = () =>
 
 export const useSuperAdminLogout = () =>
   useMutation({
-    mutationFn: () =>
-      apiFetch<{ success: boolean }>("/platform/auth/logout/", { method: "POST" }),
+    mutationFn: () => apiFetch<{ success: boolean }>(SA_AUTH_ENDPOINTS.LOGOUT, { method: "POST" }),
   });
 
 // ───────────── STILL MOCKED (endpoints not ready) ─────────────
@@ -40,7 +40,7 @@ export const useForgotPassword = () =>
   useMutation({
     mutationFn: async (payload: ForgotPasswordValues) => {
       // TODO: Replace with actual API call
-      // return apiFetch("/platform/auth/forgot-password/", { method: "POST", body: payload, auth: false });
+      // return apiFetch(SA_AUTH_ENDPOINTS.FORGOT_PASSWORD, { method: "POST", body: payload, auth: false });
       await new Promise((r) => setTimeout(r, 1000));
       return { success: true, email: payload.email };
     },
@@ -48,10 +48,9 @@ export const useForgotPassword = () =>
 
 export const useVerifyResetCode = () =>
   useMutation({
-    // @ts-ignore
-    mutationFn: async (payload: VerifyCodeValues & { email: string }) => {
-      // TODO: Replace with actual API call
-      // return apiFetch("/platform/auth/verify-code/", { method: "POST", body: payload, auth: false });
+    mutationFn: async (_payload: VerifyCodeValues & { email: string }) => {
+      // TODO: Replace with actual API call (rename _payload to payload when you use it)
+      // return apiFetch(SA_AUTH_ENDPOINTS.VERIFY_CODE, { method: "POST", body: payload, auth: false });
       await new Promise((r) => setTimeout(r, 1000));
       return { success: true, resetToken: "mock-reset-token" };
     },
@@ -59,13 +58,12 @@ export const useVerifyResetCode = () =>
 
 export const useSetNewPassword = () =>
   useMutation({
-    // @ts-ignore
-    mutationFn: async (payload: {
+    mutationFn: async (_payload: {
       password: SetPasswordValues["password"];
       resetToken: string;
     }) => {
-      // TODO: Replace with actual API call
-      // return apiFetch("/platform/auth/reset-password/", { method: "POST", body: payload, auth: false });
+      // TODO: Replace with actual API call (rename _payload to payload when you use it)
+      // return apiFetch(SA_AUTH_ENDPOINTS.RESET_PASSWORD, { method: "POST", body: payload, auth: false });
       await new Promise((r) => setTimeout(r, 1000));
       return { success: true };
     },

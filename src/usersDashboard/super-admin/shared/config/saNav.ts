@@ -36,10 +36,19 @@ export const saNav: SaNavItem[] = [
   { label: "Audit Logs", icon: ClipboardList, to: SA_PATHS.auditLogs, chevron: true },
 ];
 
+const schoolsMeta: SaPageMeta = { title: "Schools", subtitle: "Manage registered schools." };
+
 // Header title/subtitle per route. Add one line per new page as it gets built.
 const pageMeta: Record<string, SaPageMeta> = {
   [SA_PATHS.dashboard]: { title: "Dashboard", subtitle: "Platform Overview" },
+  [SA_PATHS.schools]: schoolsMeta,
+  [SA_PATHS.pendingSchools]: { title: "Pending Schools", subtitle: "Schools awaiting approval." },
+  [SA_PATHS.suspendedSchools]: { title: "Suspended Schools", subtitle: "Schools with restricted access." },
 };
 
-export const getSaPageMeta = (pathname: string): SaPageMeta =>
-  pageMeta[pathname] ?? { title: "Platform Console", subtitle: "Schoolzy" };
+export const getSaPageMeta = (pathname: string): SaPageMeta => {
+  if (pageMeta[pathname]) return pageMeta[pathname];
+  // school detail pages (/super-admin/schools/:id)
+  if (pathname.startsWith(`${SA_PATHS.schools}/`)) return schoolsMeta;
+  return { title: "Platform Console", subtitle: "Schoolzy" };
+};
