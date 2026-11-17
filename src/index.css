@@ -29,8 +29,56 @@
   --color-bg-dark: hsla(222, 47%, 11%, 1);
   --color-text-inverse-muted: hsla(220, 14%, 75%, 1);
 
+  /* ───────────── SUPER ADMIN ───────────── */
 
+  /* sidebar (platform console) */
+  --color-sa-sidebar-active: hsla(214, 58%, 18%, 1);
+  --color-sa-sidebar-border: hsla(222, 25%, 20%, 1);
+  --color-sa-sidebar-footer: hsla(226, 30%, 16%, 1);
 
+  /* surfaces */
+  --color-sa-overlay: hsla(222, 47%, 11%, 0.5);
+  --color-sa-row-hover: hsla(220, 20%, 98%, 1);
+
+  /* tones: soft = tinted background · line = tinted border · text = label text · icon = glyph / solid fill */
+  --color-sa-blue-soft: hsla(214, 100%, 97%, 1);
+  --color-sa-blue-line: hsla(214, 95%, 90%, 1);
+  --color-sa-blue-text: hsla(224, 76%, 40%, 1);
+  --color-sa-blue-icon: hsla(217, 91%, 55%, 1);
+
+  --color-sa-green-soft: hsla(138, 76%, 96%, 1);
+  --color-sa-green-line: hsla(141, 79%, 85%, 1);
+  --color-sa-green-text: hsla(142, 72%, 29%, 1);
+  --color-sa-green-icon: hsla(142, 71%, 40%, 1);
+
+  --color-sa-amber-soft: hsla(48, 100%, 95%, 1);
+  --color-sa-amber-line: hsla(46, 92%, 82%, 1);
+  --color-sa-amber-text: hsla(32, 95%, 36%, 1);
+  --color-sa-amber-icon: hsla(38, 92%, 48%, 1);
+
+  --color-sa-red-soft: hsla(0, 86%, 97%, 1);
+  --color-sa-red-line: hsla(0, 93%, 92%, 1);
+  --color-sa-red-text: hsla(0, 72%, 48%, 1);
+  --color-sa-red-icon: hsla(0, 84%, 60%, 1);
+
+  --color-sa-gray-soft: hsla(220, 14%, 96%, 1);
+  --color-sa-gray-line: hsla(220, 13%, 89%, 1);
+  --color-sa-gray-text: hsla(220, 9%, 46%, 1);
+  --color-sa-gray-icon: hsla(220, 9%, 52%, 1);
+
+  --color-sa-purple-soft: hsla(270, 100%, 97%, 1);
+  --color-sa-purple-line: hsla(269, 100%, 93%, 1);
+  --color-sa-purple-text: hsla(263, 70%, 46%, 1);
+  --color-sa-purple-icon: hsla(262, 83%, 58%, 1);
+
+  /* school avatar tiles */
+  --color-sa-avatar-green: hsla(145, 63%, 32%, 1);
+  --color-sa-avatar-amber: hsla(32, 95%, 44%, 1);
+  --color-sa-avatar-purple: hsla(263, 70%, 50%, 1);
+  --color-sa-avatar-blue: hsla(205, 83%, 45%, 1);
+  --color-sa-avatar-red: hsla(0, 72%, 51%, 1);
+  --color-sa-avatar-teal: hsla(174, 72%, 36%, 1);
+  --color-sa-avatar-pink: hsla(335, 78%, 42%, 1);
 
   /* fonts */
   --font-lato: "Lato", sans-serif;
@@ -68,6 +116,9 @@
 }
 @utility card-shadow{
   @apply shadow-[0_2px_12px_0_hsla(215,50%,23%,0.08)];
+}
+@utility sa-menu-shadow{
+  @apply shadow-[0_8px_30px_0_hsla(215,50%,23%,0.16)];
 }
 @utility flex-center{
   @apply flex items-center justify-center;

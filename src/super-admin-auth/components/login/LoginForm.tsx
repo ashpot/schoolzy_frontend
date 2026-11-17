@@ -8,7 +8,7 @@ import { loginSchema, type LoginValues } from "../../schemas";
 import { useSuperAdminLogin } from "../../hooks/useSuperAdminAuth";
 import { useCountdown } from "../../hooks/useCountdown";
 import { tokenStorage, userStorage } from "../../utils/tokenStorage";
-import { ApiError } from "../../api";
+import { ApiError } from "../../apiClient";
 import { SA_ROUTES, MAX_ATTEMPTS, LOCKOUT_SECONDS } from "../../utils/constants";
 
 export default function LoginForm() {

@@ -52,6 +52,8 @@ import {
   SuperAdminVerifyCodePage,
 } from "@/super-admin-auth";
 import { DashboardPage as SuperAdminDashboardPage } from "@/usersDashboard/super-admin/features/dashboard";
+import { PendingSchoolsPage, SchoolDetailPage, SchoolsPage, SuspendedSchoolsPage } from "@/usersDashboard/super-admin/features/schools";
+import { SA_PATHS } from "@/usersDashboard/super-admin/shared/config/saPaths";
 
 
 const AppRouter = () => {
@@ -108,6 +110,10 @@ const AppRouter = () => {
         <Route element={<RequireSuperAdmin />}>
           <Route element={<SuperAdminDashboardLayout />}>
             <Route path={SA_ROUTES.dashboard} element={<SuperAdminDashboardPage />} />
+            <Route path={SA_PATHS.schools} element={<SchoolsPage />} />
+            <Route path={SA_PATHS.pendingSchools} element={<PendingSchoolsPage />} />
+            <Route path={SA_PATHS.suspendedSchools} element={<SuspendedSchoolsPage />} />
+            <Route path={SA_PATHS.schoolDetail(":schoolId")} element={<SchoolDetailPage />} />
             {/* more super-admin pages go here as they get built */}
           </Route>
         </Route>
