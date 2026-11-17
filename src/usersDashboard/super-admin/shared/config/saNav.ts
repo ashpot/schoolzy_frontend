@@ -42,8 +42,8 @@ const schoolsMeta: SaPageMeta = { title: "Schools", subtitle: "Manage registered
 const pageMeta: Record<string, SaPageMeta> = {
   [SA_PATHS.dashboard]: { title: "Dashboard", subtitle: "Platform Overview" },
   [SA_PATHS.schools]: schoolsMeta,
-  [SA_PATHS.pendingSchools]: { title: "Pending Schools", subtitle: "Schools awaiting approval." },
-  [SA_PATHS.suspendedSchools]: { title: "Suspended Schools", subtitle: "Schools with restricted access." },
+  [SA_PATHS.pendingSchools]: { title: "Pending Schools", subtitle: "Review schools awaiting approval." },
+  [SA_PATHS.suspendedSchools]: { title: "Suspended Schools", subtitle: "Manage schools that have been temporarily disabled." },
 };
 
 export const getSaPageMeta = (pathname: string): SaPageMeta => {
