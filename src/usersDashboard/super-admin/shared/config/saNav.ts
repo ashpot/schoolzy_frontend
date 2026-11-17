@@ -18,12 +18,12 @@ export const saNav: SaNavItem[] = [
     ],
   },
   {
-    label: "Users", icon: Users, to: SA_PATHS.students,
+    label: "Users", icon: Users, to: SA_PATHS.schoolAdmins,
     children: [
-      { label: "Students", to: SA_PATHS.students },
+      { label: "School Admin", to: SA_PATHS.schoolAdmins },
+      { label: "Teacher", to: SA_PATHS.teachers },
       { label: "Parents", to: SA_PATHS.parents },
-      { label: "Teachers", to: SA_PATHS.teachers },
-      { label: "School Admins", to: SA_PATHS.schoolAdmins },
+      { label: "Students", to: SA_PATHS.students },
     ],
   },
   // TODO: add children once the dropdown designs for these are available
@@ -44,6 +44,10 @@ const pageMeta: Record<string, SaPageMeta> = {
   [SA_PATHS.schools]: schoolsMeta,
   [SA_PATHS.pendingSchools]: { title: "Pending Schools", subtitle: "Review schools awaiting approval." },
   [SA_PATHS.suspendedSchools]: { title: "Suspended Schools", subtitle: "Manage schools that have been temporarily disabled." },
+  [SA_PATHS.schoolAdmins]: { title: "School Administrators", subtitle: "Manage administrators across all schools." },
+  [SA_PATHS.teachers]: { title: "Teachers", subtitle: "View and monitor teachers across every school." },
+  [SA_PATHS.parents]: { title: "Parents", subtitle: "Manage parent accounts across the platform." },
+  [SA_PATHS.students]: { title: "Students", subtitle: "View students across all registered schools." },
 };
 
 export const getSaPageMeta = (pathname: string): SaPageMeta => {

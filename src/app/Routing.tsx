@@ -53,6 +53,12 @@ import {
 } from "@/super-admin-auth";
 import { DashboardPage as SuperAdminDashboardPage } from "@/usersDashboard/super-admin/features/dashboard";
 import { PendingSchoolsPage, SchoolDetailPage, SchoolsPage, SuspendedSchoolsPage } from "@/usersDashboard/super-admin/features/schools";
+import {
+  SchoolAdminsPage,
+  TeachersPage as SaTeachersPage,
+  ParentsPage as SaParentsPage,
+  StudentsPage as SaStudentsPage,
+} from "@/usersDashboard/super-admin/features/users";
 import { SA_PATHS } from "@/usersDashboard/super-admin/shared/config/saPaths";
 
 
@@ -110,10 +116,19 @@ const AppRouter = () => {
         <Route element={<RequireSuperAdmin />}>
           <Route element={<SuperAdminDashboardLayout />}>
             <Route path={SA_ROUTES.dashboard} element={<SuperAdminDashboardPage />} />
+
+            {/* Schools */}
             <Route path={SA_PATHS.schools} element={<SchoolsPage />} />
             <Route path={SA_PATHS.pendingSchools} element={<PendingSchoolsPage />} />
             <Route path={SA_PATHS.suspendedSchools} element={<SuspendedSchoolsPage />} />
             <Route path={SA_PATHS.schoolDetail(":schoolId")} element={<SchoolDetailPage />} />
+
+            {/* Users */}
+            <Route path={SA_PATHS.schoolAdmins} element={<SchoolAdminsPage />} />
+            <Route path={SA_PATHS.teachers} element={<SaTeachersPage />} />
+            <Route path={SA_PATHS.parents} element={<SaParentsPage />} />
+            <Route path={SA_PATHS.students} element={<SaStudentsPage />} />
+
             {/* more super-admin pages go here as they get built */}
           </Route>
         </Route>
