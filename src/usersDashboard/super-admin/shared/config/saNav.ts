@@ -26,8 +26,15 @@ export const saNav: SaNavItem[] = [
       { label: "Students", to: SA_PATHS.students },
     ],
   },
+  {
+    label: "Subscriptions", icon: CreditCard, to: SA_PATHS.subscriptions,
+    children: [
+      { label: "Plans", to: SA_PATHS.subscriptions },
+      { label: "Active Subscriptions", to: SA_PATHS.activeSubscriptions },
+      { label: "Renewal", to: SA_PATHS.renewals },
+    ],
+  },
   // TODO: add children once the dropdown designs for these are available
-  { label: "Subscriptions", icon: CreditCard, to: SA_PATHS.subscriptions, chevron: true },
   { label: "Payments", icon: Banknote, to: SA_PATHS.payments, chevron: true },
   { label: "Analytics", icon: LineChart, to: SA_PATHS.analytics, chevron: true },
   { label: "Support", icon: Headphones, to: SA_PATHS.support, chevron: true },
@@ -48,6 +55,9 @@ const pageMeta: Record<string, SaPageMeta> = {
   [SA_PATHS.teachers]: { title: "Teachers", subtitle: "View and monitor teachers across every school." },
   [SA_PATHS.parents]: { title: "Parents", subtitle: "Manage parent accounts across the platform." },
   [SA_PATHS.students]: { title: "Students", subtitle: "View students across all registered schools." },
+  [SA_PATHS.subscriptions]: { title: "Plans", subtitle: "Create and manage pricing plans available to schools." },
+  [SA_PATHS.activeSubscriptions]: { title: "Active Subscriptions", subtitle: "Monitor every school's current subscription." },
+  [SA_PATHS.renewals]: { title: "Renewals", subtitle: "Track upcoming and overdue subscription renewals." },
 };
 
 export const getSaPageMeta = (pathname: string): SaPageMeta => {

@@ -10,8 +10,10 @@ export const SA_PATHS = {
   parents: "/super-admin/users/parents",
   teachers: "/super-admin/users/teachers",
   schoolAdmins: "/super-admin/users/school-admins",
-  subscriptions: "/super-admin/subscriptions",
-  newSubscriptionPlan: "/super-admin/subscriptions/new",
+  subscriptions: "/super-admin/subscriptions", // Plans page
+  newSubscriptionPlan: "/super-admin/subscriptions?create=1", // Plans page with the create modal open
+  activeSubscriptions: "/super-admin/subscriptions/active",
+  renewals: "/super-admin/subscriptions/renewals",
   payments: "/super-admin/payments",
   analytics: "/super-admin/analytics",
   support: "/super-admin/support",
