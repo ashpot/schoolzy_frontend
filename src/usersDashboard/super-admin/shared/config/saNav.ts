@@ -34,9 +34,22 @@ export const saNav: SaNavItem[] = [
       { label: "Renewal", to: SA_PATHS.renewals },
     ],
   },
+  {
+    label: "Payments", icon: Banknote, to: SA_PATHS.payments,
+    children: [
+      { label: "Transactions", to: SA_PATHS.payments },
+      { label: "Invoices", to: SA_PATHS.invoices },
+    ],
+  },
+  {
+    label: "Analytics", icon: LineChart, to: SA_PATHS.analytics,
+    children: [
+      { label: "Platform Analytics", to: SA_PATHS.analytics },
+      { label: "Revenue", to: SA_PATHS.analyticsRevenue }, // TODO: page not built yet
+      { label: "School Growth", to: SA_PATHS.analyticsGrowth }, // TODO: page not built yet
+    ],
+  },
   // TODO: add children once the dropdown designs for these are available
-  { label: "Payments", icon: Banknote, to: SA_PATHS.payments, chevron: true },
-  { label: "Analytics", icon: LineChart, to: SA_PATHS.analytics, chevron: true },
   { label: "Support", icon: Headphones, to: SA_PATHS.support, chevron: true },
   { label: "Content Management", icon: FileText, to: SA_PATHS.content, chevron: true },
   { label: "Settings", icon: Settings, to: SA_PATHS.settings, chevron: true },
@@ -58,6 +71,9 @@ const pageMeta: Record<string, SaPageMeta> = {
   [SA_PATHS.subscriptions]: { title: "Plans", subtitle: "Create and manage pricing plans available to schools." },
   [SA_PATHS.activeSubscriptions]: { title: "Active Subscriptions", subtitle: "Monitor every school's current subscription." },
   [SA_PATHS.renewals]: { title: "Renewals", subtitle: "Track upcoming and overdue subscription renewals." },
+  [SA_PATHS.payments]: { title: "Transactions", subtitle: "Monitor every payment processed across the Schoolzy platform." },
+  [SA_PATHS.invoices]: { title: "Invoices", subtitle: "Create, manage and track invoices issued to schools." },
+  [SA_PATHS.analytics]: { title: "Platform Analytics", subtitle: "Monitor overall platform usage and operational health." },
 };
 
 export const getSaPageMeta = (pathname: string): SaPageMeta => {

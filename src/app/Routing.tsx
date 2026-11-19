@@ -60,6 +60,8 @@ import {
   StudentsPage as SaStudentsPage,
 } from "@/usersDashboard/super-admin/features/users";
 import { ActiveSubscriptionsPage, PlansPage, RenewalsPage } from "@/usersDashboard/super-admin/features/subscriptions";
+import { InvoicesPage, TransactionsPage } from "@/usersDashboard/super-admin/features/payments";
+import { AnalyticsPage } from "@/usersDashboard/super-admin/features/analytics";
 import { SA_PATHS } from "@/usersDashboard/super-admin/shared/config/saPaths";
 
 
@@ -134,6 +136,13 @@ const AppRouter = () => {
             <Route path={SA_PATHS.subscriptions} element={<PlansPage />} />
             <Route path={SA_PATHS.activeSubscriptions} element={<ActiveSubscriptionsPage />} />
             <Route path={SA_PATHS.renewals} element={<RenewalsPage />} />
+
+            {/* Payments */}
+            <Route path={SA_PATHS.payments} element={<TransactionsPage />} />
+            <Route path={SA_PATHS.invoices} element={<InvoicesPage />} />
+
+            {/* Analytics */}
+            <Route path={SA_PATHS.analytics} element={<AnalyticsPage />} />
 
             {/* more super-admin pages go here as they get built */}
           </Route>
