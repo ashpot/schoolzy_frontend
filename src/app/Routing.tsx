@@ -53,6 +53,16 @@ import {
 } from "@/super-admin-auth";
 import { DashboardPage as SuperAdminDashboardPage } from "@/usersDashboard/super-admin/features/dashboard";
 import { PendingSchoolsPage, SchoolDetailPage, SchoolsPage, SuspendedSchoolsPage } from "@/usersDashboard/super-admin/features/schools";
+import {
+  SchoolAdminsPage,
+  TeachersPage as SaTeachersPage,
+  ParentsPage as SaParentsPage,
+  StudentsPage as SaStudentsPage,
+} from "@/usersDashboard/super-admin/features/users";
+import { ActiveSubscriptionsPage, PlansPage, RenewalsPage } from "@/usersDashboard/super-admin/features/subscriptions";
+import { InvoicesPage, TransactionsPage } from "@/usersDashboard/super-admin/features/payments";
+import { AnalyticsPage, GrowthPage, RevenuePage } from "@/usersDashboard/super-admin/features/analytics";
+import { MessagesPage, TicketDetailPage, TicketsPage } from "@/usersDashboard/super-admin/features/support";
 import { SA_PATHS } from "@/usersDashboard/super-admin/shared/config/saPaths";
 
 
@@ -110,10 +120,38 @@ const AppRouter = () => {
         <Route element={<RequireSuperAdmin />}>
           <Route element={<SuperAdminDashboardLayout />}>
             <Route path={SA_ROUTES.dashboard} element={<SuperAdminDashboardPage />} />
+
+            {/* Schools */}
             <Route path={SA_PATHS.schools} element={<SchoolsPage />} />
             <Route path={SA_PATHS.pendingSchools} element={<PendingSchoolsPage />} />
             <Route path={SA_PATHS.suspendedSchools} element={<SuspendedSchoolsPage />} />
             <Route path={SA_PATHS.schoolDetail(":schoolId")} element={<SchoolDetailPage />} />
+
+            {/* Users */}
+            <Route path={SA_PATHS.schoolAdmins} element={<SchoolAdminsPage />} />
+            <Route path={SA_PATHS.teachers} element={<SaTeachersPage />} />
+            <Route path={SA_PATHS.parents} element={<SaParentsPage />} />
+            <Route path={SA_PATHS.students} element={<SaStudentsPage />} />
+
+            {/* Subscriptions */}
+            <Route path={SA_PATHS.subscriptions} element={<PlansPage />} />
+            <Route path={SA_PATHS.activeSubscriptions} element={<ActiveSubscriptionsPage />} />
+            <Route path={SA_PATHS.renewals} element={<RenewalsPage />} />
+
+            {/* Payments */}
+            <Route path={SA_PATHS.payments} element={<TransactionsPage />} />
+            <Route path={SA_PATHS.invoices} element={<InvoicesPage />} />
+
+            {/* Analytics */}
+            <Route path={SA_PATHS.analytics} element={<AnalyticsPage />} />
+            <Route path={SA_PATHS.analyticsRevenue} element={<RevenuePage />} />
+            <Route path={SA_PATHS.analyticsGrowth} element={<GrowthPage />} />
+
+            {/* Support */}
+            <Route path={SA_PATHS.support} element={<TicketsPage />} />
+            <Route path={SA_PATHS.ticketDetail(":ticketId")} element={<TicketDetailPage />} />
+            <Route path={SA_PATHS.messages} element={<MessagesPage />} />
+
             {/* more super-admin pages go here as they get built */}
           </Route>
         </Route>
