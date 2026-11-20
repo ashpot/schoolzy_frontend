@@ -61,7 +61,8 @@ import {
 } from "@/usersDashboard/super-admin/features/users";
 import { ActiveSubscriptionsPage, PlansPage, RenewalsPage } from "@/usersDashboard/super-admin/features/subscriptions";
 import { InvoicesPage, TransactionsPage } from "@/usersDashboard/super-admin/features/payments";
-import { AnalyticsPage } from "@/usersDashboard/super-admin/features/analytics";
+import { AnalyticsPage, GrowthPage, RevenuePage } from "@/usersDashboard/super-admin/features/analytics";
+import { MessagesPage, TicketDetailPage, TicketsPage } from "@/usersDashboard/super-admin/features/support";
 import { SA_PATHS } from "@/usersDashboard/super-admin/shared/config/saPaths";
 
 
@@ -143,6 +144,13 @@ const AppRouter = () => {
 
             {/* Analytics */}
             <Route path={SA_PATHS.analytics} element={<AnalyticsPage />} />
+            <Route path={SA_PATHS.analyticsRevenue} element={<RevenuePage />} />
+            <Route path={SA_PATHS.analyticsGrowth} element={<GrowthPage />} />
+
+            {/* Support */}
+            <Route path={SA_PATHS.support} element={<TicketsPage />} />
+            <Route path={SA_PATHS.ticketDetail(":ticketId")} element={<TicketDetailPage />} />
+            <Route path={SA_PATHS.messages} element={<MessagesPage />} />
 
             {/* more super-admin pages go here as they get built */}
           </Route>

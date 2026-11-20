@@ -19,9 +19,9 @@ export const SA_PATHS = {
   analytics: "/super-admin/analytics", // Platform Analytics page
   analyticsRevenue: "/super-admin/analytics/revenue",
   analyticsGrowth: "/super-admin/analytics/school-growth",
-  support: "/super-admin/support",
-  content: "/super-admin/content",
-  announcements: "/super-admin/content/announcements",
+  support: "/super-admin/support", // Tickets page
+  ticketDetail: (id: string) => `/super-admin/support/tickets/${id}`,
+  messages: "/super-admin/support/messages",
   settings: "/super-admin/settings",
   auditLogs: "/super-admin/audit-logs",
 } as const;
