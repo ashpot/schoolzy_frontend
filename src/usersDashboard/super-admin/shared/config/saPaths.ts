@@ -10,13 +10,18 @@ export const SA_PATHS = {
   parents: "/super-admin/users/parents",
   teachers: "/super-admin/users/teachers",
   schoolAdmins: "/super-admin/users/school-admins",
-  subscriptions: "/super-admin/subscriptions",
-  newSubscriptionPlan: "/super-admin/subscriptions/new",
-  payments: "/super-admin/payments",
-  analytics: "/super-admin/analytics",
-  support: "/super-admin/support",
-  content: "/super-admin/content",
-  announcements: "/super-admin/content/announcements",
+  subscriptions: "/super-admin/subscriptions", // Plans page
+  newSubscriptionPlan: "/super-admin/subscriptions?create=1",
+  activeSubscriptions: "/super-admin/subscriptions/active",
+  renewals: "/super-admin/subscriptions/renewals",
+  payments: "/super-admin/payments", // Transactions page
+  invoices: "/super-admin/payments/invoices",
+  analytics: "/super-admin/analytics", // Platform Analytics page
+  analyticsRevenue: "/super-admin/analytics/revenue",
+  analyticsGrowth: "/super-admin/analytics/school-growth",
+  support: "/super-admin/support", // Tickets page
+  ticketDetail: (id: string) => `/super-admin/support/tickets/${id}`,
+  messages: "/super-admin/support/messages",
   settings: "/super-admin/settings",
   auditLogs: "/super-admin/audit-logs",
 } as const;
