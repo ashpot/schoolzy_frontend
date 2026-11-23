@@ -22,6 +22,9 @@ export const SA_PATHS = {
   support: "/super-admin/support", // Tickets page
   ticketDetail: (id: string) => `/super-admin/support/tickets/${id}`,
   messages: "/super-admin/support/messages",
-  settings: "/super-admin/settings",
+  settings: "/super-admin/settings", // Platform Settings page
+  settingsGateways: "/super-admin/settings/gateways",
+  settingsComms: "/super-admin/settings/email-sms",
+  settingsRoles: "/super-admin/settings/roles",
   auditLogs: "/super-admin/audit-logs",
 } as const;
