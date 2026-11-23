@@ -52,8 +52,6 @@ const SchoolDetailsStep: React.FC<SchoolDetailsStepProps> = ({
           isLoading={isLoading}
           {...register("schoolName")}
         />
-
-        <div className="space-y-1">
           <FormInput
             label="School Web Address"
             placeholder="your-school-name"
@@ -61,10 +59,6 @@ const SchoolDetailsStep: React.FC<SchoolDetailsStepProps> = ({
             isLoading={isLoading}
             {...register("schoolSlug", { onChange: () => setSlugTouched(true) })}
           />
-          <p className="text-xs text-text-muted">
-            yourschool.schoolzy.com.ng. You can change this later in settings
-          </p>
-        </div>
 
         <LocationFields form={form} isLoading={isLoading} />
 
