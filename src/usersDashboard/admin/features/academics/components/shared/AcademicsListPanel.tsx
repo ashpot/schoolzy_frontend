@@ -79,7 +79,7 @@ function AcademicsListPanel<T extends { id: string }>({
 
       {/* Table */}
       <div className="overflow-x-auto whitespace-nowrap">
-        <table className="min-w-max text-sm font-lato">
+        <table className="w-full min-w-max text-sm font-lato">
           <thead>
             <tr className="border-b border-border-line02 bg-border-line02/40">
               {columns.map((col) => (
