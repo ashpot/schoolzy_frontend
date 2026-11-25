@@ -29,9 +29,9 @@ const UserPageHeader: React.FC<UserPageHeaderProps> = ({
           onClick={onBulkUpload}
           whileHover={{ scale: 1.02, y: -1 }}
           whileTap={{ scale: 0.97 }}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border-line02 bg-white text-text-nav text-sm font-lato font-medium hover:bg-bg-soft transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-brand-primary bg-white text-brand-primary text-sm font-lato font-medium hover:bg-bg-soft transition-colors"
         >
-          <Upload className="w-4 h-4" />
+          <Upload className="w-4 h-4 text-brand-primary" />
           Bulk Upload
         </motion.button>
       )}
