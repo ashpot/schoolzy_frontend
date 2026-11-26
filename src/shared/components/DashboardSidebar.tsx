@@ -1,17 +1,11 @@
 import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { cn } from "@/shared/utils/cn";
 import type { NavItem } from "@/shared/types/navigation";
 import brandLogo from "@/assets/brand/schoolzy_logo.svg";
 const school_details = JSON.parse(localStorage.getItem("school_details") || "{}");
-
-const UserAvatar = ({ initials }: { initials: string }) => (
-  <div className="w-9 h-9 rounded-full bg-brand-primary flex items-center justify-center text-white text-sm font-semibold shrink-0">
-    {initials}
-  </div>
-);
 
 interface DashboardSidebarProps {
   navItems: NavItem[];
@@ -22,21 +16,8 @@ interface DashboardSidebarProps {
 
 const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   navItems,
-  userName = "Ben Uche",
-  roleLabel = "Admin",
   className,
 }) => {
-  const user = JSON.parse(localStorage.getItem("schoolzy_user") || "{}");
-const name = user.fullname?.trim() || userName?.trim() || "User";
-const role = user.role || roleLabel
-const initials = name
-  .split(" ")
-  .filter(Boolean)
-  .slice(0, 2)
-  .map((n: string) => n[0])
-  .join("")
-  .toUpperCase();
-
   return (
     <aside
       className={cn(
@@ -67,23 +48,10 @@ const initials = name
 
       {/* Footer */}
       <div className="border-t border-border-line02 p-3">
-        <div className="flex items-center gap-3 px-2 py-1">
-          <UserAvatar initials={initials} />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-text-primary truncate capitalize">
-              {name}
-            </p>
-            <p className="text-xs text-text-muted">{role}</p>
-          </div>
-          <ChevronRight className="w-4 h-4 text-text-muted shrink-0" />
+        <div className="rounded-xl bg-brand-primary/10 px-4 py-3">
+          <p className="text-sm text-text-muted">© 2026 Schoolzy</p>
+          <p className="mt-1.5 text-sm font-medium text-text-primary">v2.1.0</p>
         </div>
-      </div>
-
-      {/* Version */}
-      <div className="px-5 py-3 border-t border-border-line02">
-        <p className="text-xs text-text-muted">
-          © 2026 Schoolzy <span className="ml-2">v2.1.0</span>
-        </p>
       </div>
     </aside>
   );

@@ -56,9 +56,16 @@ export const saNav: SaNavItem[] = [
       { label: "Messages", to: SA_PATHS.messages },
     ],
   },
-  // TODO: add children once the dropdown designs for these are available
-  { label: "Settings", icon: Settings, to: SA_PATHS.settings, chevron: true },
-  { label: "Audit Logs", icon: ClipboardList, to: SA_PATHS.auditLogs, chevron: true },
+  {
+    label: "Settings", icon: Settings, to: SA_PATHS.settings,
+    children: [
+      { label: "Platform Settings", to: SA_PATHS.settings },
+      { label: "Payment Gateways", to: SA_PATHS.settingsGateways },
+      { label: "Email & SMS", to: SA_PATHS.settingsComms },
+      { label: "Roles & Permission", to: SA_PATHS.settingsRoles },
+    ],
+  },
+  { label: "Audit Logs", icon: ClipboardList, to: SA_PATHS.auditLogs },
 ];
 
 const schoolsMeta: SaPageMeta = { title: "Schools", subtitle: "Manage registered schools." };
@@ -84,6 +91,11 @@ const pageMeta: Record<string, SaPageMeta> = {
   [SA_PATHS.analyticsGrowth]: { title: "School Growth", subtitle: "Understand customer acquisition and platform adoption." },
   [SA_PATHS.support]: ticketsMeta,
   [SA_PATHS.messages]: { title: "Messages", subtitle: "Communicate directly with school administrators." },
+  [SA_PATHS.settings]: { title: "Platform Settings", subtitle: "Configure global platform preferences and operational settings." },
+  [SA_PATHS.settingsGateways]: { title: "Payment Gateways", subtitle: "Configure payment providers used across Schoolzy." },
+  [SA_PATHS.settingsComms]: { title: "Email & SMS", subtitle: "Configure communication services for the platform." },
+  [SA_PATHS.settingsRoles]: { title: "Roles & Permissions", subtitle: "Manage platform access levels for Schoolzy staff." },
+  [SA_PATHS.auditLogs]: { title: "Audit Logs", subtitle: "Track system activities and administrative actions across the platform." },
 };
 
 export const getSaPageMeta = (pathname: string): SaPageMeta => {

@@ -65,3 +65,12 @@ export const listContainer: Variants = {
     transition: { staggerChildren: 0.055 },
   },
 };
+
+export const iconPop: Variants = {
+  hidden: { scale: 0.6, opacity: 0 },
+  show: {
+    scale: 1,
+    opacity: 1,
+    transition: { delay: 0.2, duration: 0.35, ease: "backOut" },
+  },
+};
